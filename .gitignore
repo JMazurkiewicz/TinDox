@@ -1,0 +1,11 @@
+.exe
+.obj
+
+.o
+.out
+
+build/
+build[xX]/
+
+.vs*
+
