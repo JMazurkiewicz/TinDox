@@ -1,11 +1,12 @@
-.exe
-.obj
-
+# Binary files
 .o
 .out
+.obj
+.exe
 
-build/
-build[xX]/
+# Build directories
+[Bb]uild/
+[Bb]uild[Xx]/
 
-.vs*
-
+# IDE files
+.vs*/

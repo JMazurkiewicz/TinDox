@@ -9,8 +9,27 @@ on:
 jobs:
   project:
     name: Build TIN project
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        build_type: [Debug, Release]
+
+    defaults:
+      run:
+        shell: bash
 
     steps:
-    - name: Init
-      run: echo Init
+    - uses: actions/checkout@v2
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+
+    - name: Build project
+      run: cmake --build build --config ${{matrix.build_type}}
+
+    - name: Run tests
+      run: |
+        cd build
+        ctest -C ${{matrix.build_type}}
