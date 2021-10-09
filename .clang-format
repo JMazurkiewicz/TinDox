@@ -43,7 +43,14 @@ EmptyLineAfterAccessModifier: Never
 EmptyLineBeforeAccessModifier: LogicalBlock
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
-IncludeBlocks:   Preserve
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^\"[A-Za-z]+\.(h|hpp)\"$'
+    Priority: 1
+  - Regex: '^<[a-z]+>$'
+    Priority: 2
+  - Regex: '^<[a-z]+\.h>$'
+    Priority: 3
 IndentAccessModifiers: false
 IndentCaseLabels: false
 IndentCaseBlocks: false
