@@ -14,7 +14,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        compiler: [g++-11]
+        c_compiler: [gcc-11]
+        cxx_compiler: [g++-11]
         build_type: [Debug, Release]
 
     defaults:
@@ -24,12 +25,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install C++ compiler
-      run: sudo apt install ${{matrix.compiler}}
+    - name: Install compilers
+      run: sudo apt install ${{matrix.c_compiler}} ${{matrix.cxx_compiler}}
 
     - name: Configure CMake
       env:
-        CXX: ${{matrix.compiler}}
+        CC: ${{matrix.c_compiler}}
+        CXX: ${{matrix.cxx_compiler}}
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
 
     - name: Build project
