@@ -13,3 +13,10 @@ cmake --build build
 cd build
 ctest .
 ```
+
+## Team
+
+* Jakub Mazurkiewicz ([@JMazurkiewicz](https://github.com/JMazurkiewicz))
+* Damian Piotrowski ([@dam1508](https://github.com/dam1508))
+* Anna Pyrka ([@](https://github.com/))
+* Łukasz Reszka ([@](https://github.com/))
