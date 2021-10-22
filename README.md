@@ -1,5 +1,7 @@
 # Unnamed TIN project
 
+[![CI](https://github.com/JMazurkiewicz/TIN-projekt/actions/workflows/ci.yaml/badge.svg)](https://github.com/JMazurkiewicz/TIN-projekt/actions/workflows/ci.yaml)
+
 ## Building with `CMake`
 
 ```bash
