@@ -1,0 +1,4 @@
+# Help GitHub with detecting C++ sources
+*.h linguist-language=C++
+*.hpp linguist-language=C++
+*.cpp linguist-language=C++
