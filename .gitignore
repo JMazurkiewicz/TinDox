@@ -5,8 +5,20 @@
 .exe
 
 # Build directories
-[Bb]uild/
-[Bb]uild[Xx]/
+/[Bb]uild*/
 
-# IDE files
+# Visual Studio [Code] files
 .vs*/
+/out/
+*.sln
+*.vcxproj*
+
+# CLion directories
+.idea/
+cmake-build-*/
+
+# Code::Blocks files
+*.layout
+*.depend
+/bin/
+/obj/
