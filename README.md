@@ -1,15 +1,20 @@
-# Unnamed TIN project
+# Network file system
 
 [![CI](https://github.com/JMazurkiewicz/TIN-projekt/actions/workflows/ci.yaml/badge.svg)](https://github.com/JMazurkiewicz/TIN-projekt/actions/workflows/ci.yaml)
 
-## Building with `CMake`
+## Get and build
 
 ```bash
+# Clone repository
+git clone https://github.com/JMazurkiewicz/TIN-project.git
+cd TIN-project
+
+# Build with CMake
 cmake -B build
 cmake --build build
 ```
 
-## Testing with `CTest`
+## Run tests
 
 ```bash
 cd build
