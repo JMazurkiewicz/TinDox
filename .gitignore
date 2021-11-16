@@ -1,11 +1,24 @@
-.exe
-.obj
-
+# Binary files
 .o
 .out
+.obj
+.exe
 
-build/
-build[xX]/
+# Build directories
+/[Bb]uild*/
 
-.vs*
+# Visual Studio [Code] files
+.vs*/
+/out/
+*.sln
+*.vcxproj*
 
+# CLion directories
+.idea/
+cmake-build-*/
+
+# Code::Blocks files
+*.layout
+*.depend
+/bin/
+/obj/
