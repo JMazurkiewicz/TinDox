@@ -2,16 +2,11 @@ name: "Documentation"
 
 on:
   push:
-    branches:
-    - 'main'
-    - '*docs*'
-    paths:
-    - 'docs-pl/**'
+    branches: [main]
+    paths: ['docs-pl/*.tex']
   pull_request:
-    branches:
-    - 'main'
-    paths:
-    - 'docs-pl/**'
+    branches: [main]
+    paths: ['docs-pl/*.tex']
 
 jobs:
   docs:
