@@ -1,0 +1,41 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage[T1]{fontenc}
+
+% Kropki w spisie treści:
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+% Linki w spisie treści:
+\usepackage[hidelinks]{hyperref}
+
+% Do wstawiania cytatów:
+\newcommand{\quotes}[1]{``#1''}
+
+\usepackage{makecell}
+
+\title{
+    Techniki internetowe \\
+    \large Dokumentacja projektu \quotes{Sieciowy system plików}
+}
+
+\author{
+    \begin{tabular}{p{6em}p{6em}p{6em}p{6em}}
+        \makecell{Jakub \\ Mazurkiewicz} &
+        \makecell{Damian \\ Piotrowski} &
+        \makecell{Anna \\ Pyrka} &
+        \makecell{Łukasz \\ Reszka}
+    \end{tabular}
+}
+\date{Semestr 21Z}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\pagebreak
+
+\section{Zadanie}
+
+\end{document}
