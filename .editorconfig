@@ -6,10 +6,12 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{h,c,hpp,cpp,cmake},CMakeLists.txt]
+# Indentation for C++, Kotlin, CMake
+[*.{hpp,cpp,cmake,kt},CMakeLists.txt]
 indent_style = space
 indent_size = 4
 
+# Indentation for YAML
 [*.yaml,.clang-*]
 indent_style = space
 indent_size = 2
