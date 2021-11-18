@@ -1,9 +1,5 @@
 # Global owners
 * @JMazurkiewicz @dam1508 @annapyrka @LukaszReszka
 
-# Workflows and GitHub configuration files
-.github/** @JMazurkiewicz
-
-# C++ configuration
-.clang-* @JMazurkiewicz
-CMakeLists.txt @JMazurkiewicz
+# Workflows
+.github/workflows/** @JMazurkiewicz
