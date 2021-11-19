@@ -19,4 +19,5 @@ jobs:
     - name: Build documentation
       uses: xu-cheng/latex-action@v2
       with:
-        root_file: docs-pl/documentation.tex
+        root_file: docs-pl/*.tex
+        glob_root_file: true
