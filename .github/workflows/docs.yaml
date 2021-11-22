@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-      uses: xu-cheng/latex-action@v2
+    - uses: xu-cheng/latex-action@v2
       with:
         root_file: docs-pl/src/*.tex
         glob_root_file: true
