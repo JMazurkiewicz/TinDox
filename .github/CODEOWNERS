@@ -1,1 +1,11 @@
+# Global owners
 * @JMazurkiewicz @dam1508 @annapyrka @LukaszReszka
+
+# Workflows
+.github/workflows/ @JMazurkiewicz
+
+# Projects
+/server/ @JMazurkiewicz
+/mobile/ @dam1508
+/desktop/ @annapyrka
+/cli/ @LukaszReszka
