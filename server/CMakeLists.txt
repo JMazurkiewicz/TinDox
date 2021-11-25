@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
-project("TinDox Server" LANGUAGES CXX VERSION 0.0.1)
-
 if(NOT UNIX OR APPLE)
     message(FATAL_ERROR "This project is only support by Linux OS.")
 endif()
 
+project("TinDox Server" LANGUAGES CXX VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
@@ -25,7 +24,7 @@ set(
     src/main.cpp
 )
 add_executable(tds ${TDS_SOURCES})
-target_link_libraries(tds tds-dev)
+target_link_libraries(tds PUBLIC tds-dev)
 
 if(TDS_TESTING)
     find_package(Catch2 REQUIRED)
