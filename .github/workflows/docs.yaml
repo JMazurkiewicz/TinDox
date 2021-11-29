@@ -3,10 +3,10 @@ name: Documentation
 on:
   push:
     branches: [main]
-    paths: ['docs-pl/src/*.tex']
+    paths: ['docs-pl/src/**']
   pull_request:
     branches: [main]
-    paths: ['docs-pl/src/*.tex']
+    paths: ['docs-pl/src/**']
 
 jobs:
   docs:
