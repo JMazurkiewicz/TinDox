@@ -44,7 +44,7 @@ TDP to protokół komunikacyjny typu serwer--klient wykorzystujący protokół s
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=1.001\textwidth]{img/session.png}
+\includegraphics[width=1.001\textwidth]{./img/session.png}
 \caption{\label{fig:session.png}Schemat sesji inspirowany protokołem FTP.}
 \end{figure}
 \FloatBarrier
@@ -63,7 +63,7 @@ Komunikaty w protokole wymieniane są za pośrednictwem połączenia głównego 
 \subsection{Metoda autoryzacji}
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.6\textwidth]{img/auth.png}
+\includegraphics[width=0.6\textwidth]{./img/auth.png}
 \caption{\label{fig:auth.png}Schemat autoryzacji}
 \end{figure}
 \FloatBarrier
@@ -96,7 +96,7 @@ Od momentu podania nazwy nowego katalogu jest ona już \quotes{zajęta}, w przyp
         \item Serwer tworzy plik o podanej nazwie w odpowiednim katalogu,
         \item Serwer wysyła do klienta potwierdzenie utworzenia nowego pliku.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny -- próba utworzenia w \quotes{folderze klienta} pliku o tej samej nazwie co inny plik:
     \begin{enumerate}
         \item Kroki 1 -- 2 scenariusza głównego,
@@ -113,13 +113,13 @@ Od momentu podania nazwy nowego katalogu jest ona już \quotes{zajęta}, w przyp
         \item Serwer sprawdza, czy w katalogu do usunięcia ktoś się znajduje lub czy plik do usunięcia jest aktualnie pobierany,
         \item Jeśli nie, to serwer usuwa katalog (lub plik) i wysyła potwierdzenie usunięcia do klienta.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny I -- w katalogu do usunięcia ktoś się znajduje lub plik do usunięcia jest pobierany:
     \begin{enumerate}
         \item Kroki 1 -- 3 scenariusza głównego,
         \item Serwer wysyła do klienta odmowę wykonania operacji.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny II -- próba usunięcia nieistniejącego pliku lub katalogu:
     \begin{enumerate}
         \item Kroki 1 -- 2 scenariusza głównego,
@@ -137,7 +137,7 @@ Od momentu podania nazwy nowego katalogu jest ona już \quotes{zajęta}, w przyp
         \item Jeśli jest to katalog, serwer sprawdza, czy aktualnie ktoś się w nim znajduje,
         \item Jeśli nie, serwer zmienia nazwę danego pliku lub katalogu i wysyła potwierdzenie do klienta.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny I -- istnieje już plik lub katalog o tej samej nazwie:
     \begin{enumerate}
         \item Kroki 1 -- 2 scenariusza głównego,
@@ -149,7 +149,7 @@ Od momentu podania nazwy nowego katalogu jest ona już \quotes{zajęta}, w przyp
         \item Kroki 1 -- 3 scenariusza głównego,
         \item Serwer wysyła do klienta odmowę zmiany nazwy.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny III -- próba zmiany nazwy katalogu w którym ktoś się znajduje:
     \begin{enumerate}
         \item Kroki 1 -- 4 scenariusza głównego,
@@ -166,20 +166,20 @@ Od momentu podania nazwy nowego katalogu jest ona już \quotes{zajęta}, w przyp
         \item Serwer sprawdza, czy w danym katalogu istnieje już plik o danej nazwie,
         \item Jeśli nie, serwer kopiuje plik do podanego katalogu.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny I -- plik który chcemy skopiować jest w katalogu, w którym obecnie się nie znajdujemy:
     \begin{enumerate}
         \item Kroki 1  scenariusza głównego,
         \item Serwer wysyła do klienta odmowę skopiowania pliku.
     \end{enumerate}
-    
-    
+
+
     \item Scenariusz alternatywny II -- próba skopiowania pliku do katalogu, który nie istnieje:
     \begin{enumerate}
         \item Kroki 1 -- 2 scenariusza głównego,
         \item Serwer tworzy katalog o podanej nazwie, a następnie kopiuje do niego plik.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny III -- próba skopiowania pliku w miejsce gdzie istnieje już inny o tej samej nazwie:
     \begin{enumerate}
         \item Kroki 1 -- 3 scenariusza głównego,
@@ -201,26 +201,26 @@ Od momentu podania nazwy nowego katalogu jest ona już \quotes{zajęta}, w przyp
         \item Aplikacja klienta zmienia nazwę pliku częściowego na docelową,
         \item Utworzone wcześniej dodatkowe połączenie TCP nie jest zamykane od razu -- istnieje możliwość wykorzystania go do kolejnych pobrań (lub ładowań).
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny I - odmowa pobierania:
     \begin{enumerate}
         \item Krok 1 scenariusza głównego,
         \item Klient otrzymuje odmowę pobierania pliku -- użytkownik dostaje informację o niepowodzeniu operacji.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny II -- dodatkowe połączenie TCP z serwerem zostało wcześniej zestawione:
     \begin{enumerate}
         \item Kroki 1 -- 2 scenariusza głównego,
         \item Dodatkowe połączenie już istnieje -- serwer i klient będą je wykorzystywać do przesyłania danych,
         \item Kroki 4 -- 8 scenariusza głównego.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny III -- dodatkowe połączenie TCP nie mogło zostać zestawione:
     \begin{enumerate}
         \item Kroki 1 -- 2 scenariusza głównego,
         \item Dodatkowe połączenie nie mogło zostać zestawione -- użytkownik dostaje informację o niepowodzeniu operacji.
     \end{enumerate}
-    
+
     \item \textbf{Scenariusz alternatywny IV -- przerwanie połączenia z siecią w trakcie pobierania pliku}:
     \begin{enumerate}
         \item Kroki 1 -- 4 scenariusza głównego,
@@ -238,7 +238,7 @@ Od momentu podania nazwy nowego katalogu jest ona już \quotes{zajęta}, w przyp
                 \item Serwer, po zweryfikowaniu że taka operacja faktycznie miała wcześniej miejsce, wyraża zgodę na ponowienie,
                 \item Kroki 3 -- 8 scenariusza głównego.
             \end{enumerate}
-            
+
             \item Użytkownik kończy operację pobierania pliku:
             \begin{enumerate}
                 \item Aplikacja klienta wysyła informację o tym, że pobieranie nie będzie ponawiane,
@@ -262,32 +262,32 @@ Od momentu podania nazwy nowego katalogu jest ona już \quotes{zajęta}, w przyp
         \item Serwer zmienia nazwę pliku częściowego na docelową,
         \item Utworzone wcześniej dodatkowe połączenie TCP nie jest zamykane od razu -- istnieje możliwość wykorzystania go do kolejnych ładowań (lub pobrań).
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny I - odmowa ładowania:
     \begin{enumerate}
         \item Krok 1 scenariusza głównego,
         \item Klient otrzymuje odmowę ładowania pliku -- użytkownik dostaje informację o niepowodzeniu operacji.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny II -- dodatkowe połączenie TCP z serwerem zostało wcześniej zestawione:
     \begin{enumerate}
         \item Kroki 1 -- 2 scenariusza głównego,
         \item Dodatkowe połączenie już istnieje -- serwer i klient będą je wykorzystywać do przesyłania danych,
         \item Kroki 4 -- 8 scenariusza głównego.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny III -- dodatkowe połączenie TCP nie mogło zostać zestawione:
     \begin{enumerate}
         \item Kroki 1 -- 2 scenariusza głównego,
         \item Dodatkowe połączenie nie mogło zostać zestawione -- użytkownik dostaje informację o niepowodzeniu operacji.
     \end{enumerate}
-    
+
     \item Scenariusz alternatywny IV -- klient wysłał nieprawidłowy fragment pliku:
     \begin{enumerate}
         \item Kroki 1 -- 4 scenariusza głównego,
         \item Klient wysłał nieprawidłowy fragment pliku -- serwer wysyła informację o błędzie i kończy operację. Nie zamyka on jednak zestawionego połączenia TCP -- może być wykorzystane później.
     \end{enumerate}
-    
+
     \item \textbf{Scenariusz alternatywny V -- przerwanie połączenia z siecią w trakcie ładowania pliku}:
     \begin{enumerate}
         \item Kroki 1 -- 4 scenariusza głównego,
@@ -305,7 +305,7 @@ Od momentu podania nazwy nowego katalogu jest ona już \quotes{zajęta}, w przyp
                 \item Serwer, po zweryfikowaniu że taka operacja faktycznie miała wcześniej miejsce, wyraża zgodę na ponowienie,
                 \item Kroki 3 -- 8 scenariusza głównego.
             \end{enumerate}
-            
+
             \item Użytkownik kończy operację ładowania pliku:
             \begin{enumerate}
                 \item Aplikacja klienta wysyła informację o tym, że ładowanie nie będzie ponawiane,
@@ -364,7 +364,7 @@ Przy pobieraniu lub ładowaniu plików na serwer dane przesyłane są w małych 
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.6\textwidth]{img/packet.png}
+\includegraphics[width=0.6\textwidth]{./img/packet.png}
 \caption{\label{fig:packet.png}Pakiet używany przy pobieraniu lub ładowaniu}
 \end{figure}
 \FloatBarrier
@@ -404,9 +404,9 @@ Przy pobieraniu lub ładowaniu plików na serwer dane przesyłane są w małych 
         \item Możliwość wyboru maksymalnej ilości wątków używanych przez serwer (domyślnie będzie to wartość zwracana przez funkcję z języka \texttt{C++} -- \texttt{std::thread::hardware\_concurrency()}),
         \item Możliwość wyboru maksymalnej ilości klientów w sesji.
     \end{itemize}
-    
+
     \item Wydajność -- serwer powinien sprawnie obsługiwać wiele żądań jednocześnie przy wykorzystaniu optymalnej ilości zasobów systemu operacyjnego.
-    
+
     \item Bezpieczeństwo -- serwer powinien być odporny na złośliwe zapytania. Oznacza to, że w aplikacji nie wystąpią podatności takie jak np. \href{https://en.wikipedia.org/wiki/Arbitrary_code_execution}{RCE}.
 \end{enumerate}
 
@@ -436,7 +436,7 @@ Przy pobieraniu lub ładowaniu plików na serwer dane przesyłane są w małych 
             \hline
             Automatyzacja testów & \texttt{CTest} & \makecell{3.18.4} \\
             \hline
-            Testy jednostkowe & \texttt{Catch2} & 3.0.0 \\ 
+            Testy jednostkowe & \texttt{Catch2} & 3.0.0 \\
             \hline
             Obsługa formatu TOML & \texttt{\href{https://github.com/marzer/tomlplusplus}{@marzer/tomlplusplus}} & 2.5.0 \\
             \hline
@@ -471,7 +471,7 @@ Połączenie z serwerem za pomocą klienta w aplikacji mobilnej zaimplementowane
 \section{Klient okienkowy}
 
 \subsection{Opis klienta}
-Połączenie z serwerem realizowane przez klienta okienkowego zaimplementowanego z użyciem języka Java i klasy Socket, która reprezentuje gniazda klienckie. Po uruchomieniu klient podejmie próbę połączenia z serwerem. W przypadku udanego połączenia aplikacja umożliwi interakcję ze zdalnym systemem plików.  
+Połączenie z serwerem realizowane przez klienta okienkowego zaimplementowanego z użyciem języka Java i klasy Socket, która reprezentuje gniazda klienckie. Po uruchomieniu klient podejmie próbę połączenia z serwerem. W przypadku udanego połączenia aplikacja umożliwi interakcję ze zdalnym systemem plików.
 
 \subsection{Narzędzia i biblioteki}
 \bgroup
@@ -484,7 +484,7 @@ Połączenie z serwerem realizowane przez klienta okienkowego zaimplementowanego
             \hline
             Kompilator & \texttt{javac} \\
             \hline
-            Testy jednostkowe & \texttt{JUnit}  \\ 
+            Testy jednostkowe & \texttt{JUnit}  \\
             \hline
             System budowania & \texttt{Gradle}  \\
         \end{tabular}
