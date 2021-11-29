@@ -19,5 +19,5 @@ jobs:
     - uses: xu-cheng/latex-action@v2
       with:
         working_directory: docs-pl/src
-        root_file: docs-pl/src/*.tex
+        root_file: *.tex
         glob_root_file: true
