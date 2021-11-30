@@ -3,5 +3,5 @@
 #include <iostream>
 
 int main() {
-    std::cout << tin::hello() << '\n';
+    std::cout << tds::hello() << '\n';
 }

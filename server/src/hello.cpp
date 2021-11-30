@@ -1,5 +1,7 @@
 #include "hello.hpp"
 
-std::string_view tin::hello() {
-    return "Hello TinDox!";
+namespace tds {
+    std::string_view hello() {
+        return "Hello TinDox!";
+    }
 }

@@ -2,6 +2,6 @@
 
 #include "hello.hpp"
 
-TEST_CASE("tin::hello()", "[tin.dummy]") {
-    REQUIRE(tin::hello() == "Hello TinDox!");
+TEST_CASE("tds::hello()", "[tin.dummy]") {
+    REQUIRE(tds::hello() == "Hello TinDox!");
 }

@@ -2,6 +2,6 @@
 
 #include <string_view>
 
-namespace tin {
+namespace tds {
     std::string_view hello();
 }
