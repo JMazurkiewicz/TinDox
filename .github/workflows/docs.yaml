@@ -23,5 +23,5 @@ jobs:
       env:
         NAME: ${{matrix.doctype}}-documentation
       with:
-        root_file: '$NAME.tex'
-        working_directory: 'docs-pl/src/$NAME'
+        root_file: $NAME.tex
+        working_directory: docs-pl/src/$NAME
