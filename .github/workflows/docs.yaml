@@ -8,7 +8,7 @@ on:
 
 jobs:
   docs:
-    name: Build LaTeX documentation
+    name: Build ${{matrix.doctype}} documentation
     runs-on: ${{matrix.os}}
 
     strategy:
