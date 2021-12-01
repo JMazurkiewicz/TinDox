@@ -7,7 +7,7 @@ execute_process(
 )
 
 if(NOT GIT_SUBMODULE_RESULT EQUAL "0")
-    message(FATAL_ERROR "Getting submodule 'Catch2' failed with: '${GIT_SUBMODULE_RESULT}'.")
+    message(FATAL_ERROR "Updating submodule 'Catch2' failed with: '${GIT_SUBMODULE_RESULT}'.")
 endif()
 
 set(CATCH2_PATH ${PROJECT_SOURCE_DIR}/extern/Catch2)
