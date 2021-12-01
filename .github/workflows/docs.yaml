@@ -19,9 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: dante-ev/latex-action@latest
-      env:
-        NAME: ${{matrix.doctype}}-documentation
+    - uses: xu-cheng/latex-action@v2
       with:
-        root_file: $NAME.tex
-        working_directory: docs-pl/src/$NAME
+        root_file: ${{matrix.doctype}}.tex
+        working_directory: docs-pl/src/${{matrix.doctype}}
