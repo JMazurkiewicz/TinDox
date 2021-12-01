@@ -1,0 +1,15 @@
+# Binary files
+*.a
+*.o
+*.out
+
+# Build directories
+/build
+/build[0-9]
+
+# Visual Studio Code files
+.vs*
+/out
+
+# Clangd cache
+/.cache
