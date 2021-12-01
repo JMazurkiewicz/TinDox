@@ -1,0 +1,48 @@
+name: Server build
+
+on:
+  push:
+    branches: main
+    paths: 'server/**'
+  pull_request:
+    branches: main
+    paths: 'server/**'
+
+jobs:
+  server:
+    name: Build TinDox Server
+    runs-on: ${{matrix.os}}
+
+    strategy:
+      matrix:
+        os: ubuntu-20.04
+        cc: gcc-11
+        cxx: g++-11
+        build_type: [Debug, Release]
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install compilers
+      run: sudo apt install ${{matrix.cc}} ${{matrix.cxx}}
+
+    - name: Configure CMake
+      env:
+        CC: ${{matrix.cc}}
+        CXX: ${{matrix.cxx}}
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+          -DTDS_TESTING
+
+    - name: Build project
+      run: cmake --build build
+
+    - name: Run Catch2 tests
+      run: |
+        cd build
+        ctest
