@@ -1,23 +1,25 @@
-name: Documentation
+name: Test documentation
 
 on:
   push:
-    branches: [main]
     paths: ['docs-pl/src/**']
   pull_request:
-    branches: [main]
     paths: ['docs-pl/src/**']
 
 jobs:
   docs:
     name: Build LaTeX documentation
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
+
+    strategy:
+      matrix:
+        os: ubuntu-20.04
+        doctype: [preliminary]
 
     steps:
     - uses: actions/checkout@v2
 
-    - uses: xu-cheng/latex-action@v2
+    - uses: dante-ev/latex-action@latest
       with:
-        working_directory: docs-pl/src
-        root_file: '*.tex'
-        glob_root_file: true
+        root_file: '${{doctype}}-documentation.tex'
+        working_directory: 'docs-pl/src/${{doctype}}-documentation'
