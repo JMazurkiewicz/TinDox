@@ -27,7 +27,7 @@ add_executable(tds ${TDS_SOURCES})
 target_link_libraries(tds PUBLIC tds-dev)
 
 if(TDS_TESTING)
-    find_package(Catch2 REQUIRED)
+    find_package(Catch2 3 REQUIRED)
     include(CTest)
     include(Catch)
     enable_testing()
