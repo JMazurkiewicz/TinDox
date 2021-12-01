@@ -1,4 +1,3 @@
-Language: Cpp
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: Right
@@ -31,7 +30,7 @@ BreakInheritanceList: BeforeColon
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeComma
 BreakStringLiterals: true
-ColumnLimit:     80
+ColumnLimit: 80
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
@@ -45,20 +44,26 @@ ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
 IncludeBlocks: Regroup
 IncludeCategories:
-  - Regex: '^\"[A-Za-z]+\.(h|hpp)\"$'
+  # Catch2 headers
+  - Regex: '<catch2\/[a-z_]+\.hpp>'
     Priority: 1
-  - Regex: '^<[a-z]+>$'
+  # Project's headers
+  - Regex: '^\"[A-Za-z\/]+\.(h|hpp)\"$'
     Priority: 2
-  - Regex: '^<[a-z]+\.h>$'
+  # C++ standard headers
+  - Regex: '^<(experimental\/)?[a-z_]+>$'
     Priority: 3
+  # C and POSIX headers
+  - Regex: '^<[a-z_\/]+\.h>$'
+    Priority: 4
 IndentAccessModifiers: false
 IndentCaseLabels: false
 IndentCaseBlocks: false
 IndentGotoLabels: false
 IndentPPDirectives: AfterHash
 IndentExternBlock: Indent
-IndentRequires:  true
-IndentWidth:     4
+IndentRequires: true
+IndentWidth: 4
 IndentWrappedFunctionNames: true
 InsertTrailingCommas: None
 JavaScriptQuotes: Leave
@@ -82,9 +87,9 @@ PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 120
 PenaltyIndentedWhitespace: 0
 PointerAlignment: Left
-PPIndentWidth:   -1
+PPIndentWidth: -1
 ReferenceAlignment: Pointer
-ReflowComments:  true
+ReflowComments: true
 ShortNamespaceLines: 1
 SortIncludes: true
 SortJavaStaticImport: Before
@@ -114,7 +119,4 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SpaceBeforeSquareBrackets: false
 BitFieldColonSpacing: Both
-Standard: Latest
-TabWidth: 4
-UseCRLF: false
-UseTab: Never
+Standard: 20
