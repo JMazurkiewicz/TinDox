@@ -19,7 +19,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: docs-pl/src/${{matrix.doctype}}-documentation
 
     steps:
     - uses: actions/checkout@v2
@@ -27,3 +26,4 @@ jobs:
     - uses: xu-cheng/latex-action@v2
       with:
         root_file: ${{matrix.doctype}}-documentation.tex
+        working_directory: docs-pl/src/${{matrix.doctype}}-documentation
