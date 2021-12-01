@@ -20,6 +20,8 @@ jobs:
     - uses: actions/checkout@v2
 
     - uses: dante-ev/latex-action@latest
+      env:
+        NAME: ${{doctype}}-documentation
       with:
-        root_file: '${{doctype}}-documentation.tex'
-        working_directory: 'docs-pl/src/${{doctype}}-documentation'
+        root_file: '$NAME.tex'
+        working_directory: 'docs-pl/src/$NAME'
