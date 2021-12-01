@@ -12,4 +12,6 @@ cmake --build build
 ```bash
 cmake -B build -DTDS_TESTING=ON
 cmake --build build
+cd build
+ctest
 ```
