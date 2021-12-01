@@ -4,12 +4,13 @@
 *.out
 
 # Build directories
-/build
-/build[0-9]
+/[Bb]uild/
 
-# Visual Studio Code files
+# Visual Studio [Code] files
 .vs*
-/out
+/out/
+*.sln
+*.vcxproj*
 
 # Clangd cache
-/.cache
+/.cache/
