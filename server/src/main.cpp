@@ -1,7 +1,11 @@
-#include "tds/hello.hpp"
+#include "tds/cli/command_runner.hpp"
 
-#include <iostream>
+#include <cstdlib>
+#include <ios>
 
 int main() {
-    std::cout << tds::hello() << '\n';
+    std::ios_base::sync_with_stdio(false);
+    int exit_status = EXIT_SUCCESS;
+
+    return exit_status;
 }

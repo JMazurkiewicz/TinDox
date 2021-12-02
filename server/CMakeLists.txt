@@ -34,7 +34,7 @@ endif()
 set(
     TDS_DEV_SOURCES
 
-    src/hello.cpp
+    src/cli/a.cpp
 )
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
