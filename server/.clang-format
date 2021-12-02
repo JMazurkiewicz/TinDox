@@ -45,16 +45,16 @@ FixNamespaceComments: false
 IncludeBlocks: Regroup
 IncludeCategories:
   # Catch2 headers
-  - Regex: '<catch2\/[a-z_]+\.hpp>'
+  - Regex: '^<catch2\/[a-z_]+\.hpp>$'
     Priority: 1
   # Project's headers
-  - Regex: '^\"[A-Za-z\/]+\.(h|hpp)\"$'
+  - Regex: '^\"([a-z_]+(\/|\.hpp)?)+\"$'
     Priority: 2
   # C++ standard headers
   - Regex: '^<(experimental\/)?[a-z_]+>$'
     Priority: 3
   # C and POSIX headers
-  - Regex: '^<[a-z_\/]+\.h>$'
+  - Regex: '^<(sys\/)?[a-z_]+\.h>$'
     Priority: 4
 IndentAccessModifiers: false
 IndentCaseLabels: false
