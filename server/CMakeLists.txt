@@ -10,6 +10,21 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+find_package(tomlplusplus 2.5.0 QUIET)
+if(tomlplusplus_FOUND)
+    message(STATUS "Found tomlplusplus: ${tomlplusplus_DIR} (found version \"${tomlplusplus_VERSION}\")")
+else()
+    include(FetchContent)
+    set(FETCHCONTENT_QUIET OFF)
+
+    FetchContent_Declare(
+        tomlplusplus
+        GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+        GIT_TAG v2.5.0
+    )
+    FetchContent_MakeAvailable(tomlplusplus)
+endif()
+
 set(
     TDS_DEV_SOURCES
 
@@ -18,6 +33,7 @@ set(
 
 add_library(tds-dev ${TDS_DEV_SOURCES})
 target_include_directories(tds-dev PUBLIC include)
+target_link_libraries(tds-dev PRIVATE tomlplusplus::tomlplusplus)
 
 set(
     TDS_SOURCES
