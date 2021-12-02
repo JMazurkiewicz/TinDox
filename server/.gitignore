@@ -1,0 +1,16 @@
+# Binary files
+*.a
+*.o
+*.out
+
+# Build directories
+/[Bb]uild/
+
+# Visual Studio [Code] files
+/.vs*/
+/out/
+*.sln
+*.vcxproj*
+
+# Clangd cache
+/.cache/
