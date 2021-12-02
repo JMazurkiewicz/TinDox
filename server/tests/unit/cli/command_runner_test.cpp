@@ -69,5 +69,12 @@ TEST_CASE("tds::cli::command_runner", "[cli]") {
 
     SECTION("Run invalid command") {
         REQUIRE_THROWS_AS(runner.run("invalid", args), cli_error);
+
+        try {
+            runner.run("invalid", args);
+        } catch(const std::exception& e) {
+            const std::string expected = "tds: 'invalid' is not a tds command. See 'tds --help'.";
+            REQUIRE(e.what() == expected);
+        }
     }
 }

@@ -6,7 +6,7 @@
 
 namespace tds::cli {
     template<typename T>
-    concept command = requires(T& com, std::span<const std::string_view> args) {
+    concept command = std::default_initializable<T> && requires(T& com, std::span<const std::string_view> args) {
         { T::name() } -> std::convertible_to<std::string_view>;
         { com.execute(args) } -> std::same_as<void>;
     };
