@@ -7,7 +7,7 @@
 /[Bb]uild/
 
 # Visual Studio [Code] files
-.vs*
+/.vs*/
 /out/
 *.sln
 *.vcxproj*
