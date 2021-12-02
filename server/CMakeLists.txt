@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
-project("TinDox_Server" LANGUAGES CXX VERSION 0.0.1)
+project(
+    "TinDox_Server"
+    LANGUAGES CXX
+    VERSION 0.0.1
+    HOMEPAGE_URL https://github.com/JMazurkiewicz/TinDox/server
+    DESCRIPTION "TinDox Server"
+)
 
 if(NOT UNIX OR APPLE)
     message(FATAL_ERROR "This project is only supported by Linux OS.")
