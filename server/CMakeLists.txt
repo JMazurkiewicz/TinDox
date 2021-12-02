@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 project(
-    "TinDox_Server"
+    "TinDoxServer"
     LANGUAGES CXX
     VERSION 0.0.1
     HOMEPAGE_URL https://github.com/JMazurkiewicz/TinDox/server
@@ -37,7 +37,7 @@ set(
     src/hello.cpp
 )
 
-add_library(tds-dev ${TDS_DEV_SOURCES})
+add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
 target_include_directories(tds-dev PUBLIC include)
 target_link_libraries(tds-dev PRIVATE tomlplusplus::tomlplusplus)
 
