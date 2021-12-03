@@ -46,6 +46,10 @@ namespace tds::ip {
         return ntohs(m_port);
     }
 
+    bool Port::operator==(std::uint16_t port) const noexcept {
+        return m_port == port;
+    }
+
     std::ostream& operator<<(std::ostream& stream, Port port) {
         return stream << port_to_cstring(port);
     }

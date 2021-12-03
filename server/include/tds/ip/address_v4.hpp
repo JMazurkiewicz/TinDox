@@ -20,7 +20,7 @@ namespace tds::ip {
         std::span<const std::byte, 4> as_bytes() const;
         std::uint32_t as_integer() const;
 
-        constexpr bool operator==(const AddressV4&) const noexcept = default;
+        bool operator==(const AddressV4&) const noexcept = default;
 
     private:
         std::uint32_t m_address;
