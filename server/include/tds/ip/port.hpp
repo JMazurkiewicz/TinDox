@@ -18,7 +18,7 @@ namespace tds::ip {
         std::span<const std::byte, 2> as_bytes() const;
         std::uint16_t as_integer() const;
 
-        bool operator==(const Port&) const = default;
+        bool operator==(const Port&) const noexcept = default;
         bool operator==(std::uint16_t port) const noexcept;
 
     private:

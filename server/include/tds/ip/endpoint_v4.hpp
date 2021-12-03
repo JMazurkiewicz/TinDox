@@ -12,7 +12,7 @@ namespace tds::ip {
         AddressV4 get_address() const;
         Port get_port() const;
 
-        constexpr bool operator==(const EndpointV4&) const = default;
+        constexpr bool operator==(const EndpointV4&) const noexcept = default;
 
     private:
         AddressV4 m_address;
