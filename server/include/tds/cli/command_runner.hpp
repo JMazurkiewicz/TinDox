@@ -23,12 +23,6 @@ namespace tds::cli {
         }
 
     private:
-        template<std::size_t N>
-        static std::string_view get_command_name() {
-            using alternative = std::variant_alternative_t<N, command_variant>;
-            return alternative::name();
-        }
-
         template<std::size_t N = 0>
         void construct_command(std::string_view command_name) {
             if constexpr(N == sizeof...(Commands)) {
@@ -40,6 +34,12 @@ namespace tds::cli {
                     construct_command<N + 1>(command_name);
                 }
             }
+        }
+
+        template<std::size_t N>
+        static std::string_view get_command_name() {
+            using alternative = std::variant_alternative_t<N, command_variant>;
+            return alternative::name();
         }
 
         void execute_command(std::span<const std::string_view> args) {

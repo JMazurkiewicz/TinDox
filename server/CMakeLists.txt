@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 project(
-    "TinDoxServer"
+    TinDoxServer
     LANGUAGES CXX
     VERSION 0.0.1
     HOMEPAGE_URL https://github.com/JMazurkiewicz/TinDox/server
