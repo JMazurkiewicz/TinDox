@@ -35,6 +35,7 @@ set(
     TDS_DEV_SOURCES
 
     src/cli/init_command.cpp
+    src/cli/run_command.cpp
 )
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
