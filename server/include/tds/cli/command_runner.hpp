@@ -18,9 +18,9 @@ namespace tds::cli {
         CommandRunner(const CommandRunner&) = delete;
         CommandRunner& operator=(const CommandRunner&) = delete;
 
-        void run(std::string_view command_name, std::span<const std::string_view> args) {
+        int run(std::string_view command_name, std::span<const std::string_view> args) {
             construct_command(command_name);
-            execute_command(args);
+            return execute_command(args);
         }
 
     private:
@@ -43,17 +43,19 @@ namespace tds::cli {
         template<std::size_t N>
         static std::string_view get_command_name() {
             using Alternative = std::variant_alternative_t<N, CommandVariant>;
-            return Alternative::name();
+            return Alternative::get_name();
         }
 
-        void execute_command(std::span<const std::string_view> args) {
+        int execute_command(std::span<const std::string_view> args) {
             auto visitor = [args]<typename T>(T& com) {
-                if constexpr(!std::same_as<T, std::monostate>) {
-                    com.execute(args);
+                if constexpr(Command<T>) {
+                    return com.do_execute(args);
+                } else {
+                    return 1;
                 }
             };
 
-            std::visit(visitor, m_command);
+            return std::visit(visitor, m_command);
         }
 
         CommandVariant m_command;

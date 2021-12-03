@@ -1,17 +1,15 @@
 #pragma once
 
+#include "tds/cli/command_interface.hpp"
+
 #include <span>
 #include <string_view>
 
 namespace tds::cli {
-    class RunCommand {
+    class RunCommand : public CommandInterface<RunCommand> {
     public:
-        RunCommand() = default;
-        RunCommand(const RunCommand&) = delete;
-        RunCommand& operator=(const RunCommand&) = delete;
+        static constexpr std::string_view name = "run";
 
-        static std::string_view name();
-
-        void execute(std::span<const std::string_view> args);
+        int do_execute(std::span<const std::string_view> args);
     };
 }

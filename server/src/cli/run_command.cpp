@@ -3,11 +3,8 @@
 #include <iostream>
 
 namespace tds::cli {
-    std::string_view RunCommand::name() {
-        return "run";
-    }
-
-    void RunCommand::execute(std::span<const std::string_view> args) {
+    int RunCommand::do_execute(std::span<const std::string_view> args) {
         std::cout << "Run\n";
+        return 0;
     }
 }

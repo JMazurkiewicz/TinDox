@@ -11,6 +11,8 @@ TEST_CASE("tds::cli::UserCommand", "[cli]") {
     }
 
     SECTION("Check name") {
-        REQUIRE(UserCommand::name() == "user");
+        const std::string_view expected = "user";
+        REQUIRE(UserCommand::name == expected);
+        REQUIRE(UserCommand::get_name() == expected);
     }
 }

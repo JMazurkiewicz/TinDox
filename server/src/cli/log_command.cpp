@@ -3,11 +3,8 @@
 #include <iostream>
 
 namespace tds::cli {
-    std::string_view LogCommand::name() {
-        return "log";
-    }
-
-    void LogCommand::execute(std::span<const std::string_view> args) {
+    int LogCommand::do_execute(std::span<const std::string_view> args) {
         std::cout << "Log\n";
+        return 0;
     }
 }

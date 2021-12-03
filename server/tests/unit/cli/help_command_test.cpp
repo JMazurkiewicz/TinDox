@@ -11,6 +11,8 @@ TEST_CASE("tds::cli::HelpCommand", "[cli]") {
     }
 
     SECTION("Check name") {
-        REQUIRE(HelpCommand::name() == "help");
+        const std::string_view expected = "help";
+        REQUIRE(HelpCommand::name == expected);
+        REQUIRE(HelpCommand::get_name() == expected);
     }
 }

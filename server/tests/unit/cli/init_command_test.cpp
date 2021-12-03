@@ -11,6 +11,8 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
     }
 
     SECTION("Check name") {
-        REQUIRE(InitCommand::name() == "init");
+        const std::string_view expected = "init";
+        REQUIRE(InitCommand::name == expected);
+        REQUIRE(InitCommand::get_name() == expected);
     }
 }

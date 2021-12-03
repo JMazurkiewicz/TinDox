@@ -1,17 +1,15 @@
 #pragma once
 
+#include "tds/cli/command_interface.hpp"
+
 #include <span>
 #include <string_view>
 
 namespace tds::cli {
-    class LogCommand {
+    class LogCommand : public CommandInterface<LogCommand> {
     public:
-        LogCommand() = default;
-        LogCommand(const LogCommand&) = delete;
-        LogCommand& operator=(const LogCommand&) = delete;
+        static constexpr std::string_view name = "log";
 
-        static std::string_view name();
-
-        void execute(std::span<const std::string_view> args);
+        int do_execute(std::span<const std::string_view> args);
     };
 }

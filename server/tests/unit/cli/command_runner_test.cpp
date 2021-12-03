@@ -1,44 +1,31 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include "tds/cli/command_interface.hpp"
 #include "tds/cli/command_runner.hpp"
 
 using namespace tds::cli;
 
-enum class MagicValue {
-    log = 1,
-    init = 2,
-    print = 3,
-};
+struct LogCommand : CommandInterface<LogCommand> {
+    static constexpr std::string_view name = "log";
 
-MagicValue g_observable_value;
-
-struct LogCommand {
-    static std::string_view name() {
-        return "log";
-    }
-
-    void execute([[maybe_unused]] std::span<const std::string_view>) {
-        g_observable_value = MagicValue::log;
+    int do_execute([[maybe_unused]] std::span<const std::string_view>) {
+        return 0xAA;
     }
 };
 
-struct InitCommand {
-    static std::string_view name() {
-        return "init";
-    }
+struct InitCommand : CommandInterface<InitCommand> {
+    static constexpr std::string_view name = "init";
 
-    void execute([[maybe_unused]] std::span<const std::string_view>) {
-        g_observable_value = MagicValue::init;
+    int do_execute([[maybe_unused]] std::span<const std::string_view>) {
+        return 0xBB;
     }
 };
 
-struct PrintCommand {
-    static std::string_view name() {
-        return "print";
-    }
+struct PrintCommand : CommandInterface<PrintCommand> {
+    static constexpr std::string_view name = "print";
 
-    void execute([[maybe_unused]] std::span<const std::string_view>) {
-        g_observable_value = MagicValue::print;
+    int do_execute([[maybe_unused]] std::span<const std::string_view>) {
+        return 0xCC;
     }
 };
 
@@ -53,18 +40,15 @@ TEST_CASE("tds::cli::CommandRunner", "[cli]") {
     const std::span<std::string_view> args;
 
     SECTION("Run log command") {
-        runner.run("log", args);
-        REQUIRE(g_observable_value == MagicValue::log);
+        REQUIRE(runner.run("log", args) == 0xAA);
     }
 
     SECTION("Run init command") {
-        runner.run("init", args);
-        REQUIRE(g_observable_value == MagicValue::init);
+        REQUIRE(runner.run("init", args) == 0xBB);
     }
 
     SECTION("Run print command") {
-        runner.run("print", args);
-        REQUIRE(g_observable_value == MagicValue::print);
+        REQUIRE(runner.run("print", args) == 0xCC);
     }
 
     SECTION("Run invalid command") {

@@ -11,6 +11,8 @@ TEST_CASE("tds::cli::ConfigCommand", "[cli]") {
     }
 
     SECTION("Check name") {
-        REQUIRE(ConfigCommand::name() == "config");
+        const std::string_view expected = "config";
+        REQUIRE(ConfigCommand::name == expected);
+        REQUIRE(ConfigCommand::get_name() == expected);
     }
 }

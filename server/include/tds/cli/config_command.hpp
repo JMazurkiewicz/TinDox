@@ -1,17 +1,17 @@
 #pragma once
 
+#include "tds/cli/command_interface.hpp"
+
 #include <span>
 #include <string_view>
 
 namespace tds::cli {
-    class ConfigCommand {
+    class ConfigCommand : public CommandInterface<ConfigCommand> {
     public:
-        ConfigCommand() = default;
-        ConfigCommand(const ConfigCommand&) = delete;
-        ConfigCommand& operator=(const ConfigCommand&) = delete;
+        static constexpr std::string_view name = "config";
 
-        static std::string_view name();
-
-        void execute([[maybe_unused]] std::span<const std::string_view>);
+        int do_execute([[maybe_unused]] std::span<const std::string_view>);
     };
+
+    static_assert(Command<ConfigCommand>);
 }

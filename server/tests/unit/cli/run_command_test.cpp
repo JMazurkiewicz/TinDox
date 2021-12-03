@@ -11,6 +11,8 @@ TEST_CASE("tds::cli::RunCommand", "[cli]") {
     }
 
     SECTION("Check name") {
-        REQUIRE(RunCommand::name() == "run");
+        const std::string_view expected = "run";
+        REQUIRE(RunCommand::name == expected);
+        REQUIRE(RunCommand::get_name() == expected);
     }
 }

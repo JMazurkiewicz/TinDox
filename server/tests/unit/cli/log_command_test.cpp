@@ -11,6 +11,8 @@ TEST_CASE("tds::cli::LogCommand", "[cli]") {
     }
 
     SECTION("Check name") {
-        REQUIRE(LogCommand::name() == "log");
+        const std::string_view expected = "log";
+        REQUIRE(LogCommand::name == expected);
+        REQUIRE(LogCommand::get_name() == expected);
     }
 }

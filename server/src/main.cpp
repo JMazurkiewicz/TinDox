@@ -10,24 +10,6 @@
 #include <iostream>
 #include <vector>
 
-namespace {
-    void start(std::span<const std::string_view> args) {
-        using namespace tds;
-
-        using CommandRunner = cli::CommandRunner<
-            cli::ConfigCommand,
-            cli::HelpCommand,
-            cli::InitCommand,
-            cli::LogCommand,
-            cli::RunCommand,
-            cli::UserCommand
-        >;
-
-        CommandRunner runner;
-        runner.run(args.front(), args.subspan(1));
-    }
-}
-
 int main(int argc, char** argv) {
     std::ios_base::sync_with_stdio(false);
     int exit_status = EXIT_SUCCESS;
@@ -39,7 +21,15 @@ int main(int argc, char** argv) {
     } else {
         try {
             std::vector<std::string_view> args(argv + 1, argv + argc);
-            start(args);
+
+            using namespace tds;
+
+            using CommandRunner = cli::CommandRunner<cli::ConfigCommand, cli::HelpCommand, cli::InitCommand,
+                                                     cli::LogCommand, cli::RunCommand, cli::UserCommand>;
+
+            CommandRunner runner;
+            return runner.run(args.front(), std::span{args}.subspan(1));
+
         } catch(const std::exception& e) {
             std::cerr << e.what() << '\n';
             exit_status = EXIT_FAILURE;

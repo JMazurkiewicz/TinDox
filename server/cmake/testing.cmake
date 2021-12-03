@@ -24,6 +24,7 @@ set(
     TDS_UNIT_TESTS
 
     tests/unit/cli/cli_error_test.cpp
+    tests/unit/cli/command_interface_test.cpp
     tests/unit/cli/command_runner_test.cpp
     tests/unit/cli/command_test.cpp
     tests/unit/cli/config_command_test.cpp
