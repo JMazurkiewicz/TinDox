@@ -11,4 +11,6 @@ namespace tds::ip {
         explicit IpError(int code, const std::error_category& category, const std::string& msg);
         explicit IpError(int code, const std::error_category& category, const char* msg);
     };
+
+    const std::error_category& get_gai_category();
 }

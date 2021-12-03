@@ -66,7 +66,7 @@ namespace tds::ip {
                     ip = reinterpret_cast<sockaddr_in*>(info->ai_addr)->sin_addr.s_addr;
                     freeaddrinfo(info);
                 } else {
-                    throw IpError{errc, "tds::ip::make_address_v4 failed"};
+                    throw IpError{errc, get_gai_category(), "tds::ip::make_address_v4 failed"};
                 }
             }
 
