@@ -4,10 +4,10 @@
 
 namespace tds::cli {
     std::string_view user_command::name() {
-        return "run";
+        return "user";
     }
 
     void user_command::execute(std::span<const std::string_view> args) {
-        std::cout << "Run\n";
+        std::cout << "User\n";
     }
 }
