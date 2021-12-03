@@ -4,11 +4,11 @@
 #include <string_view>
 
 namespace tds::cli {
-    class run_command {
+    class RunCommand {
     public:
-        run_command() = default;
-        run_command(const run_command&) = delete;
-        run_command& operator=(const run_command&) = delete;
+        RunCommand() = default;
+        RunCommand(const RunCommand&) = delete;
+        RunCommand& operator=(const RunCommand&) = delete;
 
         static std::string_view name();
 

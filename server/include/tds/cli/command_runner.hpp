@@ -6,17 +6,17 @@
 #include <variant>
 
 namespace tds::cli {
-    template<command... Commands>
+    template<Command... Commands>
         requires(sizeof...(Commands) > 0)
-    class command_runner {
+    class CommandRunner {
     private:
-        using command_variant = std::variant<std::monostate, Commands...>;
-        static constexpr std::size_t command_variant_size = std::variant_size_v<command_variant>;
+        using CommandVariant = std::variant<std::monostate, Commands...>;
+        static constexpr std::size_t variant_size_v = std::variant_size_v<CommandVariant>;
 
     public:
-        command_runner() = default;
-        command_runner(const command_runner&) = delete;
-        command_runner& operator=(const command_runner&) = delete;
+        CommandRunner() = default;
+        CommandRunner(const CommandRunner&) = delete;
+        CommandRunner& operator=(const CommandRunner&) = delete;
 
         void run(std::string_view command_name, std::span<const std::string_view> args) {
             construct_command(command_name);
@@ -25,7 +25,7 @@ namespace tds::cli {
 
     private:
         template<std::size_t N = 1>
-            requires(N < command_variant_size)
+            requires(N < variant_size_v)
         void construct_command(std::string_view command_name) {
             if(get_command_name<N>() == command_name) {
                 m_command.template emplace<N>();
@@ -35,15 +35,15 @@ namespace tds::cli {
         }
 
         template<std::size_t N>
-            requires(N == command_variant_size)
+            requires(N == variant_size_v)
         [[noreturn]] void construct_command(std::string_view command_name) {
-            throw cli_error{"tds: '" + std::string{command_name} + "' is not a tds command. See 'tds help'."};
+            throw CliError{"tds: '" + std::string{command_name} + "' is not a tds command. See 'tds help'."};
         }
 
         template<std::size_t N>
         static std::string_view get_command_name() {
-            using alternative = std::variant_alternative_t<N, command_variant>;
-            return alternative::name();
+            using Alternative = std::variant_alternative_t<N, CommandVariant>;
+            return Alternative::name();
         }
 
         void execute_command(std::span<const std::string_view> args) {
@@ -56,6 +56,6 @@ namespace tds::cli {
             std::visit(visitor, m_command);
         }
 
-        command_variant m_command;
+        CommandVariant m_command;
     };
 }

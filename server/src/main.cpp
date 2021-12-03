@@ -14,16 +14,16 @@ namespace {
     void start(std::span<const std::string_view> args) {
         using namespace tds;
 
-        using command_runner = cli::command_runner<
-            cli::config_command,
-            cli::help_command,
-            cli::init_command,
-            cli::log_command,
-            cli::run_command,
-            cli::user_command
+        using CommandRunner = cli::CommandRunner<
+            cli::ConfigCommand,
+            cli::HelpCommand,
+            cli::InitCommand,
+            cli::LogCommand,
+            cli::RunCommand,
+            cli::UserCommand
         >;
 
-        command_runner runner;
+        CommandRunner runner;
         runner.run(args.front(), args.subspan(1));
     }
 }
@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     int exit_status = EXIT_SUCCESS;
 
     if(argc <= 1) {
-        tds::cli::help_command help;
+        tds::cli::HelpCommand help;
         help.execute({});
         exit_status = EXIT_FAILURE;
     } else {

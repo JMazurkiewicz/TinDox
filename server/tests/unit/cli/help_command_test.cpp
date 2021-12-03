@@ -5,12 +5,12 @@
 
 using namespace tds::cli;
 
-TEST_CASE("tds::cli::help_command", "[cli]") {
-    SECTION("Is `help_command` a valid command?") {
-        REQUIRE(command<help_command>);
+TEST_CASE("tds::cli::HelpCommand", "[cli]") {
+    SECTION("Is `HelpCommand` a valid command?") {
+        REQUIRE(Command<HelpCommand>);
     }
 
     SECTION("Check name") {
-        REQUIRE(help_command::name() == "help");
+        REQUIRE(HelpCommand::name() == "help");
     }
 }

@@ -4,11 +4,11 @@
 #include <string_view>
 
 namespace tds::cli {
-    class help_command {
+    class HelpCommand {
     public:
-        help_command() = default;
-        help_command(const help_command&) = delete;
-        help_command& operator=(const help_command&) = delete;
+        HelpCommand() = default;
+        HelpCommand(const HelpCommand&) = delete;
+        HelpCommand& operator=(const HelpCommand&) = delete;
 
         static std::string_view name();
 

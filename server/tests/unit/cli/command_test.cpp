@@ -4,7 +4,7 @@
 
 using namespace tds::cli;
 
-struct good_command1 {
+struct GoodCommand1 {
     static std::string_view name() {
         return "good_command1";
     }
@@ -12,7 +12,7 @@ struct good_command1 {
     void execute([[maybe_unused]] std::span<const std::string_view>) { }
 };
 
-struct good_command2 {
+struct GoodCommand2 {
     static const char* name() {
         return "good_command2";
     }
@@ -20,7 +20,7 @@ struct good_command2 {
     void execute([[maybe_unused]] std::span<const std::string_view>) { }
 };
 
-struct bad_command1 {
+struct BadCommand1 {
     static int name() {
         return 0;
     }
@@ -28,7 +28,7 @@ struct bad_command1 {
     void execute([[maybe_unused]] std::span<const std::string_view>) { }
 };
 
-struct bad_command2 {
+struct BadCommand2 {
     static const char* name() {
         return "bad_command2";
     }
@@ -36,17 +36,17 @@ struct bad_command2 {
     void execute([[maybe_unused]] std::span<std::string_view>) { }
 };
 
-struct bad_command3 { };
+struct BadCommand3 { };
 
-TEST_CASE("tds::cli::command", "[cli]") {
+TEST_CASE("tds::cli::Command", "[cli]") {
     SECTION("Test good commands") {
-        REQUIRE(command<good_command1>);
-        REQUIRE(command<good_command2>);
+        REQUIRE(Command<GoodCommand1>);
+        REQUIRE(Command<GoodCommand2>);
     }
 
     SECTION("Test bad commands") {
-        REQUIRE_FALSE(command<bad_command1>);
-        REQUIRE_FALSE(command<bad_command2>);
-        REQUIRE_FALSE(command<bad_command3>);
+        REQUIRE_FALSE(Command<BadCommand1>);
+        REQUIRE_FALSE(Command<BadCommand2>);
+        REQUIRE_FALSE(Command<BadCommand3>);
     }
 }

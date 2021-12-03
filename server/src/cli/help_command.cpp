@@ -16,11 +16,11 @@ namespace tds::cli {
             "* user         add, modify or remove users\n"};
     }
 
-    std::string_view help_command::name() {
+    std::string_view HelpCommand::name() {
         return "help";
     }
 
-    void help_command::execute(std::span<const std::string_view>) {
+    void HelpCommand::execute(std::span<const std::string_view>) {
         std::cout << help_message;
     }
 }

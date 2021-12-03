@@ -4,11 +4,11 @@
 #include <string_view>
 
 namespace tds::cli {
-    class user_command {
+    class UserCommand {
     public:
-        user_command() = default;
-        user_command(const user_command&) = delete;
-        user_command& operator=(const user_command&) = delete;
+        UserCommand() = default;
+        UserCommand(const UserCommand&) = delete;
+        UserCommand& operator=(const UserCommand&) = delete;
 
         static std::string_view name();
 

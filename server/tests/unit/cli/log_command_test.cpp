@@ -5,12 +5,12 @@
 
 using namespace tds::cli;
 
-TEST_CASE("tds::cli::log_command", "[cli]") {
-    SECTION("Is `log_command` a valid command?") {
-        REQUIRE(command<log_command>);
+TEST_CASE("tds::cli::LogCommand", "[cli]") {
+    SECTION("Is `LogCommand` a valid command?") {
+        REQUIRE(Command<LogCommand>);
     }
 
     SECTION("Check name") {
-        REQUIRE(log_command::name() == "log");
+        REQUIRE(LogCommand::name() == "log");
     }
 }

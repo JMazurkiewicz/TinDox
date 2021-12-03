@@ -5,12 +5,12 @@
 
 using namespace tds::cli;
 
-TEST_CASE("tds::cli::init_command", "[cli]") {
-    SECTION("Is `init_command` a valid command?") {
-        REQUIRE(command<init_command>);
+TEST_CASE("tds::cli::InitCommand", "[cli]") {
+    SECTION("Is `InitCommand` a valid command?") {
+        REQUIRE(Command<InitCommand>);
     }
 
     SECTION("Check name") {
-        REQUIRE(init_command::name() == "init");
+        REQUIRE(InitCommand::name() == "init");
     }
 }

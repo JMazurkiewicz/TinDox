@@ -4,71 +4,71 @@
 
 using namespace tds::cli;
 
-enum class magic_value {
+enum class MagicValue {
     log = 1,
     init = 2,
     print = 3,
 };
 
-magic_value g_observable_value;
+MagicValue g_observable_value;
 
-struct log_command {
+struct LogCommand {
     static std::string_view name() {
         return "log";
     }
 
     void execute([[maybe_unused]] std::span<const std::string_view>) {
-        g_observable_value = magic_value::log;
+        g_observable_value = MagicValue::log;
     }
 };
 
-struct init_command {
+struct InitCommand {
     static std::string_view name() {
         return "init";
     }
 
     void execute([[maybe_unused]] std::span<const std::string_view>) {
-        g_observable_value = magic_value::init;
+        g_observable_value = MagicValue::init;
     }
 };
 
-struct print_command {
+struct PrintCommand {
     static std::string_view name() {
         return "print";
     }
 
     void execute([[maybe_unused]] std::span<const std::string_view>) {
-        g_observable_value = magic_value::print;
+        g_observable_value = MagicValue::print;
     }
 };
 
-TEST_CASE("tds::cli::command_runner", "[cli]") {
+TEST_CASE("tds::cli::CommandRunner", "[cli]") {
     SECTION("Check commands") {
-        REQUIRE(command<log_command>);
-        REQUIRE(command<init_command>);
-        REQUIRE(command<print_command>);
+        REQUIRE(Command<LogCommand>);
+        REQUIRE(Command<InitCommand>);
+        REQUIRE(Command<PrintCommand>);
     }
 
-    command_runner<log_command, init_command, print_command> runner;
+    CommandRunner<LogCommand, InitCommand, PrintCommand> runner;
     const std::span<std::string_view> args;
 
     SECTION("Run log command") {
         runner.run("log", args);
-        REQUIRE(g_observable_value == magic_value::log);
+        REQUIRE(g_observable_value == MagicValue::log);
     }
 
     SECTION("Run init command") {
         runner.run("init", args);
-        REQUIRE(g_observable_value == magic_value::init);
+        REQUIRE(g_observable_value == MagicValue::init);
     }
 
     SECTION("Run print command") {
         runner.run("print", args);
-        REQUIRE(g_observable_value == magic_value::print);
+        REQUIRE(g_observable_value == MagicValue::print);
     }
 
     SECTION("Run invalid command") {
-        REQUIRE_THROWS_AS(runner.run("invalid", args), cli_error);
+        REQUIRE_THROWS_AS(runner.run("invalid", args), CliError);
 
         try {
             runner.run("invalid", args);

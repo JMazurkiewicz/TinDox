@@ -4,10 +4,10 @@
 
 using namespace tds::cli;
 
-TEST_CASE("tds::cli::cli_error", "[cli]") {
+TEST_CASE("tds::cli::CliError", "[cli]") {
     SECTION("Test throwing") {
         auto throwing = [] {
-            throw cli_error{"throwing"};
+            throw CliError{"throwing"};
         };
 
         REQUIRE_THROWS(throwing());
@@ -16,7 +16,7 @@ TEST_CASE("tds::cli::cli_error", "[cli]") {
     SECTION("Test construction") {
         const std::string msg = "example";
 
-        cli_error e{msg};
+        CliError e{msg};
         REQUIRE(e.what() == msg);
     }
 }

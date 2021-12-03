@@ -7,7 +7,7 @@
 // clang-format off
 namespace tds::cli {
     template<typename T>
-    concept command =
+    concept Command =
         std::default_initializable<T> &&
         requires(T& com, std::span<const std::string_view> args) {
             { T::name() } -> std::convertible_to<std::string_view>;
