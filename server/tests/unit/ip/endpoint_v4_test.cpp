@@ -79,6 +79,8 @@ TEST_CASE("tds::ip::make_endpoint_v4", "[ip]") {
     }
 
     SECTION("Test localhost") {
-        REQUIRE(make_endpoint_v4("localhost:80").get_address() == AddressV4::localhost);
+        const auto local_http = make_endpoint_v4("localhost:80");
+        REQUIRE(local_http.get_address() == AddressV4::localhost);
+        REQUIRE(local_http.get_port() == 80);
     }
 }

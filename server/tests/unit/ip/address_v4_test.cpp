@@ -99,7 +99,7 @@ TEST_CASE("tds::ip::make_address_v4", "[ip]") {
     }
 
     SECTION("Test invalid dns") {
-        REQUIRE_THROWS_AS(make_address_v4("i.don.not.exist.com"), IpError);
+        REQUIRE_THROWS_AS(make_address_v4("i.do.not.exist.com"), IpError);
     }
 
     SECTION("Test localhost") {

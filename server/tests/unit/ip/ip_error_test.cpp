@@ -19,7 +19,7 @@ TEST_CASE("tds::ip::IpError", "[ip]") {
 
     SECTION("Test IpError thrown by `make_address_v4`") {
         try {
-            auto address = make_address_v4("pi.wo");
+            [[maybe_unused]] auto address = make_address_v4("pi.wo");
         } catch(const IpError& e) {
             IpError error = e;
             REQUIRE(&error.code().category() == &get_gai_category());
