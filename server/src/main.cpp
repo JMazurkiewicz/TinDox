@@ -1,4 +1,5 @@
 #include "tds/cli/command_runner.hpp"
+#include "tds/cli/help_command.hpp"
 #include "tds/cli/init_command.hpp"
 #include "tds/cli/run_command.hpp"
 
@@ -11,6 +12,7 @@ namespace {
         using namespace tds;
 
         using command_runner = cli::command_runner<
+            cli::help_command,
             cli::init_command,
             cli::run_command
         >;
@@ -25,7 +27,8 @@ int main(int argc, char** argv) {
     int exit_status = EXIT_SUCCESS;
 
     if(argc <= 1) {
-        std::cerr << "Invalid.\n";
+        tds::cli::help_command help;
+        help.execute({});
         exit_status = EXIT_FAILURE;
     } else {
         try {

@@ -32,7 +32,7 @@ namespace tds::cli {
         template<std::size_t N = 0>
         void construct_command(std::string_view command_name) {
             if constexpr(N == sizeof...(Commands)) {
-                throw cli_error("tds: '" + std::string{command_name} + "' is not a tds command. See 'tds --help'.");
+                throw cli_error("tds: '" + std::string{command_name} + "' is not a tds command. See 'tds help'.");
             } else {
                 if(get_command_name<N>() == command_name) {
                     m_commands.template emplace<N>();

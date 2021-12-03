@@ -73,7 +73,7 @@ TEST_CASE("tds::cli::command_runner", "[cli]") {
         try {
             runner.run("invalid", args);
         } catch(const std::exception& e) {
-            const std::string expected = "tds: 'invalid' is not a tds command. See 'tds --help'.";
+            const std::string expected = "tds: 'invalid' is not a tds command. See 'tds help'.";
             REQUIRE(e.what() == expected);
         }
     }
