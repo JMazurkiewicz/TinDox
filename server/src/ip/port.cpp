@@ -45,7 +45,7 @@ namespace tds::ip {
     }
 
     bool Port::operator==(std::uint16_t port) const noexcept {
-        return m_port == port;
+        return as_integer() == port;
     }
 
     std::ostream& operator<<(std::ostream& stream, Port port) {

@@ -59,11 +59,11 @@ TEST_CASE("tds::ip::make_endpoint_v4", "[ip]") {
     SECTION("Test dns string") {
         const auto endpoint1 = make_endpoint_v4("dns.google.com:80");
         REQUIRE((endpoint1.get_address() == AddressV4{8, 8, 8, 8} || endpoint1.get_address() == AddressV4{8, 8, 4, 4}));
-        REQUIRE(endpoint1.get_port() == Port{80});
+        REQUIRE(endpoint1.get_port() == 80);
 
         const auto endpoint2 = make_endpoint_v4("one.one.one.one:22");
         REQUIRE((endpoint2.get_address() == AddressV4{1, 1, 1, 1} || endpoint2.get_address() == AddressV4{1, 0, 0, 1}));
-        REQUIRE(endpoint2.get_port().as_integer() == 22);
+        REQUIRE(endpoint2.get_port() == 22);
     }
 
     SECTION("Test invalid string") {
