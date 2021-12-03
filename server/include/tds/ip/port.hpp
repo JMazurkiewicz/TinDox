@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <ostream>
 #include <span>
+#include <string>
 
 namespace tds::ip {
     class Port {

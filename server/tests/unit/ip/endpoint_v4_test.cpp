@@ -28,12 +28,12 @@ TEST_CASE("tds::ip::EndpointV4", "[ip]") {
         REQUIRE(stream.str() == "255.255.255.255:22");
 
         stream.str("");
-        stream << EndpointV4{AddressV4{83, 53, 123, 43}, Port{443}};
+        stream << EndpointV4{AddressV4(83, 53, 123, 43), Port(443)};
         REQUIRE(stream.str() == "83.53.123.43:443");
     }
 
     SECTION("Test `to_string` function") {
-        EndpointV4 endpoint{AddressV4{1, 1, 1, 1}, Port{80}};
+        EndpointV4 endpoint{AddressV4(1, 1, 1, 1), Port(80)};
         REQUIRE(to_string(endpoint) == "1.1.1.1:80");
     }
 }
@@ -48,7 +48,7 @@ TEST_CASE("tds::ip::make_endpoint_v4", "[ip]") {
         REQUIRE(second.get_address() == AddressV4::broadcast);
         REQUIRE(second.get_port().as_integer() == 12345);
 
-        const auto third =make_endpoint_v4("127.0.0.1:80");
+        const auto third = make_endpoint_v4("127.0.0.1:80");
         REQUIRE(third.get_address() == AddressV4::localhost);
         REQUIRE(third.get_port() == Port{80});
 

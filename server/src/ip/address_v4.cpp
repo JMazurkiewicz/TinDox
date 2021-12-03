@@ -3,8 +3,6 @@
 #include "tds/ip/ip_error.hpp"
 
 #include <cstring>
-#include <iostream>
-#include <ranges>
 
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -16,7 +14,7 @@ namespace tds::ip {
     namespace {
         const char* address_to_cstring(AddressV4 address) {
             const in_addr addr = {.s_addr = htonl(address.as_integer())};
-            return ::inet_ntoa(addr);
+            return inet_ntoa(addr);
         }
     }
 
