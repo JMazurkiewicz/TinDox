@@ -24,16 +24,19 @@ namespace tds::cli {
 
     private:
         template<std::size_t N = 0>
+            requires(N < sizeof...(Commands))
         void construct_command(std::string_view command_name) {
-            if constexpr(N == sizeof...(Commands)) {
-                throw cli_error("tds: '" + std::string{command_name} + "' is not a tds command. See 'tds help'.");
+            if(get_command_name<N>() == command_name) {
+                m_commands.template emplace<N>();
             } else {
-                if(get_command_name<N>() == command_name) {
-                    m_commands.template emplace<N>();
-                } else {
-                    construct_command<N + 1>(command_name);
-                }
+                construct_command<N + 1>(command_name);
             }
+        }
+
+        template<std::size_t N>
+            requires(N == sizeof...(Commands))
+        [[noreturn]] void construct_command(std::string_view command_name) {
+            throw cli_error("tds: '" + std::string{command_name} + "' is not a tds command. See 'tds help'.");
         }
 
         template<std::size_t N>

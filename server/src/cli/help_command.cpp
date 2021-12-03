@@ -13,8 +13,7 @@ namespace tds::cli {
             "* init         creates server instance in current or selected directory\n"
             "* log          display logs\n"
             "* run          run TinDoxServer\n"
-            "* user         add, modify or remove users\n"
-        };
+            "* user         add, modify or remove users\n"};
     }
 
     std::string_view help_command::name() {
