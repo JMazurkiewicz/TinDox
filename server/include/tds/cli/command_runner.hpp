@@ -10,7 +10,8 @@ namespace tds::cli {
         requires(sizeof...(Commands) > 0)
     class command_runner {
     private:
-        using command_variant = std::variant<Commands...>;
+        using command_variant = std::variant<std::monostate, Commands...>;
+        static constexpr std::size_t command_variant_size = std::variant_size_v<command_variant>;
 
     public:
         command_runner() = default;
@@ -23,20 +24,20 @@ namespace tds::cli {
         }
 
     private:
-        template<std::size_t N = 0>
-            requires(N < sizeof...(Commands))
+        template<std::size_t N = 1>
+            requires(N < command_variant_size)
         void construct_command(std::string_view command_name) {
             if(get_command_name<N>() == command_name) {
-                m_commands.template emplace<N>();
+                m_command.template emplace<N>();
             } else {
                 construct_command<N + 1>(command_name);
             }
         }
 
         template<std::size_t N>
-            requires(N == sizeof...(Commands))
+            requires(N == command_variant_size)
         [[noreturn]] void construct_command(std::string_view command_name) {
-            throw cli_error("tds: '" + std::string{command_name} + "' is not a tds command. See 'tds help'.");
+            throw cli_error{"tds: '" + std::string{command_name} + "' is not a tds command. See 'tds help'."};
         }
 
         template<std::size_t N>
@@ -46,13 +47,15 @@ namespace tds::cli {
         }
 
         void execute_command(std::span<const std::string_view> args) {
-            auto visitor = [args](auto& command) {
-                command.execute(args);
+            auto visitor = [args]<typename T>(T& com) {
+                if constexpr(!std::same_as<T, std::monostate>) {
+                    com.execute(args);
+                }
             };
 
-            std::visit(visitor, m_commands);
+            std::visit(visitor, m_command);
         }
 
-        command_variant m_commands;
+        command_variant m_command;
     };
 }
