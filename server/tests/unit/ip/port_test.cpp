@@ -73,6 +73,16 @@ TEST_CASE("tds::ip::Port", "[ip]") {
         REQUIRE(to_string(port) == "420");
     }
 
+    SECTION("Test `to_string`, then `make_port`") {
+        Port port{22};
+        const std::string str = to_string(port);
+        Port back_to_port = make_port(str);
+
+        REQUIRE(port == 22);
+        REQUIRE(str == "22");
+        REQUIRE(back_to_port == 22);
+    }
+
     SECTION("Test `make_port` function") {
         const char* good = "40555";
         const char* bad1 = "I am bad";

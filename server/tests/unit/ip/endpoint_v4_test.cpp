@@ -83,4 +83,16 @@ TEST_CASE("tds::ip::make_endpoint_v4", "[ip]") {
         REQUIRE(local_http.get_address() == AddressV4::localhost);
         REQUIRE(local_http.get_port() == 80);
     }
+
+    SECTION("Test `to_string`, then `make_endpoint_v4`"){
+        EndpointV4 endpoint{AddressV4::localhost, Port{22}};
+        const std::string str = to_string(endpoint);
+        EndpointV4 back_to_port = make_endpoint_v4(str);
+
+        REQUIRE(endpoint.get_address().as_integer() == 0x7F000001);
+        REQUIRE(endpoint.get_port() == 22);
+        REQUIRE(str == "127.0.0.1:22");
+        REQUIRE(back_to_port.get_address().as_integer() == 0x7F000001);
+        REQUIRE(back_to_port.get_port() == 22);
+    }
 }

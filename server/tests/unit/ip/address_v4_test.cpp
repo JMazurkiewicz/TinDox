@@ -105,4 +105,14 @@ TEST_CASE("tds::ip::make_address_v4", "[ip]") {
     SECTION("Test localhost") {
         REQUIRE(make_address_v4("localhost") == AddressV4::localhost);
     }
+
+    SECTION("Test `to_string`, then `make_address_v4") {
+        AddressV4 address{1, 0, 0, 1};
+        const std::string str = to_string(address);
+        AddressV4 back_to_address = make_address_v4(str);
+
+        REQUIRE(address.as_integer() == 0x01000001);
+        REQUIRE(str == "1.0.0.1");
+        REQUIRE(back_to_address.as_integer() == 0x01000001);
+    }
 }
