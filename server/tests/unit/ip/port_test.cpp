@@ -54,7 +54,10 @@ TEST_CASE("tds::ip::Port", "[ip]") {
 
     SECTION("Test `==` operator") {
         REQUIRE(std::equality_comparable<Port>);
-        REQUIRE(std::equality_comparable_with<Port, std::uint16_t>);
+        REQUIRE(requires(Port p1, std::uint16_t p2) {
+            { p1 == p2 } -> std::same_as<bool>;
+            { p1 != p2 } -> std::same_as<bool>;
+        });
 
         const Port one{10};
         const Port two{0x00, 0x0A};
