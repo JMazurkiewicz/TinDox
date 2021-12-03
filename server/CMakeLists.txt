@@ -42,6 +42,7 @@ set(
     src/cli/user_command.cpp
 
     src/ip/address_v4.cpp
+    src/ip/endpoint_v4.cpp
     src/ip/ip_error.cpp
     src/ip/port.cpp
 )
