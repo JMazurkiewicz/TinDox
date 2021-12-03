@@ -94,6 +94,8 @@ TEST_CASE("tds::ip::make_address_v4", "[ip]") {
 
     SECTION("Test invalid string") {
         REQUIRE_THROWS_AS(make_address_v4("this will not work"), IpError);
+        REQUIRE_THROWS_AS(make_address_v4("289.1.3.1"), IpError);
+        REQUIRE_THROWS_AS(make_address_v4("255.255.255.256"), IpError);
     }
 
     SECTION("Test invalid dns") {
