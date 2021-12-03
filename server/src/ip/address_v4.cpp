@@ -34,7 +34,7 @@ namespace tds::ip {
         : AddressV4(static_cast<unsigned>(b0 << 24) | (b1 << 16) | (b2 << 8) | b3) { }
 
     std::span<const std::byte, 4> AddressV4::as_bytes() const {
-        std::span<const std::uint32_t, 1> s{&m_address, 1};
+        const std::span<const std::uint32_t, 1> s{&m_address, 1};
         return std::as_bytes(s);
     }
 

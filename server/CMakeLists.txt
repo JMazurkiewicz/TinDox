@@ -43,6 +43,7 @@ set(
 
     src/ip/address_v4.cpp
     src/ip/ip_error.cpp
+    src/ip/port.cpp
 )
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})

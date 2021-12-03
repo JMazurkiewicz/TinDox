@@ -36,6 +36,7 @@ set(
 
     tests/unit/ip/address_v4_test.cpp
     tests/unit/ip/ip_error_test.cpp
+    tests/unit/ip/port_test.cpp
 )
 
 add_executable(tds-unit-tests ${TDS_UNIT_TESTS})
