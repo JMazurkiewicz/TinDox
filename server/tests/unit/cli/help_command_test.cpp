@@ -9,4 +9,8 @@ TEST_CASE("tds::cli::help_command", "[cli]") {
     SECTION("Is `help_command` a valid command?") {
         REQUIRE(command<help_command>);
     }
+
+    SECTION("Check name") {
+        REQUIRE(help_command::name() == "help");
+    }
 }

@@ -9,4 +9,8 @@ TEST_CASE("tds::cli::user_command", "[cli]") {
     SECTION("Is `user_command` a valid command?") {
         REQUIRE(command<user_command>);
     }
+
+    SECTION("Check name") {
+        REQUIRE(user_command::name() == "user");
+    }
 }

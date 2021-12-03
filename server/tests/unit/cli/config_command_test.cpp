@@ -9,4 +9,8 @@ TEST_CASE("tds::cli::config_command", "[cli]") {
     SECTION("Is `config_command` a valid command?") {
         REQUIRE(command<config_command>);
     }
+
+    SECTION("Check name") {
+        REQUIRE(config_command::name() == "config");
+    }
 }

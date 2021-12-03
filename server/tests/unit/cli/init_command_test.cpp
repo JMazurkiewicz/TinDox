@@ -9,4 +9,8 @@ TEST_CASE("tds::cli::init_command", "[cli]") {
     SECTION("Is `init_command` a valid command?") {
         REQUIRE(command<init_command>);
     }
+
+    SECTION("Check name") {
+        REQUIRE(init_command::name() == "init");
+    }
 }

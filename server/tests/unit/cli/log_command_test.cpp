@@ -9,4 +9,8 @@ TEST_CASE("tds::cli::log_command", "[cli]") {
     SECTION("Is `log_command` a valid command?") {
         REQUIRE(command<log_command>);
     }
+
+    SECTION("Check name") {
+        REQUIRE(log_command::name() == "log");
+    }
 }
