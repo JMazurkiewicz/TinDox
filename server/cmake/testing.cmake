@@ -30,6 +30,7 @@ set(
     tests/unit/cli/init_command_test.cpp
     tests/unit/cli/log_command_test.cpp
     tests/unit/cli/run_command_test.cpp
+    tests/unit/cli/user_command_test.cpp
 )
 
 add_executable(tds-unit-tests ${TDS_UNIT_TESTS})

@@ -38,6 +38,7 @@ set(
     src/cli/init_command.cpp
     src/cli/log_command.cpp
     src/cli/run_command.cpp
+    src/cli/user_command.cpp
 )
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
