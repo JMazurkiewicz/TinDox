@@ -36,6 +36,7 @@ set(
 
     src/cli/help_command.cpp
     src/cli/init_command.cpp
+    src/cli/log_command.cpp
     src/cli/run_command.cpp
 )
 

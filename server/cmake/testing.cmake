@@ -28,6 +28,7 @@ set(
     tests/unit/cli/command_test.cpp
     tests/unit/cli/help_command_test.cpp
     tests/unit/cli/init_command_test.cpp
+    tests/unit/cli/log_command_test.cpp
     tests/unit/cli/run_command_test.cpp
 )
 

@@ -1,6 +1,7 @@
 #include "tds/cli/command_runner.hpp"
 #include "tds/cli/help_command.hpp"
 #include "tds/cli/init_command.hpp"
+#include "tds/cli/log_command.hpp"
 #include "tds/cli/run_command.hpp"
 
 #include <cstdlib>
@@ -14,6 +15,7 @@ namespace {
         using command_runner = cli::command_runner<
             cli::help_command,
             cli::init_command,
+            cli::log_command,
             cli::run_command
         >;
 
