@@ -40,6 +40,11 @@ set(
     src/cli/log_command.cpp
     src/cli/run_command.cpp
     src/cli/user_command.cpp
+
+    src/ip/address_v4.cpp
+    src/ip/endpoint_v4.cpp
+    src/ip/ip_error.cpp
+    src/ip/port.cpp
 )
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})

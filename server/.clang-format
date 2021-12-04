@@ -48,13 +48,13 @@ IncludeCategories:
   - Regex: '^<catch2\/[a-z_]+\.hpp>$'
     Priority: 1
   # Project's headers
-  - Regex: '^\"([a-z_]+(\/|\.hpp)?)+\"$'
+  - Regex: '^\"([a-z_0-9]+(\/|\.hpp)?)+\"$'
     Priority: 2
   # C++ standard headers
   - Regex: '^<(experimental\/)?[a-z_]+>$'
     Priority: 3
   # C and POSIX headers
-  - Regex: '^<(sys\/)?[a-z_]+\.h>$'
+  - Regex: '^<([a-z]+\/)?[a-z_]+\.h>$'
     Priority: 4
 IndentAccessModifiers: false
 IndentCaseLabels: false
