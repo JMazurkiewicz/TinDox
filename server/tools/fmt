@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-if [ -z "${fmtdir+x}" ]; then
-    echo "Please set \`fmtdir\` variable to target module name."
-else
+modules="cli;ip;linux"
+for name in ${modules//;/ }
+do
+    echo "Formatting $name"
     clang-format -i include/tds/$fmtdir/*.hpp
     clang-format -i src/$fmtdir/*.cpp
     clang-format -i tests/unit/$fmtdir/*.cpp
-fi
+done
