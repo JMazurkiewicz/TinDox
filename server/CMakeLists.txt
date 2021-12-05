@@ -47,6 +47,7 @@ set(
     src/ip/port.cpp
 
     src/linux/io_device.cpp
+    src/linux/linux_error.cpp
 )
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})

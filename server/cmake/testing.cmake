@@ -40,6 +40,7 @@ set(
     tests/unit/ip/port_test.cpp
 
     tests/unit/linux/io_device_test.cpp
+    tests/unit/linux/linux_error_test.cpp
 )
 
 add_executable(tds-unit-tests ${TDS_UNIT_TESTS})
