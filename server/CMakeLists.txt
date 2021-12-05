@@ -54,7 +54,9 @@ set(
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
 target_include_directories(tds-dev PUBLIC include)
+
 target_link_libraries(tds-dev PRIVATE tomlplusplus::tomlplusplus)
+set_target_properties(tomlplusplus::tomlplusplus PROPERTIES EXCLUDE_FROM_ALL ON)
 
 set(
     TDS_SOURCES
