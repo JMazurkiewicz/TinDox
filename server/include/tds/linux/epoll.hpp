@@ -2,7 +2,6 @@
 
 #include "tds/linux/io_device.hpp"
 
-#include <array>
 #include <chrono>
 #include <span>
 #include <unordered_map>

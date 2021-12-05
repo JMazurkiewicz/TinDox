@@ -1,33 +1,26 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "tds/linux/epoll.hpp"
-#include "tds/linux/io_device.hpp"
 #include "tds/linux/linux_error.hpp"
 
-#include <chrono>
-#include <cstdio>
-
-#include <fcntl.h>
 #include <unistd.h>
 
 using namespace tds::linux;
 using namespace std::chrono;
 
-struct TestDevice : IoDevice {
-    void handle() override { }
-};
-
-struct Stdin : TestDevice {
-    Stdin() {
-        set_fd(STDIN_FILENO);
-    }
-};
-
-struct InvalidDevice : TestDevice { };
-
 TEST_CASE("tds::linux::Epoll", "[linux]") {
+    struct TestDevice : IoDevice {
+        void handle() override { }
+    };
+
     SECTION("Test valid descriptor") {
         auto test = [] {
+            struct Stdin : TestDevice {
+                Stdin() {
+                    set_fd(STDIN_FILENO);
+                }
+            };
+
             Epoll epoll;
             Stdin in;
             epoll.add_device(in);
@@ -36,6 +29,8 @@ TEST_CASE("tds::linux::Epoll", "[linux]") {
     }
 
     SECTION("Test invalid descriptor") {
+        struct InvalidDevice : TestDevice { };
+
         auto test = [] {
             Epoll epoll;
             InvalidDevice invalid;

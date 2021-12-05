@@ -1,7 +1,5 @@
 #pragma once
 
-#include "tds/linux/streambuf.hpp"
-
 namespace tds::linux {
     class IoDevice {
     public:
