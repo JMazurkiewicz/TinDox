@@ -1,3 +1,5 @@
+set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY true)
+
 include(GNUInstallDirs)
 
 install(
