@@ -1,5 +1,4 @@
 find_package(Catch2 3 QUIET)
-
 if(Catch2_FOUND)
     message(STATUS "Found Catch2: ${Catch2_DIR} (found version \"${Catch2_VERSION}\")")
 else()
@@ -15,6 +14,9 @@ else()
 
     list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
 endif()
+
+find_package(Threads REQUIRED)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 include(CTest)
 include(Catch)
@@ -42,8 +44,9 @@ set(
     tests/unit/linux/epoll_test.cpp
     tests/unit/linux/io_device_test.cpp
     tests/unit/linux/linux_error_test.cpp
+    tests/unit/linux/signal_device_test.cpp
 )
 
 add_executable(tds-unit-tests ${TDS_UNIT_TESTS})
-target_link_libraries(tds-unit-tests PRIVATE Catch2::Catch2WithMain tds-dev)
+target_link_libraries(tds-unit-tests PRIVATE Catch2::Catch2WithMain tds-dev Threads::Threads)
 catch_discover_tests(tds-unit-tests)

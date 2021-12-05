@@ -84,7 +84,7 @@ TEST_CASE("tds::ip::make_endpoint_v4", "[ip]") {
         REQUIRE(local_http.get_port() == 80);
     }
 
-    SECTION("Test `to_string`, then `make_endpoint_v4`"){
+    SECTION("Test `to_string`, then `make_endpoint_v4`") {
         EndpointV4 endpoint{AddressV4::localhost, Port{22}};
         const std::string str = to_string(endpoint);
         EndpointV4 back_to_port = make_endpoint_v4(str);

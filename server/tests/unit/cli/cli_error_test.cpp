@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "tds/cli/cli_error.hpp"
+
 #include <stdexcept>
 
 using namespace tds::cli;

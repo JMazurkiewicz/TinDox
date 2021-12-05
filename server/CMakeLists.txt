@@ -49,6 +49,7 @@ set(
     src/linux/epoll.cpp
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
+    src/linux/signal_device.cpp
 )
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
