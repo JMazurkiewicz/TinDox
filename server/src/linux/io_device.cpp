@@ -28,8 +28,6 @@ namespace tds::linux {
     }
 
     void IoDevice::raw_close() {
-        if(is_valid()) {
-            close(m_fd);
-        }
+        close(m_fd);
     }
 }

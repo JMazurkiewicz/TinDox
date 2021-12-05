@@ -46,6 +46,7 @@ set(
     src/ip/ip_error.cpp
     src/ip/port.cpp
 
+    src/linux/epoll.cpp
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
 )
