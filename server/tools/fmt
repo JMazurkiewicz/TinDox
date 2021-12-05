@@ -3,7 +3,7 @@ modules="cli;ip;linux"
 for name in ${modules//;/ }
 do
     echo "Formatting $name"
-    clang-format -i include/tds/$fmtdir/*.hpp
-    clang-format -i src/$fmtdir/*.cpp
-    clang-format -i tests/unit/$fmtdir/*.cpp
+    clang-format -i include/tds/$name/*.hpp
+    clang-format -i src/$name/*.cpp
+    clang-format -i tests/unit/$name/*.cpp
 done
