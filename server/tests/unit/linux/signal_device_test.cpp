@@ -12,19 +12,21 @@
 using namespace tds::linux;
 
 void test_signal_device(std::invocable auto test) {
-    switch(fork()) {
+    switch(const int pid = fork()) {
     case -1:
-        REQUIRE(!"`test_signal_device` failed to create process with fork(2)");
-        break;
+        REQUIRE_FALSE("`test_signal_device` failed to create process with fork(2)");
 
     case 0:
         test();
-        REQUIRE(!"Should be unreachable");
+        _exit(1);
 
-    default:
-        int result = -1;
-        wait(&result);
-        REQUIRE(result == 0);
+    default: {
+        int status = 1;
+        waitpid(pid, &status, 0);
+
+        REQUIRE(WIFEXITED(status));
+        REQUIRE(WEXITSTATUS(status) == 0);
+    }
     }
 }
 
@@ -40,7 +42,7 @@ TEST_CASE("tds::linux::SignalDevice", "[linux]") {
             std::raise(SIGINT);
             signal_device.handle();
 
-            std::exit(status);
+            _exit(status);
         });
     }
 
@@ -56,7 +58,7 @@ TEST_CASE("tds::linux::SignalDevice", "[linux]") {
                 std::raise(SIGINT);
                 signal_device.handle();
 
-                std::exit(status);
+                _exit(status);
             }}.join();
         });
     }
@@ -77,7 +79,7 @@ TEST_CASE("tds::linux::{SignalDevice+Epoll}", "[linux]") {
             std::raise(SIGINT);
             epoll.handle();
 
-            std::exit(status);
+            _exit(status);
         });
     }
 
@@ -96,7 +98,7 @@ TEST_CASE("tds::linux::{SignalDevice+Epoll}", "[linux]") {
                 std::raise(SIGINT);
                 epoll.handle();
 
-                std::exit(status);
+                _exit(status);
             }}.join();
         });
     }
