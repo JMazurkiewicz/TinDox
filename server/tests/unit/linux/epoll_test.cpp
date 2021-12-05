@@ -14,13 +14,13 @@ TEST_CASE("tds::linux::Epoll", "[linux]") {
     };
 
     SECTION("Test valid descriptor") {
-        auto test = [] {
-            struct Stdin : TestDevice {
-                Stdin() {
-                    set_fd(STDIN_FILENO);
-                }
-            };
+        struct Stdin : TestDevice {
+            Stdin() {
+                set_fd(STDIN_FILENO);
+            }
+        };
 
+        auto test = [] {
             Epoll epoll;
             Stdin in;
             epoll.add_device(in);
