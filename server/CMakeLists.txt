@@ -65,6 +65,8 @@ set(
 add_executable(tds ${TDS_SOURCES})
 target_link_libraries(tds PUBLIC tds-dev)
 
+include("cmake/installing.cmake")
+
 option(TDS_TESTING "Run unit tests.")
 if(TDS_TESTING)
     include("cmake/testing.cmake")

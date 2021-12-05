@@ -1,0 +1,11 @@
+include(GNUInstallDirs)
+
+install(
+    TARGETS tds-dev LIBRARY
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(
+    TARGETS tds RUNTIME
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
