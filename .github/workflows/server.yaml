@@ -46,7 +46,7 @@ jobs:
     - name: Run tests
       run: ctest --test-dir build --output-on-failure
 
-    - name: Install locally
+    - name: Install with CMake
       run: |
         sudo cmake --install build
         tds help

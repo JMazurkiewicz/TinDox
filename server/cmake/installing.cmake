@@ -1,6 +1,5 @@
 include(GNUInstallDirs)
-
-set_target_properties(tds PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+set_target_properties(tds PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_FULL_LIBDIR}")
 
 install(
     TARGETS tds-dev tds
