@@ -54,7 +54,7 @@ set(
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
 target_include_directories(tds-dev PUBLIC include)
-target_link_libraries(tds-dev PRIVATE tomlplusplus::tomlplusplus)
+#target_link_libraries(tds-dev PRIVATE tomlplusplus::tomlplusplus)
 
 set(
     TDS_SOURCES
@@ -64,6 +64,7 @@ set(
 
 add_executable(tds ${TDS_SOURCES})
 target_link_libraries(tds PUBLIC tds-dev)
+set_target_properties(tds PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 include("cmake/installing.cmake")
 
