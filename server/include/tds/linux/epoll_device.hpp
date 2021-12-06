@@ -9,11 +9,11 @@
 #include <sys/epoll.h>
 
 namespace tds::linux {
-    class Epoll : public IoDevice {
+    class EpollDevice : public IoDevice {
     public:
         static constexpr std::chrono::milliseconds default_timeout{5000};
 
-        Epoll();
+        EpollDevice();
 
         void add_device(IoDevice& dev);
         void handle() override;

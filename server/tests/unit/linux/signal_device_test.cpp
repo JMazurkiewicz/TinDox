@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "tds/linux/epoll.hpp"
+#include "tds/linux/epoll_device.hpp"
 #include "tds/linux/signal_device.hpp"
 
 #include <csignal>
@@ -73,11 +73,11 @@ TEST_CASE("tds::linux::{SignalDevice+Epoll}", "[linux]") {
             signal_device.add_handler(SIGINT, [&](int) { status = 0; });
             signal_device.apply();
 
-            Epoll epoll;
-            epoll.add_device(signal_device);
+            EpollDevice epoll_device;
+            epoll_device.add_device(signal_device);
 
             std::raise(SIGINT);
-            epoll.handle();
+            epoll_device.handle();
 
             _exit(status);
         });
@@ -92,11 +92,11 @@ TEST_CASE("tds::linux::{SignalDevice+Epoll}", "[linux]") {
                 signal_device.add_handler(SIGINT, [&](int) { status = 0; });
                 signal_device.apply();
 
-                Epoll epoll;
-                epoll.add_device(signal_device);
+                EpollDevice epoll_device;
+                epoll_device.add_device(signal_device);
 
                 std::raise(SIGINT);
-                epoll.handle();
+                epoll_device.handle();
 
                 _exit(status);
             }}.join();

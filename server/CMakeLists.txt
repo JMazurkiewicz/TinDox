@@ -50,7 +50,7 @@ set(
     src/ip/ip_error.cpp
     src/ip/port.cpp
 
-    src/linux/epoll.cpp
+    src/linux/epoll_device.cpp
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
     src/linux/signal_device.cpp
