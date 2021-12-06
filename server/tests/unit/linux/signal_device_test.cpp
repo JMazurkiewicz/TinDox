@@ -64,7 +64,7 @@ TEST_CASE("tds::linux::SignalDevice", "[linux]") {
     }
 }
 
-TEST_CASE("tds::linux::{SignalDevice+Epoll}", "[linux]") {
+TEST_CASE("tds::linux::{SignalDevice+EpollDevice}", "[linux]") {
     SECTION("Test in main thread") {
         test_signal_device([] {
             SignalDevice signal_device;

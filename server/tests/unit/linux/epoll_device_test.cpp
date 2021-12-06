@@ -8,7 +8,7 @@
 using namespace tds::linux;
 using namespace std::chrono;
 
-TEST_CASE("tds::linux::Epoll", "[linux]") {
+TEST_CASE("tds::linux::EpollDevice", "[linux]") {
     struct TestDevice : IoDevice {
         void handle() override { }
     };
