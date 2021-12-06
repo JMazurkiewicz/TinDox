@@ -29,8 +29,8 @@ namespace tds::linux {
         std::array<epoll_event, 256> events; // @todo temporary solution
         const int event_count = get_event_count(events);
 
-        auto devices =
-            events | std::views::take(event_count) | std::views::transform(std::bind_front(&EpollDevice::get_device, this));
+        auto devices = events | std::views::take(event_count) |
+                       std::views::transform(std::bind_front(&EpollDevice::get_device, this));
         std::ranges::for_each(devices, &IoDevice::handle);
     }
 

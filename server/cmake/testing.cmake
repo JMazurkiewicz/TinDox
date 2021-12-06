@@ -36,6 +36,8 @@ set(
     tests/unit/cli/run_command_test.cpp
     tests/unit/cli/user_command_test.cpp
 
+    tests/unit/config/defaults_test.cpp
+
     tests/unit/ip/address_v4_test.cpp
     tests/unit/ip/endpoint_v4_test.cpp
     tests/unit/ip/ip_error_test.cpp
