@@ -8,12 +8,12 @@ namespace tds::cli {
             "usage: tds <command> [<args>]\n"
             "\n"
             "These are TinDoxServer commands:\n"
-            "* config       modify server's properties\n"
-            "* help         display available options\n"
-            "* init         creates server instance in current or selected directory\n"
-            "* log          display logs\n"
-            "* run          run TinDoxServer\n"
-            "* user         add, modify or remove users\n"};
+            "* config               modify server's properties\n"
+            "* help                 display available options\n"
+            "* init [<location>]    creates server instance in current or specified directory\n"
+            "* log                  display logs\n"
+            "* run                  run TinDoxServer\n"
+            "* user                 add, modify or remove users\n"};
     }
 
     int HelpCommand::do_execute(std::span<const std::string_view> args) {
