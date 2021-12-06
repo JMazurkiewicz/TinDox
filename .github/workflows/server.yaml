@@ -49,6 +49,5 @@ jobs:
     - name: Install TDS on local machine
       run: |
         sudo cmake --install build
-        sudo echo "/usr/local/lib" >> /etc/ld.so.conf
-        sudo ldconfig /usr/local/lib
+        export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
         tds help
