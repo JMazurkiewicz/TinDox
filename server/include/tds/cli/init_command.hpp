@@ -21,6 +21,9 @@ namespace tds::cli {
         void create_config_directory();
         void create_default_config();
 
+        void handle_filesystem_error(const std::filesystem::filesystem_error& e);
+        void handle_exception(const std::exception& e);
+
         std::filesystem::path m_location;
         int m_exit_status;
     };

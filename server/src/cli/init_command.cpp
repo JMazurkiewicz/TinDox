@@ -2,6 +2,7 @@
 
 #include "tds/config/defaults.hpp"
 
+#include <array>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -14,7 +15,15 @@ namespace tds::cli {
 
     int InitCommand::do_execute(std::span<const std::string_view> args) {
         set_location(args);
-        execute_steps();
+
+        try {
+            execute_steps();
+        } catch(const fs::filesystem_error& e) {
+            handle_filesystem_error(e);
+        } catch(const std::exception& e) {
+            handle_exception(e);
+        }
+
         return m_exit_status;
     }
 
@@ -38,20 +47,17 @@ namespace tds::cli {
     }
 
     void InitCommand::execute_steps() {
-        try {
-            for(auto op : {&InitCommand::create_config_directory, &InitCommand::create_default_config}) {
-                if(m_exit_status != 0) {
-                    break;
-                }
-                (this->*op)();
+        const std::array steps = {
+            &InitCommand::create_config_directory,
+            &InitCommand::create_default_config,
+        };
+
+        for(auto step : steps) {
+            if(m_exit_status != 0) {
+                break;
+            } else {
+                (this->*step)();
             }
-        } catch(const fs::filesystem_error& e) {
-            std::cerr << "error: " << e.what() << "\npath1: " << e.path1() << "\npath2: " << e.path2()
-                      << "\ncode: " << e.code() << '\n';
-            m_exit_status = 1;
-        } catch(const std::exception& e) {
-            std::cerr << "error: " << e.what() << '\n';
-            m_exit_status = 1;
         }
     }
 
@@ -71,17 +77,27 @@ namespace tds::cli {
         std::ofstream config_file{m_location / "config"};
         if(!config_file.good()) {
             m_exit_status = 1;
-            return;
+        } else {
+            config_file << "[config]\n"
+                           "max_thread_count = "
+                        << config::defaults::get_default_max_thread_count()
+                        << "\n"
+                           "max_user_count = "
+                        << config::defaults::get_default_max_user_count()
+                        << "\n"
+                           "backlog = "
+                        << config::defaults::get_default_backlog() << '\n';
         }
+    }
 
-        config_file << "[config]\n"
-                       "max_thread_count = "
-                    << config::defaults::get_default_max_thread_count()
-                    << "\n"
-                       "max_user_count = "
-                    << config::defaults::get_default_max_user_count()
-                    << "\n"
-                       "backlog = "
-                    << config::defaults::get_default_backlog() << '\n';
+    void InitCommand::handle_filesystem_error(const fs::filesystem_error& e) {
+        std::cerr << "error: " << e.what() << "\npath1: " << e.path1() << "\npath2: " << e.path2()
+                  << "\ncode: " << e.code() << '\n';
+        m_exit_status = 1;
+    }
+
+    void InitCommand::handle_exception(const std::exception& e) {
+        std::cerr << "error: " << e.what() << '\n';
+        m_exit_status = 1;
     }
 }
