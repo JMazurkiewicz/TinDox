@@ -1,7 +1,5 @@
 #include "tds/linux/io_device.hpp"
 
-#include "tds/linux/streambuf.hpp"
-
 #include <unistd.h>
 
 namespace tds::linux {
