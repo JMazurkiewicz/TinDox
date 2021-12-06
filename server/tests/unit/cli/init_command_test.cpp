@@ -3,6 +3,7 @@
 
 #include "tds/cli/command.hpp"
 #include "tds/cli/init_command.hpp"
+
 #include <array>
 #include <filesystem>
 
@@ -22,7 +23,7 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
     }
 
     SECTION("Test creating instance in current path") {
-        tds::unit::test_in_new_process([]{
+        tds::unit::test_in_new_process([] {
             fs::current_path("/tmp");
             InitCommand init;
             init.execute({});
@@ -31,7 +32,7 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
     }
 
     SECTION("Test creating instance in different path") {
-        tds::unit::test_in_new_process([]{
+        tds::unit::test_in_new_process([] {
             InitCommand init;
             const auto args = std::to_array<std::string_view>({"/tmp"});
             init.execute(args);
