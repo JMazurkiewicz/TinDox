@@ -28,7 +28,11 @@ else()
         GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
         GIT_TAG v2.5.0
     )
-    FetchContent_MakeAvailable(tomlplusplus)
+
+    if(NOT tomlplusplus_POPULATED)
+        FetchContent_Populate(tomlplusplus)
+        add_subdirectory("${tomlplusplus_SOURCE_DIR}" EXCLUDE_FROM_ALL)
+    endif()
 endif()
 
 set(
@@ -64,6 +68,8 @@ set(
 
 add_executable(tds ${TDS_SOURCES})
 target_link_libraries(tds PUBLIC tds-dev)
+
+include("cmake/installing.cmake")
 
 option(TDS_TESTING "Run unit tests.")
 if(TDS_TESTING)

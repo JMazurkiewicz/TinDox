@@ -1,0 +1,13 @@
+include(GNUInstallDirs)
+set_target_properties(tds PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_FULL_LIBDIR}")
+
+install(
+    TARGETS tds-dev tds
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+set(CPACK_PACKAGE_NAME "TinDox Server")
+set(CPACK_PACKAGE_VENDOR "Jakub Mazurkiewicz")
+set(CPACK_GENERATOR "ZIP")
+include(CPack)

@@ -45,3 +45,11 @@ jobs:
 
     - name: Run tests
       run: ctest --test-dir build --output-on-failure
+
+    - name: Install with CMake
+      run: |
+        sudo cmake --install build
+        tds help
+
+    - name: Run CPack
+      run: sudo cpack --config build/CPackConfig.cmake -B build
