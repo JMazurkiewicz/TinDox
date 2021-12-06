@@ -1,17 +1,23 @@
 # TinDox Server
 
-## How to build
+## Build
 
 ```bash
 cmake -B build
 cmake --build build
 ```
 
-## How to test
+## Test
 
 ```bash
 cmake -B build -DTDS_TESTING=ON
 cmake --build build
 cd build
 ctest
+```
+
+## Install
+
+```bash
+cmake --install build
 ```
