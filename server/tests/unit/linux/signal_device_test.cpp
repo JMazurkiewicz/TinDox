@@ -21,7 +21,7 @@ TEST_CASE("tds::linux::SignalDevice", "[linux]") {
             std::raise(SIGINT);
             signal_device.handle();
 
-            _exit(status);
+            return status;
         });
     }
 
@@ -39,6 +39,8 @@ TEST_CASE("tds::linux::SignalDevice", "[linux]") {
 
                 _exit(status);
             }}.join();
+
+            return 1;
         });
     }
 }
@@ -58,7 +60,7 @@ TEST_CASE("tds::linux::{SignalDevice+EpollDevice}", "[linux]") {
             std::raise(SIGINT);
             epoll_device.handle();
 
-            _exit(status);
+            return status;
         });
     }
 
@@ -79,6 +81,8 @@ TEST_CASE("tds::linux::{SignalDevice+EpollDevice}", "[linux]") {
 
                 _exit(status);
             }}.join();
+
+            return 1;
         });
     }
 }
