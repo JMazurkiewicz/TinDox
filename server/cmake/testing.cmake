@@ -36,6 +36,8 @@ set(
     tests/unit/cli/run_command_test.cpp
     tests/unit/cli/user_command_test.cpp
 
+    tests/unit/config/defaults_test.cpp
+
     tests/unit/ip/address_v4_test.cpp
     tests/unit/ip/endpoint_v4_test.cpp
     tests/unit/ip/ip_error_test.cpp
@@ -49,4 +51,5 @@ set(
 
 add_executable(tds-unit-tests ${TDS_UNIT_TESTS})
 target_link_libraries(tds-unit-tests PRIVATE Catch2::Catch2WithMain tds-dev Threads::Threads)
+target_include_directories(tds-unit-tests PRIVATE tests/unit)
 catch_discover_tests(tds-unit-tests)

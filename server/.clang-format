@@ -45,7 +45,7 @@ FixNamespaceComments: false
 IncludeBlocks: Regroup
 IncludeCategories:
   # Catch2 headers
-  - Regex: '^<catch2\/[a-z_]+\.hpp>$'
+  - Regex: '^<(catch2\/[a-z_]+|unit)\.hpp>$'
     Priority: 1
   # Project's headers
   - Regex: '^\"([a-z_0-9]+(\/|\.hpp)?)+\"$'
