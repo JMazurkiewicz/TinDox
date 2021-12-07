@@ -24,27 +24,33 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
 
     SECTION("Test creating instance in current path") {
         tds::unit::test_in_new_process([] {
-            fs::current_path("/tmp");
-            InitCommand init;
-            init.execute({});
+            const fs::path test_dir = "/tmp/tds_test1";
+            fs::create_directory(test_dir);
+            fs::current_path(test_dir);
 
-            const fs::path tds_root = fs::current_path() / ".tds";
-            const bool status =
-                fs::exists(tds_root) && fs::exists(tds_root / "config") && fs::exists(tds_root / "users");
-            return static_cast<int>(!status);
+            InitCommand init;
+            const int status = init.execute({});
+
+            const fs::path tds_root = test_dir / ".tds";
+            const bool success = status == 0 && fs::exists(tds_root) && fs::exists(tds_root / "config") &&
+                                 fs::exists(tds_root / "users");
+            return static_cast<int>(!success);
         });
     }
 
     SECTION("Test creating instance in different path") {
         tds::unit::test_in_new_process([] {
-            const auto args = std::to_array<std::string_view>({"/tmp"});
-            InitCommand init;
-            init.execute(args);
+            const fs::path test_dir = "/tmp/tds_test2";
+            fs::create_directory(test_dir);
+            const auto args = std::to_array<std::string_view>({test_dir.native()});
 
-            const fs::path tds_root = "/tmp/.tds";
-            const bool status =
-                fs::exists(tds_root) && fs::exists(tds_root / "config") && fs::exists(tds_root / "users");
-            return static_cast<int>(!status);
+            InitCommand init;
+            const int status = init.execute(args);
+
+            const fs::path tds_root = test_dir / ".tds";
+            const bool success = status == 0 && fs::exists(tds_root) && fs::exists(tds_root / "config") &&
+                                 fs::exists(tds_root / "users");
+            return static_cast<int>(!success);
         });
     }
 }
