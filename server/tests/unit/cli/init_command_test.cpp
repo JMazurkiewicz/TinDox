@@ -27,16 +27,24 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
             fs::current_path("/tmp");
             InitCommand init;
             init.execute({});
-            return static_cast<int>(!fs::exists(fs::current_path() / ".tds"));
+
+            const fs::path tds_root = fs::current_path() / ".tds";
+            const bool status =
+                fs::exists(tds_root) && fs::exists(tds_root / "config") && fs::exists(tds_root / "users");
+            return static_cast<int>(!status);
         });
     }
 
     SECTION("Test creating instance in different path") {
         tds::unit::test_in_new_process([] {
-            InitCommand init;
             const auto args = std::to_array<std::string_view>({"/tmp"});
+            InitCommand init;
             init.execute(args);
-            return static_cast<int>(!fs::exists("/tmp/.tds"));
+
+            const fs::path tds_root = "/tmp/.tds";
+            const bool status =
+                fs::exists(tds_root) && fs::exists(tds_root / "config") && fs::exists(tds_root / "users");
+            return static_cast<int>(!status);
         });
     }
 }
