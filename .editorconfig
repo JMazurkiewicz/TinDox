@@ -13,3 +13,7 @@ indent_size = 4
 [*.yaml,.clang-*]
 indent_style = space
 indent_size = 2
+
+[*.tex]
+indent_style = space
+indent_size = 4

@@ -1,0 +1,29 @@
+name: Test documentation
+
+on:
+  push:
+    paths: ['docs-pl/src/**']
+  pull_request:
+    paths: ['docs-pl/src/**']
+
+jobs:
+  docs:
+    name: Build ${{matrix.doctype}} documentation
+    runs-on: ${{matrix.os}}
+
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        doctype: [preliminary]
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: xu-cheng/latex-action@v2
+      with:
+        root_file: ${{matrix.doctype}}-documentation.tex
+        working_directory: docs-pl/src/${{matrix.doctype}}-documentation
