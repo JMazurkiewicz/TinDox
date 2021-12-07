@@ -35,14 +35,12 @@ namespace tds::cli {
         case 1:
             m_location = args[0];
             if(!fs::exists(m_location)) {
-                std::cerr << "error: location " << m_location << " does not exist\n";
-                m_exit_status = 1;
+                log_error() << "error: location " << m_location << " does not exist\n";
             }
             break;
         default:
-            std::cerr << "error: invalid arguments\n"
-                         "usage: tds init [<location>]\n";
-            m_exit_status = 1;
+            log_error() << "error: invalid arguments\n"
+                           "usage: tds init [<location>]\n";
         }
     }
 
@@ -50,7 +48,7 @@ namespace tds::cli {
         const std::array steps = {
             &InitCommand::create_config_directory,
             &InitCommand::create_default_config,
-            &InitCommand::create_default_users
+            &InitCommand::create_default_users,
         };
 
         for(auto step : steps) {
@@ -66,8 +64,7 @@ namespace tds::cli {
         const fs::path config_name = m_location / ".tds";
 
         if(fs::exists(config_name)) {
-            std::cerr << "error: config already exists in " << m_location << '\n';
-            m_exit_status = 1;
+            log_error() << "error: config already exists in " << m_location << '\n';
         } else {
             fs::create_directory(config_name);
             m_location = std::move(config_name);
@@ -78,8 +75,7 @@ namespace tds::cli {
         const fs::path file_name = m_location / "config";
         std::ofstream config_file{file_name};
         if(!config_file.good()) {
-            std::cerr << "error: failed to create config file (" << file_name << ")\n";
-            m_exit_status = 1;
+            log_error() << "error: failed to create config file (" << file_name << ")\n";
         } else {
             config_file << "[config]\n"
                            "max_thread_count = "
@@ -97,21 +93,23 @@ namespace tds::cli {
         const fs::path file_name = m_location / "users";
         std::ofstream users_file{file_name};
         if(!users_file.good()) {
-            std::cerr << "error: failed to create users file (" << file_name << ")\n";
-            m_exit_status = 1;
+            log_error() << "error: failed to create users file (" << file_name << ")\n";
         } else {
             users_file << "admin:admin:all\n";
         }
     }
 
     void InitCommand::handle_filesystem_error(const fs::filesystem_error& e) {
-        std::cerr << "error: " << e.what() << "\npath1: " << e.path1() << "\npath2: " << e.path2()
-                  << "\ncode: " << e.code() << '\n';
-        m_exit_status = 1;
+        log_error() << "error: " << e.what() << "\npath1: " << e.path1() << "\npath2: " << e.path2()
+                    << "\ncode: " << e.code() << '\n';
     }
 
     void InitCommand::handle_exception(const std::exception& e) {
-        std::cerr << "error: " << e.what() << '\n';
+        log_error() << "error: " << e.what() << '\n';
+    }
+
+    std::ostream& InitCommand::log_error() {
         m_exit_status = 1;
+        return std::cerr;
     }
 }
