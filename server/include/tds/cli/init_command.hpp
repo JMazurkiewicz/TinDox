@@ -20,6 +20,7 @@ namespace tds::cli {
         void execute_steps();
         void create_config_directory();
         void create_default_config();
+        void create_default_users();
 
         void handle_filesystem_error(const std::filesystem::filesystem_error& e);
         void handle_exception(const std::exception& e);

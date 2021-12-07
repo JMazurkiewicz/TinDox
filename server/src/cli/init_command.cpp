@@ -50,6 +50,7 @@ namespace tds::cli {
         const std::array steps = {
             &InitCommand::create_config_directory,
             &InitCommand::create_default_config,
+            &InitCommand::create_default_users
         };
 
         for(auto step : steps) {
@@ -74,8 +75,10 @@ namespace tds::cli {
     }
 
     void InitCommand::create_default_config() {
-        std::ofstream config_file{m_location / "config"};
+        const fs::path file_name = m_location / "config";
+        std::ofstream config_file{file_name};
         if(!config_file.good()) {
+            std::cerr << "error: failed to create config file (" << file_name << ")\n";
             m_exit_status = 1;
         } else {
             config_file << "[config]\n"
@@ -87,6 +90,17 @@ namespace tds::cli {
                         << "\n"
                            "backlog = "
                         << config::defaults::get_default_backlog() << '\n';
+        }
+    }
+
+    void InitCommand::create_default_users() {
+        const fs::path file_name = m_location / "users";
+        std::ofstream users_file{file_name};
+        if(!users_file.good()) {
+            std::cerr << "error: failed to create users file (" << file_name << ")\n";
+            m_exit_status = 1;
+        } else {
+            users_file << "admin:admin:all\n";
         }
     }
 
