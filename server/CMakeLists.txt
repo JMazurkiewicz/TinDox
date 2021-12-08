@@ -56,6 +56,8 @@ set(
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
     src/linux/signal_device.cpp
+
+    src/tcp/listener.cpp
 )
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
