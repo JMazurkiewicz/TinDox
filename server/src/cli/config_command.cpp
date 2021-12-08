@@ -3,8 +3,9 @@
 #include <iostream>
 
 namespace tds::cli {
-    int ConfigCommand::do_execute(std::span<const std::string_view>) {
+    void ConfigCommand::parse_arguments(std::span<const std::string_view>) { }
+
+    void ConfigCommand::execute() {
         std::cout << "Config\n";
-        return 0;
     }
 }

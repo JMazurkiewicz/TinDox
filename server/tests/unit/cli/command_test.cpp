@@ -8,25 +8,22 @@ using namespace tds::cli;
 struct GoodCommand1 : public CommandInterface<GoodCommand1> {
     static constexpr std::string_view name = "good_command1";
 
-    int do_execute([[maybe_unused]] std::span<const std::string_view>) {
-        return 0;
-    }
+    void parse_arguments(std::span<const std::string_view>) { }
+    void execute() { }
 };
 
 struct GoodCommand2 : public CommandInterface<GoodCommand2> {
     static constexpr const char* name = "good_command2";
 
-    int do_execute([[maybe_unused]] std::span<const std::string_view>) {
-        return 0;
-    }
+    void parse_arguments(std::span<const std::string_view>) { }
+    void execute() { }
 };
 
 struct BadCommand1 : public CommandInterface<BadCommand1> {
     static std::string name;
 
-    int do_execute([[maybe_unused]] std::span<const std::string_view>) {
-        return 0;
-    }
+    void parse_arguments(std::span<std::string_view>) { }
+    void execute() { }
 };
 
 std::string BadCommand1::name = "bad_command1";
@@ -34,7 +31,7 @@ std::string BadCommand1::name = "bad_command1";
 struct BadCommand2 : public CommandInterface<BadCommand2> {
     static constexpr std::string_view name = "bad_command2";
 
-    void do_execute([[maybe_unused]] std::span<std::string_view>) { }
+    void execute() { }
 };
 
 struct BadCommand3 { };

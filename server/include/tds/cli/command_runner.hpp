@@ -47,9 +47,9 @@ namespace tds::cli {
         }
 
         int execute_command(std::span<const std::string_view> args) {
-            auto visitor = [args]<typename T>(T& com) {
+            auto visitor = [args]<typename T>(T& command) {
                 if constexpr(Command<T>) {
-                    return com.do_execute(args);
+                    return command(args);
                 } else {
                     return 1;
                 }

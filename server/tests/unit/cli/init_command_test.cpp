@@ -29,7 +29,7 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
             fs::current_path(test_dir);
 
             InitCommand init;
-            const int status = init.execute({});
+            const int status = init({});
 
             const fs::path tds_root = test_dir / ".tds";
             const bool success = status == 0 && fs::exists(tds_root) && fs::exists(tds_root / "config") &&
@@ -45,7 +45,7 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
             const auto args = std::to_array<std::string_view>({test_dir.native()});
 
             InitCommand init;
-            const int status = init.execute(args);
+            const int status = init(args);
 
             const fs::path tds_root = test_dir / ".tds";
             const bool success = status == 0 && fs::exists(tds_root) && fs::exists(tds_root / "config") &&

@@ -3,8 +3,9 @@
 #include <iostream>
 
 namespace tds::cli {
-    int UserCommand::do_execute(std::span<const std::string_view> args) {
+    void UserCommand::parse_arguments(std::span<const std::string_view>) { }
+
+    void UserCommand::execute() {
         std::cout << "User\n";
-        return 0;
     }
 }

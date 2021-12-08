@@ -10,53 +10,34 @@
 namespace fs = std::filesystem;
 
 namespace tds::cli {
-    InitCommand::InitCommand()
-        : m_exit_status{0} { }
-
-    int InitCommand::do_execute(std::span<const std::string_view> args) {
-        set_location(args);
-
-        try {
-            execute_steps();
-        } catch(const fs::filesystem_error& e) {
-            handle_filesystem_error(e);
-        } catch(const std::exception& e) {
-            handle_exception(e);
-        }
-
-        return m_exit_status;
-    }
-
-    void InitCommand::set_location(std::span<const std::string_view> args) {
+    void InitCommand::parse_arguments(std::span<const std::string_view> args) {
         switch(args.size()) {
         case 0:
             m_location = fs::current_path();
             break;
+
         case 1:
             m_location = args[0];
             if(!fs::exists(m_location)) {
                 log_error() << "error: location " << m_location << " does not exist\n";
             }
             break;
+
         default:
             log_error() << "error: invalid arguments\n"
                            "usage: tds init [<location>]\n";
+            break;
         }
     }
 
-    void InitCommand::execute_steps() {
-        const std::array steps = {
-            &InitCommand::create_config_directory,
-            &InitCommand::create_default_config,
-            &InitCommand::create_default_users,
-        };
-
-        for(auto step : steps) {
-            if(m_exit_status != 0) {
-                break;
-            } else {
-                (this->*step)();
-            }
+    void InitCommand::execute() {
+        try {
+            execute_steps(&InitCommand::create_config_directory, &InitCommand::create_default_config,
+                          &InitCommand::create_default_users);
+        } catch(const fs::filesystem_error& e) {
+            handle_filesystem_error(e);
+        } catch(const std::exception& e) {
+            handle_exception(e);
         }
     }
 
@@ -106,10 +87,5 @@ namespace tds::cli {
 
     void InitCommand::handle_exception(const std::exception& e) {
         log_error() << "error: " << e.what() << '\n';
-    }
-
-    std::ostream& InitCommand::log_error() {
-        m_exit_status = 1;
-        return std::cerr;
     }
 }

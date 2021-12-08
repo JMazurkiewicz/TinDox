@@ -11,9 +11,13 @@ using namespace std::string_view_literals;
 struct GoodCommand : CommandInterface<GoodCommand> {
     static constexpr std::string_view name = "good";
 
-    int do_execute(std::span<const std::string_view> args) {
-        return static_cast<int>(args.size());
+    void parse_arguments(std::span<const std::string_view> args) {
+        m_argc = static_cast<int>(args.size());
     }
+
+    void execute() { }
+
+    std::size_t m_argc = 0;
 };
 
 TEST_CASE("tds::cli::CommandInterace<T>", "[cli]") {
@@ -28,6 +32,8 @@ TEST_CASE("tds::cli::CommandInterace<T>", "[cli]") {
     SECTION("Check `execute` function") {
         GoodCommand command;
         std::array args = {"a"sv, "b"sv, "c"sv};
-        REQUIRE(command.execute(args) == 3);
+
+        command.parse_arguments(args);
+        REQUIRE(command.m_argc == 3);
     }
 }

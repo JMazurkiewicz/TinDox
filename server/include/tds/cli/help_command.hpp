@@ -10,6 +10,13 @@ namespace tds::cli {
     public:
         static constexpr std::string_view name = "help";
 
-        int do_execute(std::span<const std::string_view> args);
+        HelpCommand();
+        void parse_arguments(std::span<const std::string_view> args);
+        void execute();
+
+    private:
+        void print_help();
+
+        bool m_empty_args;
     };
 }

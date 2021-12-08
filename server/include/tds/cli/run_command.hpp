@@ -10,6 +10,7 @@ namespace tds::cli {
     public:
         static constexpr std::string_view name = "run";
 
-        int do_execute(std::span<const std::string_view> args);
+        void parse_arguments(std::span<const std::string_view> args);
+        void execute();
     };
 }
