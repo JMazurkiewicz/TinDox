@@ -1,4 +1,4 @@
-#include "tds/tcp/listener.hpp"
+#include "tds/ip/tcp_listener.hpp"
 
 #include "tds/ip/address_v4.hpp"
 #include "tds/ip/endpoint_v4.hpp"
@@ -12,7 +12,7 @@
 #include <unistd.h>
 
 namespace tds::tcp {
-    Listener::Listener()
+    TcpListener::TcpListener()
         : m_backlog{32} {
         if(const int socket_fd = socket(AF_INET, SOCK_STREAM, 0); socket_fd == -1) {
             throw linux::LinuxError{"socket(2)"};
@@ -21,7 +21,7 @@ namespace tds::tcp {
         }
     }
 
-    void Listener::set_backlog(int new_backlog) {
+    void TcpListener::set_backlog(int new_backlog) {
         if(new_backlog <= 0) {
             throw std::logic_error{"Listener: backlog should not be negative"};
         } else {
@@ -29,15 +29,15 @@ namespace tds::tcp {
         }
     }
 
-    void Listener::set_connection_handler(ConnectionHandler connection_handler) {
+    void TcpListener::set_connection_handler(ConnectionHandler connection_handler) {
         m_connection_handler = std::move(connection_handler);
     }
 
-    void Listener::listen(ip::Port port) {
+    void TcpListener::listen(ip::Port port) {
         listen(ip::EndpointV4(ip::AddressV4::any, port));
     }
 
-    void Listener::listen(ip::EndpointV4 endpoint) {
+    void TcpListener::listen(ip::EndpointV4 endpoint) {
         const sockaddr_in addr = {
             .sin_family = AF_INET,
             .sin_port = htons(endpoint.get_port().as_integer()),
@@ -53,7 +53,7 @@ namespace tds::tcp {
         }
     }
 
-    void Listener::handle() {
+    void TcpListener::handle() {
         sockaddr_in addrbuf = {};
         socklen_t addr_length = sizeof(sockaddr_in);
         const int connection_fd = accept(get_fd(), reinterpret_cast<sockaddr*>(&addrbuf), &addr_length);

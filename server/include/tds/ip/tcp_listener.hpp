@@ -8,9 +8,9 @@
 namespace tds::tcp {
     using ConnectionHandler = std::function<void(int connection_fd, ip::EndpointV4 client)>;
 
-    class Listener : public linux::IoDevice {
+    class TcpListener : public linux::IoDevice {
     public:
-        Listener();
+        TcpListener();
 
         void set_backlog(int new_backlog);
         void set_connection_handler(ConnectionHandler connection_handler);
