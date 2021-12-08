@@ -48,7 +48,7 @@ IncludeCategories:
   - Regex: '^<(catch2\/[a-z_]+|unit)\.hpp>$'
     Priority: 1
   # Project's headers
-  - Regex: '^\"([a-z_0-9]+(\/|\.hpp)?)+\"$'
+  - Regex: '^"tds\/([a-z_0-9]+(\/|\.hpp)?)+"$'
     Priority: 2
   # C++ standard headers
   - Regex: '^<(experimental\/)?[a-z_]+>$'
