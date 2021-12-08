@@ -6,7 +6,7 @@
 #include <functional>
 
 namespace tds::ip {
-    using ConnectionHandler = std::function<void(int connection_fd, ip::EndpointV4 client)>;
+    using ConnectionHandler = std::function<void(int connection_fd, EndpointV4 client)>;
 
     class TcpListener : public linux::IoDevice {
     public:
@@ -15,8 +15,8 @@ namespace tds::ip {
         void set_backlog(int new_backlog);
         void set_connection_handler(ConnectionHandler connection_handler);
 
-        void listen(ip::Port port);
-        void listen(ip::EndpointV4 endpoint);
+        void listen(Port port);
+        void listen(EndpointV4 endpoint);
 
         void handle() override;
 

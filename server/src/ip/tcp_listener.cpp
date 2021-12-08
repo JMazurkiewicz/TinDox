@@ -33,11 +33,11 @@ namespace tds::ip {
         m_connection_handler = std::move(connection_handler);
     }
 
-    void TcpListener::listen(ip::Port port) {
-        listen(ip::EndpointV4(ip::AddressV4::any, port));
+    void TcpListener::listen(Port port) {
+        listen(EndpointV4(AddressV4::any, port));
     }
 
-    void TcpListener::listen(ip::EndpointV4 endpoint) {
+    void TcpListener::listen(EndpointV4 endpoint) {
         const sockaddr_in addr = {
             .sin_family = AF_INET,
             .sin_port = htons(endpoint.get_port().as_integer()),
@@ -69,9 +69,9 @@ namespace tds::ip {
                 std::runtime_error{"Listener: received non-Ipv4 connection"};
             }
 
-            const ip::AddressV4 address{ntohl(addr->sin_addr.s_addr)};
-            const ip::Port port{ntohs(addr->sin_port)};
-            m_connection_handler(connection_fd, ip::EndpointV4(address, port));
+            const AddressV4 address{ntohl(addr->sin_addr.s_addr)};
+            const Port port{ntohs(addr->sin_port)};
+            m_connection_handler(connection_fd, EndpointV4(address, port));
         }
     }
 }
