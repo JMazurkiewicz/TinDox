@@ -10,8 +10,7 @@ namespace tds::cli {
     public:
         static constexpr std::string_view name = "config";
 
-        int do_execute([[maybe_unused]] std::span<const std::string_view>);
+        void parse_arguments(std::span<const std::string_view> args);
+        void execute();
     };
-
-    static_assert(Command<ConfigCommand>);
 }

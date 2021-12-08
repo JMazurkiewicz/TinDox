@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 
     if(argc <= 1) {
         tds::cli::HelpCommand help;
-        help.execute({});
+        help({});
         exit_status = EXIT_FAILURE;
     } else {
         try {

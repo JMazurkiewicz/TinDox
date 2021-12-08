@@ -38,6 +38,7 @@ endif()
 set(
     TDS_DEV_SOURCES
 
+    src/cli/command_base.cpp
     src/cli/config_command.cpp
     src/cli/help_command.cpp
     src/cli/init_command.cpp
