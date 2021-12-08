@@ -5,7 +5,7 @@
 
 #include <functional>
 
-namespace tds::tcp {
+namespace tds::ip {
     using ConnectionHandler = std::function<void(int connection_fd, ip::EndpointV4 client)>;
 
     class TcpListener : public linux::IoDevice {

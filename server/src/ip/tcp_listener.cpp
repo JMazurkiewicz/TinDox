@@ -11,7 +11,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-namespace tds::tcp {
+namespace tds::ip {
     TcpListener::TcpListener()
         : m_backlog{32} {
         if(const int socket_fd = socket(AF_INET, SOCK_STREAM, 0); socket_fd == -1) {
