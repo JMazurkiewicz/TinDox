@@ -17,7 +17,7 @@ namespace tds::linux {
         void handle() override;
 
     private:
-        int get_event_count(std::span<epoll_event> events);
+        int wait_for_events(std::span<epoll_event> events);
         IoDevice& get_device(epoll_event event);
 
         int m_timeout;

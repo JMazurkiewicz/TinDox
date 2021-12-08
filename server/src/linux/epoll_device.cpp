@@ -31,15 +31,15 @@ namespace tds::linux {
     }
 
     void EpollDevice::handle() {
-        std::array<epoll_event, 256> events; // @todo temporary solution
-        const int event_count = get_event_count(events);
+        std::array<epoll_event, 64> events;
+        const int event_count = wait_for_events(events);
 
         auto devices = events | std::views::take(event_count) |
                        std::views::transform(std::bind_front(&EpollDevice::get_device, this));
         std::ranges::for_each(devices, &IoDevice::handle);
     }
 
-    int EpollDevice::get_event_count(std::span<epoll_event> events) {
+    int EpollDevice::wait_for_events(std::span<epoll_event> events) {
         if(const int count = epoll_wait(get_fd(), events.data(), events.size(), m_timeout); count != -1) {
             return count;
         } else {
