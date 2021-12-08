@@ -96,19 +96,18 @@ namespace tds::cli {
             throw linux::LinuxError{"read(2)"};
         } else {
             std::string_view msg{buffer.data(), static_cast<size_t>(amount)};
-            std::cout << msg << std::flush;
-            const auto answer = '[' + to_string(client) + "]: " + std::string{msg};
+            std::cout << '[' << client << "]: " << msg << std::flush;
 
             ssize_t written = 0;
             do {
-                const int bytes = write(get_fd(), answer.data() + written, answer.size() - written);
+                const int bytes = write(get_fd(), msg.data() + written, msg.size() - written);
 
                 if(bytes == -1) {
                     throw linux::LinuxError{"write(2)"};
                 } else {
                     written += bytes;
                 }
-            } while(written != answer.size());
+            } while(written != msg.size());
         }
     }
 }

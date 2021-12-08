@@ -10,9 +10,6 @@
 #include "tds/linux/signal_device.hpp"
 
 #include <memory>
-#include <span>
-#include <string_view>
-#include <system_error>
 #include <vector>
 
 namespace tds::cli {
