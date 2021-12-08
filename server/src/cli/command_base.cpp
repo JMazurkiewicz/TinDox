@@ -3,6 +3,9 @@
 #include <iostream>
 
 namespace tds::cli {
+    CommandBase::CommandBase()
+        : m_status{0} { }
+
     void CommandBase::set_error() {
         m_status = 1;
     }

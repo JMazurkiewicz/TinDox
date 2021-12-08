@@ -12,6 +12,8 @@ namespace tds::cli {
     public:
         using Derived = T;
 
+        CommandInterface() = default;
+
         static consteval std::string_view get_name() {
             return Derived::name;
         }

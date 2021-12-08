@@ -23,34 +23,46 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
     }
 
     SECTION("Test creating instance in current path") {
-        tds::unit::test_in_new_process([] {
-            const fs::path test_dir = "/tmp/tds_test1";
-            fs::create_directory(test_dir);
-            fs::current_path(test_dir);
+        const fs::path test_dir = "/tmp/tds_test1";
+        fs::create_directory(test_dir);
+        fs::current_path(test_dir);
 
-            InitCommand init;
-            const int status = init({});
+        InitCommand init;
+        const int status = init({});
 
-            const fs::path tds_root = test_dir / ".tds";
-            const bool success = status == 0 && fs::exists(tds_root) && fs::exists(tds_root / "config") &&
-                                 fs::exists(tds_root / "users");
-            return static_cast<int>(!success);
-        });
+        const fs::path tds_root = test_dir / ".tds";
+        REQUIRE(status == 0);
+        REQUIRE(fs::exists(tds_root));
+        REQUIRE(fs::exists(tds_root / "config"));
+        REQUIRE(fs::exists(tds_root / "users"));
     }
 
     SECTION("Test creating instance in different path") {
-        tds::unit::test_in_new_process([] {
-            const fs::path test_dir = "/tmp/tds_test2";
-            fs::create_directory(test_dir);
-            const auto args = std::to_array<std::string_view>({test_dir.native()});
+        const fs::path test_dir = "/tmp/tds_test2";
+        fs::create_directory(test_dir);
+        const auto args = std::to_array<std::string_view>({test_dir.native()});
 
-            InitCommand init;
-            const int status = init(args);
+        InitCommand init;
+        const int status = init(args);
 
-            const fs::path tds_root = test_dir / ".tds";
-            const bool success = status == 0 && fs::exists(tds_root) && fs::exists(tds_root / "config") &&
-                                 fs::exists(tds_root / "users");
-            return static_cast<int>(!success);
-        });
+        const fs::path tds_root = test_dir / ".tds";
+        REQUIRE(status == 0);
+        REQUIRE(fs::exists(tds_root));
+        REQUIRE(fs::exists(tds_root / "config"));
+        REQUIRE(fs::exists(tds_root / "users"));
+    }
+
+    SECTION("Test creating instance in different (invalid) path") {
+        const fs::path test_dir = "i/do/not/exist";
+        const auto args = std::to_array<std::string_view>({test_dir.native()});
+
+        InitCommand init;
+        REQUIRE(init(args) != 0);
+    }
+
+    SECTION("Test invalid arguments") {
+        const auto args = std::to_array<std::string_view>({"bad", "arguments"});
+        InitCommand init;
+        REQUIRE(init(args) != 0);
     }
 }

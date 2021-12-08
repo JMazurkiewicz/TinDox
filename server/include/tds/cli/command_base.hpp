@@ -5,11 +5,12 @@
 namespace tds::cli {
     class CommandBase {
     public:
-        CommandBase() = default;
         CommandBase(const CommandBase&) = delete;
         CommandBase& operator=(const CommandBase&) = delete;
 
     protected:
+        CommandBase();
+
         void set_error();
         int get_status() const noexcept;
         bool is_ok() const noexcept;
