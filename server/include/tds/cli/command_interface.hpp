@@ -25,7 +25,7 @@ namespace tds::cli {
             return get_status();
         }
 
-        template<std::invocable<T>... Steps>
+        template<std::invocable<Derived&>... Steps>
         void execute_steps(Steps&&... steps) {
             if(is_ok()) {
                 execute_steps_impl(std::forward<Steps>(steps)...);
