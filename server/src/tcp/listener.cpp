@@ -9,6 +9,7 @@
 
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 namespace tds::tcp {
     Listener::Listener()
@@ -60,6 +61,7 @@ namespace tds::tcp {
         if(connection_fd == -1) {
             throw linux::LinuxError{"accept(2)"};
         } else if(addr_length != sizeof(sockaddr_in)) {
+            close(connection_fd);
             throw std::runtime_error{"Listener: accept(2) returned invalid addrlen"};
         } else {
             auto addr = reinterpret_cast<const sockaddr_in*>(&addrbuf);
