@@ -45,6 +45,7 @@ namespace tds::cli {
     void RunCommand::start_epoll() {
         while(m_continue) {
             m_epoll.handle();
+            std::erase_if(m_connections, [](auto& connection) { return !connection->is_valid(); });
         }
     }
 
@@ -116,7 +117,6 @@ namespace tds::cli {
             std::cerr << "error: '" << e.what() << "'\n";
             raw_close();
             set_fd(-1);
-            client = {};
         }
     }
 }
