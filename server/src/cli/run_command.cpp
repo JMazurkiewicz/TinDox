@@ -45,23 +45,26 @@ namespace tds::cli {
     void RunCommand::start_epoll() {
         while(m_continue) {
             m_epoll.handle();
+            std::erase_if(m_connections, [](auto& connection) { return !connection->is_valid(); });
         }
     }
 
     void RunCommand::handle_signal(int code) {
+        std::cout << "Got ";
         if(code == SIGINT) {
-            std::cout << "Got SIGINT\n";
+            std::cout << "SIGINT";
         } else if(code == SIGQUIT) {
-            std::cout << "Got SIGQUIT\n";
+            std::cout << "SIGQUIT";
         } else if(code == SIGABRT) {
-            std::cout << "Got SIGABRT\n";
+            std::cout << "SIGABRT";
         } else if(code == SIGTERM) {
-            std::cout << "Got SIGTERM\n";
+            std::cout << "SIGTERM";
         } else if(code == SIGPIPE) {
-            std::cout << "Got SIGPIPE\n";
+            std::cout << "SIGPIPE" << std::endl;
             return;
         }
 
+        std::cout << std::endl;
         m_continue = false;
     }
 
@@ -90,24 +93,30 @@ namespace tds::cli {
     }
 
     void RunCommand::Connection::handle() {
-        std::array<char, 256> buffer;
-        const auto amount = read(get_fd(), buffer.data(), buffer.size());
-        if(amount == -1) {
-            throw linux::LinuxError{"read(2)"};
-        } else {
-            std::string_view msg{buffer.data(), static_cast<size_t>(amount)};
-            std::cout << '[' << client << "]: " << msg << std::flush;
+        try {
+            std::array<char, 256> buffer;
+            const auto amount = read(get_fd(), buffer.data(), buffer.size());
+            if(amount == -1) {
+                throw linux::LinuxError{"read(2)"};
+            } else {
+                std::string_view msg{buffer.data(), static_cast<size_t>(amount)};
+                std::cout << '[' << client << "]: " << msg << std::flush;
 
-            ssize_t written = 0;
-            do {
-                const int bytes = write(get_fd(), msg.data() + written, msg.size() - written);
+                ssize_t written = 0;
+                do {
+                    const int bytes = write(get_fd(), msg.data() + written, msg.size() - written);
 
-                if(bytes == -1) {
-                    throw linux::LinuxError{"write(2)"};
-                } else {
-                    written += bytes;
-                }
-            } while(written != msg.size());
+                    if(bytes == -1) {
+                        throw linux::LinuxError{"write(2)"};
+                    } else {
+                        written += bytes;
+                    }
+                } while(written != msg.size());
+            }
+        } catch(const std::exception& e) {
+            std::cerr << "error: '" << e.what() << "'\n";
+            raw_close();
+            set_fd(-1);
         }
     }
 }
