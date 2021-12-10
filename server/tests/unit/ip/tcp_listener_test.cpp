@@ -2,6 +2,7 @@
 
 #include "tds/ip/address_v4.hpp"
 #include "tds/ip/tcp_listener.hpp"
+#include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/epoll_device.hpp"
 #include "tds/linux/linux_error.hpp"
 
@@ -29,7 +30,7 @@ TEST_CASE("tds::ip::TcpListener", "[ip]") {
                 close(fd);
             });
             tcp.listen(server_port);
-            tcp.handle();
+            tcp.handle_last_connection();
         } catch(...) {
             server_error = true;
         }
@@ -90,7 +91,16 @@ TEST_CASE("tds::ip::{TcpListener+EpollDevice}", "[ip]") {
 
             tds::linux::EpollDevice epoll_device;
             epoll_device.add_device(tcp);
-            epoll_device.handle();
+
+            tds::linux::EpollBuffer buffer{16};
+            epoll_device.wait_for_events(buffer);
+
+            for(int fd : buffer.get_available_events()) {
+                if(fd == tcp.get_fd()) {
+                    tcp.handle_last_connection();
+                }
+            }
+
         } catch(std::exception& e) {
             server_error = true;
         }

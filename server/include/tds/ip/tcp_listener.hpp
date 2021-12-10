@@ -18,7 +18,7 @@ namespace tds::ip {
         void listen(Port port);
         void listen(EndpointV4 endpoint);
 
-        void handle() override;
+        void handle_last_connection();
 
     private:
         int m_backlog;

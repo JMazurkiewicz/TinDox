@@ -6,12 +6,15 @@
 #include "tds/cli/run_command.hpp"
 #include "tds/cli/user_command.hpp"
 
+#include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
 
 int main(int argc, char** argv) {
     std::ios_base::sync_with_stdio(false);
+    std::signal(SIGPIPE, SIG_IGN);
+
     int exit_status = EXIT_SUCCESS;
 
     if(argc <= 1) {

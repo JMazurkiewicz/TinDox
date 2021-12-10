@@ -4,7 +4,6 @@
 #include "tds/ip/endpoint_v4.hpp"
 #include "tds/ip/tcp_listener.hpp"
 #include "tds/linux/epoll_device.hpp"
-#include "tds/linux/fd_buf.hpp"
 #include "tds/linux/io_device.hpp"
 #include "tds/linux/linux_error.hpp"
 #include "tds/linux/signal_device.hpp"
@@ -43,9 +42,11 @@ namespace tds::cli {
         struct Connection : public linux::IoDevice {
             ip::EndpointV4 client;
 
-            using IoDevice::IoDevice;
-            ~Connection() override;
-            void handle() override;
+            explicit Connection(int fd)
+                : IoDevice(fd) { }
+
+            ~Connection();
+            void handle();
         };
 
         std::vector<std::unique_ptr<Connection>> m_connections;

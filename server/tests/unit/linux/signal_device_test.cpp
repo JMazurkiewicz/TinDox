@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <unit.hpp>
 
+#include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/epoll_device.hpp"
 #include "tds/linux/signal_device.hpp"
 
@@ -19,7 +20,7 @@ TEST_CASE("tds::linux::SignalDevice", "[linux]") {
             signal_device.apply();
 
             std::raise(SIGINT);
-            signal_device.handle();
+            signal_device.handle_last_signal();
 
             return status;
         });
@@ -35,7 +36,7 @@ TEST_CASE("tds::linux::SignalDevice", "[linux]") {
                 signal_device.apply();
 
                 std::raise(SIGINT);
-                signal_device.handle();
+                signal_device.handle_last_signal();
 
                 _exit(status);
             }}.join();
@@ -56,9 +57,14 @@ TEST_CASE("tds::linux::{SignalDevice+EpollDevice}", "[linux]") {
 
             EpollDevice epoll_device;
             epoll_device.add_device(signal_device);
-
             std::raise(SIGINT);
-            epoll_device.handle();
+
+            EpollBuffer buffer{4};
+            epoll_device.wait_for_events(buffer);
+            for(int fd : buffer.get_available_events()) {
+                REQUIRE(fd == signal_device.get_fd());
+                signal_device.handle_last_signal();
+            }
 
             return status;
         });
@@ -75,9 +81,14 @@ TEST_CASE("tds::linux::{SignalDevice+EpollDevice}", "[linux]") {
 
                 EpollDevice epoll_device;
                 epoll_device.add_device(signal_device);
-
                 std::raise(SIGINT);
-                epoll_device.handle();
+
+                EpollBuffer buffer{4};
+                epoll_device.wait_for_events(buffer);
+                for(int fd : buffer.get_available_events()) {
+                    REQUIRE(fd == signal_device.get_fd());
+                    signal_device.handle_last_signal();
+                }
 
                 _exit(status);
             }}.join();

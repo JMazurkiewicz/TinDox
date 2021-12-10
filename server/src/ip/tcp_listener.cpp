@@ -53,7 +53,7 @@ namespace tds::ip {
         }
     }
 
-    void TcpListener::handle() {
+    void TcpListener::handle_last_connection() {
         sockaddr_in addrbuf = {};
         socklen_t addr_length = sizeof(sockaddr_in);
         const int connection_fd = accept(get_fd(), reinterpret_cast<sockaddr*>(&addrbuf), &addr_length);
@@ -61,7 +61,7 @@ namespace tds::ip {
         if(connection_fd == -1) {
             throw linux::LinuxError{"accept(2)"};
         } else if(addr_length != sizeof(sockaddr_in)) {
-            close(connection_fd);
+            ::close(connection_fd);
             throw std::runtime_error{"Listener: accept(2) returned invalid addrlen"};
         } else {
             auto addr = reinterpret_cast<const sockaddr_in*>(&addrbuf);

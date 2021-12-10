@@ -44,6 +44,7 @@ set(
     tests/unit/ip/port_test.cpp
     tests/unit/ip/tcp_listener_test.cpp
 
+    tests/unit/linux/epoll_buffer_test.cpp
     tests/unit/linux/epoll_device_test.cpp
     tests/unit/linux/io_device_test.cpp
     tests/unit/linux/linux_error_test.cpp
