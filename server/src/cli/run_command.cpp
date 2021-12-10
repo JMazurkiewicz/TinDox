@@ -30,7 +30,6 @@ namespace tds::cli {
         m_signals.add_handler(SIGQUIT, handler);
         m_signals.add_handler(SIGABRT, handler);
         m_signals.add_handler(SIGTERM, handler);
-        m_signals.add_handler(SIGPIPE, handler);
         m_signals.apply();
     }
 
@@ -73,9 +72,6 @@ namespace tds::cli {
             std::cout << "SIGABRT";
         } else if(code == SIGTERM) {
             std::cout << "SIGTERM";
-        } else if(code == SIGPIPE) {
-            std::cout << "SIGPIPE" << std::endl;
-            return;
         }
 
         std::cout << std::endl;
