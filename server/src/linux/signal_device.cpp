@@ -27,7 +27,7 @@ namespace tds::linux {
     void SignalDevice::handle_last_signal() {
         signalfd_siginfo info;
         if(read(&info, sizeof(info)) != sizeof(info)) {
-            throw std::runtime_error{"SignalDevice could not read enough bytes"}
+            throw std::runtime_error{"SignalDevice could not read enough bytes"};
         }
 
         const auto signo = info.ssi_signo;

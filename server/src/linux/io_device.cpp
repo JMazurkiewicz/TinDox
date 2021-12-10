@@ -11,12 +11,11 @@ namespace tds::linux {
         : m_fd{-1} { }
 
     IoDevice::~IoDevice() {
-        raw_close();
+        ::close(m_fd);
     }
 
     void IoDevice::close() {
-        raw_close();
-        set_fd(-1);
+        ::close(std::exchange(m_fd, -1));
     }
 
     int IoDevice::get_fd() const noexcept {
@@ -29,6 +28,10 @@ namespace tds::linux {
 
     IoDevice::operator bool() const noexcept {
         return is_valid();
+    }
+
+    int IoDevice::release() noexcept {
+        return std::exchange(m_fd, -1);
     }
 
     ssize_t IoDevice::read(std::span<std::byte> buffer) {
@@ -74,9 +77,5 @@ namespace tds::linux {
 
     void IoDevice::set_fd(int fd) {
         m_fd = fd;
-    }
-
-    void IoDevice::raw_close() {
-        ::close(get_fd());
     }
 }

@@ -19,7 +19,7 @@ namespace tds::linux {
         bool is_valid() const noexcept;
         explicit operator bool() const noexcept;
 
-        void release() const noexcept;
+        int release() noexcept;
 
         ssize_t read(std::span<std::byte> buffer);
         ssize_t read(void* buffer, std::size_t size);
@@ -38,8 +38,6 @@ namespace tds::linux {
         void set_fd(int fd);
 
     private:
-        void raw_close();
-
         int m_fd;
     };
 }
