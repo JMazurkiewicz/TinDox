@@ -3,11 +3,6 @@
 #include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/io_device.hpp"
 
-#include <cstdint>
-#include <span>
-
-#include <sys/epoll.h>
-
 namespace tds::linux {
     enum class EpollMode : std::uint32_t {
         level_triggered = EPOLLIN,

@@ -13,7 +13,7 @@
 
 int main(int argc, char** argv) {
     std::ios_base::sync_with_stdio(false);
-    signal(SIGPIPE, SIG_IGN);
+    std::signal(SIGPIPE, SIG_IGN);
 
     int exit_status = EXIT_SUCCESS;
 
