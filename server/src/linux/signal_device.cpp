@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <ranges>
+#include <span>
 #include <stdexcept>
 
 #include <signal.h>
@@ -11,7 +12,10 @@
 
 namespace tds::linux {
     void SignalDevice::add_handler(int signal, SignalHandler handler) {
-        m_handlers[signal] = std::move(handler);
+        auto&& [_, inserted] = m_handlers.insert({signal, std::move(handler)});
+        if(!inserted) {
+            throw std::runtime_error{"SignalDevice failed to add handler"};
+        }
     }
 
     void SignalDevice::apply() {
@@ -20,14 +24,14 @@ namespace tds::linux {
         create_fd();
     }
 
-    void SignalDevice::handle() {
+    void SignalDevice::handle_last_signal() {
         signalfd_siginfo info;
-        if(sizeof(info) != read(get_fd(), &info, sizeof(info))) {
-            throw LinuxError{"read(2)"};
+        if(read(&info, sizeof(info)) != sizeof(info)) {
+            throw std::runtime_error{"SignalDevice could not read enough bytes"}
         }
 
         const auto signo = info.ssi_signo;
-        auto handler = m_handlers.find(signo);
+        const auto handler = m_handlers.find(signo);
 
         if(handler != m_handlers.end()) {
             handler->second(signo);
@@ -38,7 +42,7 @@ namespace tds::linux {
 
     void SignalDevice::create_mask() {
         sigemptyset(&m_mask);
-        std::ranges::for_each(m_handlers | std::views::keys, std::bind_front(sigaddset, &m_mask));
+        std::ranges::for_each(m_handlers | std::views::keys, std::bind_front(&::sigaddset, &m_mask));
     }
 
     void SignalDevice::block_signals() {
@@ -48,8 +52,7 @@ namespace tds::linux {
     }
 
     void SignalDevice::create_fd() {
-        const int fd = signalfd(-1, &m_mask, 0);
-        if(fd == -1) {
+        if(const int fd = signalfd(-1, &m_mask, 0); fd == -1) {
             throw LinuxError{"signalfd(2)"};
         } else {
             set_fd(fd);

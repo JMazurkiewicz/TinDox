@@ -6,18 +6,12 @@
 #include <unistd.h>
 
 using namespace tds::linux;
-using namespace std::chrono;
 
 TEST_CASE("tds::linux::EpollDevice", "[linux]") {
-    struct TestDevice : IoDevice {
-        void handle() override { }
-    };
-
     SECTION("Test valid descriptor") {
-        struct Stdin : TestDevice {
-            Stdin() {
-                set_fd(STDIN_FILENO);
-            }
+        struct Stdin : IoDevice {
+            Stdin()
+                : IoDevice(STDIN_FILENO) { }
         };
 
         auto test = [] {
@@ -29,7 +23,7 @@ TEST_CASE("tds::linux::EpollDevice", "[linux]") {
     }
 
     SECTION("Test invalid descriptor") {
-        struct InvalidDevice : TestDevice { };
+        struct InvalidDevice : IoDevice { };
 
         auto test = [] {
             EpollDevice epoll_device;

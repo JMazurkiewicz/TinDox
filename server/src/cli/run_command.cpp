@@ -1,7 +1,9 @@
 #include "tds/cli/run_command.hpp"
 
+#include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/linux_error.hpp"
 
+#include <algorithm>
 #include <csignal>
 #include <iostream>
 
@@ -43,8 +45,20 @@ namespace tds::cli {
     }
 
     void RunCommand::start_epoll() {
+        linux::EpollBuffer epoll_buffer{32};
         while(m_continue) {
-            m_epoll.handle();
+            m_epoll.wait_for_events(epoll_buffer);
+            for(int fd : epoll_buffer.get_available_events()) {
+                if(fd == m_signals.get_fd()) {
+                    m_signals.handle_last_signal();
+                } else if(fd == m_listener.get_fd()) {
+                    m_listener.handle_last_connection();
+                } else {
+                    auto connection = std::ranges::find(m_connections, fd, [](auto& ptr) { return ptr->get_fd(); });
+                    (*connection)->handle();
+                }
+            }
+
             std::erase_if(m_connections, [](auto& connection) { return !connection->is_valid(); });
         }
     }
@@ -95,27 +109,18 @@ namespace tds::cli {
     void RunCommand::Connection::handle() {
         try {
             std::array<char, 256> buffer;
-            const auto amount = read(get_fd(), buffer.data(), buffer.size());
-            if(amount == -1) {
-                throw linux::LinuxError{"read(2)"};
-            } else {
-                std::string_view msg{buffer.data(), static_cast<size_t>(amount)};
-                std::cout << '[' << client << "]: " << msg << std::flush;
+            const auto amount = read(buffer.data(), buffer.size());
+            std::string_view msg{buffer.data(), static_cast<size_t>(amount)};
+            std::cout << '[' << client << "]: " << msg << std::flush;
 
-                ssize_t written = 0;
-                do {
-                    const int bytes = write(get_fd(), msg.data() + written, msg.size() - written);
-
-                    if(bytes == -1) {
-                        throw linux::LinuxError{"write(2)"};
-                    } else {
-                        written += bytes;
-                    }
-                } while(written != msg.size());
-            }
+            ssize_t written = 0;
+            do {
+                const int bytes = write(msg.data() + written, msg.size() - written);
+                written += bytes;
+            } while(written != msg.size());
         } catch(const std::exception& e) {
             std::cerr << "error: '" << e.what() << "'\n";
-            raw_close();
+            close();
             set_fd(-1);
         }
     }

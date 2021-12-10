@@ -8,7 +8,6 @@ using namespace tds::linux;
 
 TEST_CASE("tds::linux::IoDevice", "[linux]") {
     struct TestDevice : IoDevice {
-        void handle() override { }
         using IoDevice::set_fd;
     };
 

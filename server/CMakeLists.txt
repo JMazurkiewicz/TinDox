@@ -54,6 +54,7 @@ set(
     src/ip/port.cpp
     src/ip/tcp_listener.cpp
 
+    src/linux/epoll_buffer.cpp
     src/linux/epoll_device.cpp
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
