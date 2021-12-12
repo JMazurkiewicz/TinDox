@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:onClick="submit"
-        android:text="Button"
+        android:text="connect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/portEditText" />
