@@ -40,6 +40,7 @@ namespace tds::cli {
         bool m_continue;
 
         struct Connection : public linux::IoDevice {
+            RunCommand* parent;
             ip::EndpointV4 client;
 
             explicit Connection(int fd)

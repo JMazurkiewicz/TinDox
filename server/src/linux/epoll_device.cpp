@@ -31,6 +31,12 @@ namespace tds::linux {
         }
     }
 
+    void EpollDevice::remove_device(const IoDevice& dev) {
+        if(epoll_ctl(get_fd(), EPOLL_CTL_DEL, dev.get_fd(), nullptr) == -1) {
+            throw LinuxError{"epoll_ctl(2)"};
+        }
+    }
+
     int EpollDevice::wait_for_events(EpollBuffer& buffer) {
         if(const int count = epoll_wait(get_fd(), buffer.data(), buffer.max_size(), m_timeout); count != -1) {
             buffer.set_size(count);
