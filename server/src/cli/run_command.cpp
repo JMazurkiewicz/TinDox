@@ -108,7 +108,7 @@ namespace tds::cli {
             std::array<char, 256> buffer;
             const auto amount = read(buffer.data(), buffer.size());
             if(amount == 0) {
-                throw std::runtime_error{"Connection lost"};
+                throw std::runtime_error{"Connection lost with " + to_string(client)};
             }
 
             std::string_view msg{buffer.data(), static_cast<size_t>(amount)};
