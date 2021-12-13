@@ -41,7 +41,7 @@ bool Connection::sendToServer(std::string &message) {
         int len = message.size() + 1;
         int sent_bytes, buf_pos = 0;
         while(len) {
-            sent_bytes = send(sock, msg + buf_pos, len, 0);
+            sent_bytes = write(sock, msg + buf_pos, len);
             if(sent_bytes < 0) {
                 perror("sending message");
                 exit(1);
@@ -67,17 +67,17 @@ bool Connection::receiveFromServer(std::string &message, int len) {
     int read_bytes;
 
     do{
-        read_bytes = recv(sock, buf, len, 0);
+        read_bytes = read(sock, buf, len);
         buf[read_bytes] = '\0';
         if(read_bytes < 0) {
             perror("reading message");
-            delete buf;
+            delete []buf;
             exit(-1);
         }
         message.append(buf);
     } while(buf[read_bytes-1] != '\0');
 
-    delete buf;
+    delete []buf;
 
     if(message.empty()) {   //connection lost
         closeConnection();
