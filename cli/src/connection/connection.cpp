@@ -75,7 +75,6 @@ bool Connection::receiveFromServer(std::string &message, int len) {
         exit(-1);
     }
     message.append(buf);
-
     delete []buf;
 
     if(message.empty()) {   //connection lost
