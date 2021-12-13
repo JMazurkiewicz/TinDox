@@ -86,6 +86,7 @@ namespace tds::cli {
 
         auto connection = std::make_unique<Connection>(fd);
         connection->client = client;
+        connection->parent = this;
         m_epoll.add_device(*connection);
         m_connections.emplace_back(std::move(connection));
     }
@@ -106,6 +107,10 @@ namespace tds::cli {
         try {
             std::array<char, 256> buffer;
             const auto amount = read(buffer.data(), buffer.size());
+            if(amount == 0) {
+                throw std::runtime_error{"Connection lost with " + to_string(client)};
+            }
+
             std::string_view msg{buffer.data(), static_cast<size_t>(amount)};
             std::cout << '[' << client << "]: " << msg << std::flush;
 
@@ -116,6 +121,7 @@ namespace tds::cli {
             } while(written != msg.size());
         } catch(const std::exception& e) {
             std::cerr << "error: '" << e.what() << "'\n";
+            parent->m_epoll.remove_device(*this);
             close();
             set_fd(-1);
         }
