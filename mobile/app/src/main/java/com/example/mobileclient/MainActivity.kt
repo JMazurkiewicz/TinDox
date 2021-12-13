@@ -34,37 +34,24 @@ class MainActivity : AppCompatActivity() {
 
         while(active)
         {
-            var input = ""
+            var input: String = ""
             input = reader.nextLine()
 
-            if(data.length < 300)
-                data += "\n$input"
-            else
-                data = input
+            Log.i("yeet", input)
 
-            resultTextView.text = data
         }
-
         reader.close()
         connection.close()
-
-
     }
 
 
     fun submit(view: View) {
-        //Toast.makeText(this, ipAddressEditText.text, Toast.LENGTH_SHORT).show()
 
 
-        val address = "83.5.133.22"
-            //ipAddressEditText.text.toString()
-        val port = 37666
-            //Integer.parseInt(portEditText.text.toString())
-
-        /*var socket = Socket(ipAddressEditText.text.toString() , Integer.parseInt(portEditText.text.toString()))
-        var info = socket.getInputStream()
-        var buffer = ByteArray(128)
-        var count = info.read(buffer)*/
+        //val address = "83.5.133.22"
+        val address = ipAddressEditText.text.toString()
+        //val port = 37666
+        val port = Integer.parseInt(portEditText.text.toString())
 
         if(!active){
             submitButton.text ="disconnect"
@@ -72,19 +59,16 @@ class MainActivity : AppCompatActivity() {
             CoroutineScope(IO).launch{
                 client( address, port )
             }
+
+            resultTextView.text = data
+
         }else
         {
             active = false
             submitButton.text = "connect"
 
         }
-
-
-        //resultTextView.text = result
-
     }
-
-    //val socket = Socket(InetAddress.getByAddress("83.5.133.22".toByteArray()), 37666)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
