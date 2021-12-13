@@ -48,9 +48,7 @@ class MainActivity : AppCompatActivity() {
     fun submit(view: View) {
 
 
-        //val address = "83.5.133.22"
         val address = ipAddressEditText.text.toString()
-        //val port = 37666
         val port = Integer.parseInt(portEditText.text.toString())
 
         if(!active){
