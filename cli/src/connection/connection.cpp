@@ -63,19 +63,18 @@ bool Connection::receiveFromServer(std::string &message, int len) {
 
     message.clear();
     char *buf = new char[len + 1];
-
-    int read_bytes;
-
-    do{
-        read_bytes = read(sock, buf, len);
-        buf[read_bytes] = '\0';
-        if(read_bytes < 0) {
-            perror("reading message");
-            delete []buf;
-            exit(-1);
-        }
-        message.append(buf);
-    } while(buf[read_bytes-1] != '\0');
+    int read_bytes = read(sock, buf, len);
+    if (read_bytes > len) {
+        delete [] buf;
+        return false;
+    }
+    buf[read_bytes] = '\0';
+    if(read_bytes < 0) {
+        perror("reading message");
+        delete []buf;
+        exit(-1);
+    }
+    message.append(buf);
 
     delete []buf;
 
