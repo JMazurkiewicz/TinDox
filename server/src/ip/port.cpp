@@ -24,7 +24,6 @@ namespace tds::ip {
     }
 
     const Port Port::invalid{0};
-    const Port Port::default_port{37666};
 
     Port::Port()
         : m_port{0} { }

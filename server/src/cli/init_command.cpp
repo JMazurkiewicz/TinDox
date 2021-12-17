@@ -58,7 +58,7 @@ namespace tds::cli {
         if(!config_file.good()) {
             log_error() << "error: failed to create config file (" << file_name << ")\n";
         } else {
-            config_file << "[config]\n"
+            config_file << "[server]\n"
                            "max_thread_count = "
                         << config::defaults::get_default_max_thread_count()
                         << "\n"
@@ -66,7 +66,10 @@ namespace tds::cli {
                         << config::defaults::get_default_max_user_count()
                         << "\n"
                            "backlog = "
-                        << config::defaults::get_default_backlog() << '\n';
+                        << config::defaults::get_default_backlog()
+                        << "\n"
+                           "port = "
+                        << config::defaults::get_default_port() << '\n';
         }
     }
 

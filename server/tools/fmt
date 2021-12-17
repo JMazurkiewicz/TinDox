@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-modules="cli;config;ip;linux"
+modules="cli;config;ip;linux;server"
 for name in ${modules//;/ }
 do
     echo "Formatting $name"
@@ -7,3 +7,5 @@ do
     clang-format -i src/$name/*.cpp
     clang-format -i tests/unit/$name/*.cpp
 done
+
+clang-format -i src/main.cpp

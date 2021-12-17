@@ -14,4 +14,8 @@ namespace tds::config::defaults {
     int get_default_backlog() {
         return 32;
     }
+
+    ip::Port get_default_port() {
+        return ip::Port{37666};
+    }
 }

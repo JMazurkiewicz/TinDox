@@ -11,6 +11,8 @@
 #include <iostream>
 #include <vector>
 
+#include <toml++/toml.h>
+
 int main(int argc, char** argv) {
     std::ios_base::sync_with_stdio(false);
     std::signal(SIGPIPE, SIG_IGN);
@@ -33,8 +35,15 @@ int main(int argc, char** argv) {
             CommandRunner runner;
             return runner.run(args.front(), std::span{args}.subspan(1));
 
+        } catch(const toml::parse_error& e) {
+            std::cerr << "TOML parse error:\n"
+                         "Description: "
+                      << e.description()
+                      << "\n"
+                         "Source file: "
+                      << e.source() << '\n';
         } catch(const std::exception& e) {
-            std::cerr << e.what() << '\n';
+            std::cerr << "fatal error: '" << e.what() << "'\n";
             exit_status = EXIT_FAILURE;
         }
     }

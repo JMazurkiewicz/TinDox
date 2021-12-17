@@ -1,129 +1,76 @@
 #include "tds/cli/run_command.hpp"
 
-#include "tds/linux/epoll_buffer.hpp"
-#include "tds/linux/linux_error.hpp"
+#include "tds/config/config_reader.hpp"
 
-#include <algorithm>
-#include <csignal>
-#include <iostream>
+#include <charconv>
+#include <filesystem>
+#include <stdexcept>
+
+#include <fmt/core.h>
+
+namespace fs = std::filesystem;
 
 namespace tds::cli {
-    RunCommand::RunCommand()
-        : m_continue{true} { }
+    void RunCommand::parse_arguments(std::span<const std::string_view> args) {
+        const auto end = args.end();
 
-    void RunCommand::parse_arguments(std::span<const std::string_view>) { }
-
-    void RunCommand::execute() {
-        try {
-            execute_steps(&RunCommand::configure_signals, &RunCommand::configure_listener, &RunCommand::configure_epoll,
-                          &RunCommand::start_epoll);
-        } catch(const std::system_error& e) {
-            handle_system_error(e);
-        } catch(const std::exception& e) {
-            handle_exception(e);
-        }
-    }
-
-    void RunCommand::configure_signals() {
-        auto handler = std::bind_front(&RunCommand::handle_signal, this);
-        m_signals.add_handler(SIGINT, handler);
-        m_signals.add_handler(SIGQUIT, handler);
-        m_signals.add_handler(SIGABRT, handler);
-        m_signals.add_handler(SIGTERM, handler);
-        m_signals.apply();
-    }
-
-    void RunCommand::configure_listener() {
-        m_listener.listen(ip::Port::default_port);
-        m_listener.set_connection_handler(std::bind_front(&RunCommand::handle_connection, this));
-    }
-
-    void RunCommand::configure_epoll() {
-        m_epoll.add_device(m_signals);
-        m_epoll.add_device(m_listener);
-    }
-
-    void RunCommand::start_epoll() {
-        linux::EpollBuffer epoll_buffer{32};
-        while(m_continue) {
-            m_epoll.wait_for_events(epoll_buffer);
-            for(int fd : epoll_buffer.get_available_events()) {
-                if(fd == m_signals.get_fd()) {
-                    m_signals.handle_last_signal();
-                } else if(fd == m_listener.get_fd()) {
-                    m_listener.handle_last_connection();
-                } else {
-                    auto connection = std::ranges::find(m_connections, fd, [](auto& ptr) { return ptr->get_fd(); });
-                    (*connection)->handle();
-                }
+        for(auto it = args.begin(); it != end; ++it) {
+            if(*it == "--port" && ++it != end) {
+                parse_port(*it);
+            } else if(*it == "--path" && ++it != end) {
+                parse_root(*it);
+            } else {
             }
+        }
 
-            std::erase_if(m_connections, [](auto& connection) { return !connection->is_valid(); });
+        make_root_path();
+        read_config();
+        apply_arguments();
+    }
+
+    void RunCommand::execute() { }
+
+    void RunCommand::parse_port(std::string_view arg) {
+        std::uint16_t port = 0;
+        const char* const arg_end = arg.data() + arg.size();
+        auto&& [end, errc] = std::from_chars(arg.data(), arg_end, port);
+
+        if(errc != std::errc{} || end != arg_end || port == 0) {
+            throw std::runtime_error{
+                fmt::format("invalid --port value (should be 16 bit unsigned integer, got {})", arg)};
+        } else {
+            m_port.emplace(port);
         }
     }
 
-    void RunCommand::handle_signal(int code) {
-        std::cout << "Got ";
-        if(code == SIGINT) {
-            std::cout << "SIGINT";
-        } else if(code == SIGQUIT) {
-            std::cout << "SIGQUIT";
-        } else if(code == SIGABRT) {
-            std::cout << "SIGABRT";
-        } else if(code == SIGTERM) {
-            std::cout << "SIGTERM";
+    void RunCommand::parse_root(std::string_view arg) {
+        fs::path root = arg;
+        if(!fs::exists(root)) {
+            throw std::runtime_error{fmt::format("Path {} does not exist", root.native())};
         }
 
-        std::cout << std::endl;
-        m_continue = false;
+        const fs::path tds_config = fs::canonical(root) / ".tds";
+        if(!fs::exists(tds_config)) {
+            throw std::runtime_error{fmt::format("{} is not valid TDS instance", tds_config.native())};
+        } else {
+            m_root.emplace(std::move(root));
+        }
     }
 
-    void RunCommand::handle_connection(int fd, ip::EndpointV4 client) {
-        std::cout << "Got new connection from " << client << " [" << fd << "], sending 'hello' message" << std::endl;
-
-        std::string hello = "Hello " + to_string(client) + "!\n";
-        write(fd, hello.data(), hello.size());
-
-        auto connection = std::make_unique<Connection>(fd);
-        connection->client = client;
-        connection->parent = this;
-        m_epoll.add_device(*connection);
-        m_connections.emplace_back(std::move(connection));
+    void RunCommand::make_root_path() {
+        if(!m_root.has_value()) {
+            parse_root(fs::current_path().native());
+        }
     }
 
-    void RunCommand::handle_system_error(const std::system_error& e) {
-        log_error() << "error: " << e.what() << "\ncode: " << e.code() << '\n';
+    void RunCommand::read_config() {
+        config::ConfigReader reader{*m_root};
+        m_config = reader.read_config();
     }
 
-    void RunCommand::handle_exception(const std::exception& e) {
-        log_error() << "error: " << e.what() << '\n';
-    }
-
-    RunCommand::Connection::~Connection() {
-        std::cout << "Bye " << client << "!\n";
-    }
-
-    void RunCommand::Connection::handle() {
-        try {
-            std::array<char, 256> buffer;
-            const auto amount = read(buffer.data(), buffer.size());
-            if(amount == 0) {
-                throw std::runtime_error{"Connection lost with " + to_string(client)};
-            }
-
-            std::string_view msg{buffer.data(), static_cast<size_t>(amount)};
-            std::cout << '[' << client << "]: " << msg << std::flush;
-
-            ssize_t written = 0;
-            do {
-                const int bytes = write(msg.data() + written, msg.size() - written);
-                written += bytes;
-            } while(written != msg.size());
-        } catch(const std::exception& e) {
-            std::cerr << "error: '" << e.what() << "'\n";
-            parent->m_epoll.remove_device(*this);
-            close();
-            set_fd(-1);
+    void RunCommand::apply_arguments() {
+        if(m_port.has_value()) {
+            m_config.set_port(ip::Port{*m_port});
         }
     }
 }

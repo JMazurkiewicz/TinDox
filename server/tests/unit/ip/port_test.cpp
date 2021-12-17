@@ -49,7 +49,6 @@ TEST_CASE("tds::ip::Port", "[ip]") {
 
     SECTION("Test predefined ports") {
         REQUIRE(Port::invalid.as_integer() == 0);
-        REQUIRE(Port::default_port.as_integer() == 37666);
     }
 
     SECTION("Test `==` operator") {

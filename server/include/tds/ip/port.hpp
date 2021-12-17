@@ -9,10 +9,8 @@ namespace tds::ip {
     class Port {
     public:
         static const Port invalid;
-        static const Port default_port;
 
         Port();
-
         explicit Port(std::uint16_t port);
         explicit Port(std::uint8_t b0, std::uint8_t b1);
 
