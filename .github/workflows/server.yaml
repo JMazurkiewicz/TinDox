@@ -38,12 +38,13 @@ jobs:
         cmake \
           -B build \
           -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
-          -DTDS_TESTING=ON
+          -DTDS_UNIT_TESTS=ON \
+          -DTDS_INTEGRATION_TESTS=OFF
 
     - name: Build project
       run: cmake --build build
 
-    - name: Run tests
+    - name: Run unit tests
       run: ctest --test-dir build --output-on-failure
 
     - name: Install with CMake
@@ -53,3 +54,11 @@ jobs:
 
     - name: Run CPack
       run: sudo cpack --config build/CPackConfig.cmake -B build
+
+    - name: Run integration tests
+      run: |
+        cmake \
+          -B build \
+          -DTDS_UNIT_TESTS=OFF \
+          -DTDS_INTEGRATION_TESTS=ON
+        ctest --test-dir build --output-on-failure

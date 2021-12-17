@@ -119,9 +119,15 @@ add_executable(tds ${TDS_SOURCES})
 target_link_libraries(tds PRIVATE ${TDS_EXTERNAL_LIBS})
 target_link_libraries(tds PUBLIC tds-dev)
 
-include("cmake/installing.cmake")
+include("cmake/install.cmake")
 
-option(TDS_TESTING "Run unit tests.")
-if(TDS_TESTING)
-    include("cmake/testing.cmake")
+option(TDS_UNIT_TESTS "Run unit tests for TinDox Server")
+option(TDS_INTEGRATION_TESTS "Run integration tests for TinDox Server")
+
+if(TDS_UNIT_TESTS)
+    include("cmake/unit_tests.cmake")
+endif()
+
+if(TDS_INTEGRATION_TESTS)
+    include("cmake/integration_tests.cmake")
 endif()

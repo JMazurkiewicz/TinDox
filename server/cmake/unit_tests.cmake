@@ -23,7 +23,7 @@ include(Catch)
 enable_testing()
 
 set(
-    TDS_UNIT_TESTS
+    TDS_UNIT_TESTS_SOURCES
 
     tests/unit/cli/cli_error_test.cpp
     tests/unit/cli/command_interface_test.cpp
@@ -55,7 +55,7 @@ set(
     tests/unit/user/permissions_test.cpp
 )
 
-add_executable(tds-unit-tests ${TDS_UNIT_TESTS})
+add_executable(tds-unit-tests ${TDS_UNIT_TESTS_SOURCES})
 target_link_libraries(tds-unit-tests PRIVATE Catch2::Catch2WithMain tds-dev Threads::Threads)
 target_include_directories(tds-unit-tests PRIVATE tests/unit)
 catch_discover_tests(tds-unit-tests)
