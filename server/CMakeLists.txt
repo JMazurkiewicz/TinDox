@@ -51,6 +51,25 @@ else()
     endif()
 endif()
 
+set(PIC_FLAG CMAKE_POSITION_INDEPENDENT_CODE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+find_package(spdlog 1.9 QUIET)
+if(spdlog_FOUND)
+    message(STATUS "Found spdlog: ${spdlog_DIR} (found version \"${spdlog_VERSION}\")")
+else()
+    FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG v1.9.2
+    )
+
+    if(NOT spdlog_POPULATED)
+        FetchContent_Populate(spdlog)
+        add_subdirectory("${spdlog_SOURCE_DIR}" EXCLUDE_FROM_ALL)
+    endif()
+endif()
+set(CMAKE_POSITION_INDEPENDENT_CODE PIC_FLAG)
+
 set(
     TDS_DEV_SOURCES
 
@@ -77,11 +96,13 @@ set(
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
     src/linux/signal_device.cpp
+
+    src/server/server.cpp
 )
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
 target_include_directories(tds-dev PUBLIC include)
-target_link_libraries(tds-dev PRIVATE tomlplusplus::tomlplusplus fmt::fmt)
+target_link_libraries(tds-dev PRIVATE tomlplusplus::tomlplusplus fmt::fmt spdlog::spdlog)
 
 set(
     TDS_SOURCES

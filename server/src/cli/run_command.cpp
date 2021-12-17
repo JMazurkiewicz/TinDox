@@ -1,6 +1,7 @@
 #include "tds/cli/run_command.hpp"
 
 #include "tds/config/config_reader.hpp"
+#include "tds/server/server.hpp"
 
 #include <charconv>
 #include <filesystem>
@@ -28,7 +29,11 @@ namespace tds::cli {
         apply_arguments();
     }
 
-    void RunCommand::execute() { }
+    void RunCommand::execute() {
+        server::Server server{*m_root};
+        server.set_config(m_config);
+        server.launch();
+    }
 
     void RunCommand::parse_port(std::string_view arg) {
         std::uint16_t port = 0;
