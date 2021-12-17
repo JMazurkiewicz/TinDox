@@ -53,6 +53,7 @@ set(
     tests/unit/linux/signal_device_test.cpp
 
     tests/unit/user/permissions_test.cpp
+    tests/unit/user/user_record_data_test.cpp
 )
 
 add_executable(tds-unit-tests ${TDS_UNIT_TESTS_SOURCES})

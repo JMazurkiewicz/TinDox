@@ -93,6 +93,7 @@ set(
 
     src/linux/epoll_buffer.cpp
     src/linux/epoll_device.cpp
+    src/linux/hash.cpp
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
     src/linux/pipe_device.cpp
@@ -101,13 +102,14 @@ set(
     src/server/server.cpp
 
     src/user/permissions.cpp
+    src/user/user_record_data.cpp
 )
 
 set(TDS_EXTERNAL_LIBS tomlplusplus::tomlplusplus fmt::fmt spdlog::spdlog)
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
 target_include_directories(tds-dev PUBLIC include)
-target_link_libraries(tds-dev PRIVATE ${TDS_EXTERNAL_LIBS})
+target_link_libraries(tds-dev PRIVATE ${TDS_EXTERNAL_LIBS} crypt)
 
 set(
     TDS_SOURCES
