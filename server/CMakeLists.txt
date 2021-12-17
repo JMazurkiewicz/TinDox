@@ -35,6 +35,8 @@ else()
     endif()
 endif()
 
+set(TDS_POSITION_INDEPENDENT_CODE CMAKE_POSITION_INDEPENDENT_CODE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(fmt 8.0 QUIET)
 if(fmt_FOUND)
     message(STATUS "Found {fmt}: ${fmt_DIR} (found version \"${fmt_VERSION}\")")
@@ -51,8 +53,6 @@ else()
     endif()
 endif()
 
-set(PIC_FLAG CMAKE_POSITION_INDEPENDENT_CODE)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(spdlog 1.9 QUIET)
 if(spdlog_FOUND)
     message(STATUS "Found spdlog: ${spdlog_DIR} (found version \"${spdlog_VERSION}\")")
@@ -68,7 +68,7 @@ else()
         add_subdirectory("${spdlog_SOURCE_DIR}" EXCLUDE_FROM_ALL)
     endif()
 endif()
-set(CMAKE_POSITION_INDEPENDENT_CODE PIC_FLAG)
+set(CMAKE_POSITION_INDEPENDENT_CODE TDS_POSITION_INDEPENDENT_CODE)
 
 set(
     TDS_DEV_SOURCES
