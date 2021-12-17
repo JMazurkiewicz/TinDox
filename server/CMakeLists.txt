@@ -35,19 +35,19 @@ else()
     endif()
 endif()
 
-find_package(FMT 8.0 QUIET)
-if(FMT_FOUND)
-    message(STATUS "Found {fmt}: ${FMT_DIR} (found version \"${FMT_VERSION}\")")
+find_package(fmt 8.0 QUIET)
+if(fmt_FOUND)
+    message(STATUS "Found {fmt}: ${fmt_DIR} (found version \"${fmt_VERSION}\")")
 else()
     FetchContent_Declare(
-        FMT
+        fmt
         GIT_REPOSITORY https://github.com/fmtlib/fmt.git
         GIT_TAG 8.0.1
     )
 
-    if(NOT FMT_POPULATED)
-        FetchContent_Populate(FMT)
-        add_subdirectory("${FMT_SOURCE_DIR}" EXCLUDE_FROM_ALL)
+    if(NOT fmt_POPULATED)
+        FetchContent_Populate(fmt)
+        add_subdirectory("${fmt_SOURCE_DIR}" EXCLUDE_FROM_ALL)
     endif()
 endif()
 
