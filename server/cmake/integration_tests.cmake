@@ -9,4 +9,5 @@ endfunction()
 
 enable_testing()
 AddIntegrationTest(help)
+AddIntegrationTest(init)
 AddIntegrationTest(run)

@@ -32,5 +32,11 @@ fi
 tds run --port 5000000 >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
-    failure "Command \`tds run --port\` should fail - 5000000 is not valid port"
+    failure "Command \`tds run --port 5000000\` should fail - 5000000 is not valid port"
+fi
+
+tds run --port 30000 >/dev/null 2>/dev/null
+if [ $? -eq 0 ]
+then
+    failure "Command \`tds run --port 30000\` should fail - current directory is not valid instance"
 fi
