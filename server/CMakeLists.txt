@@ -98,11 +98,15 @@ set(
     src/linux/signal_device.cpp
 
     src/server/server.cpp
+
+    src/user/permissions.cpp
 )
+
+set(TDS_EXTERNAL_LIBS tomlplusplus::tomlplusplus fmt::fmt spdlog::spdlog)
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
 target_include_directories(tds-dev PUBLIC include)
-target_link_libraries(tds-dev PRIVATE tomlplusplus::tomlplusplus fmt::fmt spdlog::spdlog)
+target_link_libraries(tds-dev PRIVATE ${TDS_EXTERNAL_LIBS})
 
 set(
     TDS_SOURCES
@@ -111,7 +115,7 @@ set(
 )
 
 add_executable(tds ${TDS_SOURCES})
-target_link_libraries(tds PRIVATE tomlplusplus::tomlplusplus fmt::fmt spdlog::spdlog)
+target_link_libraries(tds PRIVATE ${TDS_EXTERNAL_LIBS})
 target_link_libraries(tds PUBLIC tds-dev)
 
 include("cmake/installing.cmake")
