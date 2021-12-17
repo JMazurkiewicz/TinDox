@@ -20,7 +20,7 @@ namespace tds::server {
             return;
         }
 
-        for(linux::EpollBuffer buffer{16}; m_running;) {
+        for(linux::EpollBuffer buffer{4}; m_running;) {
             m_main_epoll.wait_for_events(buffer);
 
             for(int fd : buffer.get_available_events()) {
@@ -77,7 +77,7 @@ namespace tds::server {
             }
         }();
 
-        spdlog::warn("Got signal: {} (code {})", signal_name, code);
+        spdlog::warn("Got stop signal: {} (code {})", signal_name, code);
         stop();
     }
 

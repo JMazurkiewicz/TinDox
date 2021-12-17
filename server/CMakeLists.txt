@@ -95,6 +95,7 @@ set(
     src/linux/epoll_device.cpp
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
+    src/linux/pipe_device.cpp
     src/linux/signal_device.cpp
 
     src/server/server.cpp

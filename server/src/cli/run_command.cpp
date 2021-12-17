@@ -1,6 +1,7 @@
 #include "tds/cli/run_command.hpp"
 
 #include "tds/config/config_reader.hpp"
+#include "tds/linux/linux_error.hpp"
 #include "tds/server/server.hpp"
 
 #include <charconv>
@@ -13,14 +14,23 @@ namespace fs = std::filesystem;
 
 namespace tds::cli {
     void RunCommand::parse_arguments(std::span<const std::string_view> args) {
-        const auto end = args.end();
+        const auto args_end = args.end();
 
-        for(auto it = args.begin(); it != end; ++it) {
-            if(*it == "--port" && ++it != end) {
-                parse_port(*it);
-            } else if(*it == "--path" && ++it != end) {
-                parse_root(*it);
+        for(auto it = args.begin(); it != args_end; ++it) {
+            if(*it == "--port") {
+                if(++it == args_end) {
+                    throw std::runtime_error{"--port expects port as argument"};
+                } else {
+                    parse_port(*it);
+                }
+            } else if(*it == "--path") {
+                if(++it == args_end) {
+                    throw std::runtime_error{"--port expects valid path as argument"};
+                } else {
+                    parse_root(*it);
+                }
             } else {
+                throw std::runtime_error{fmt::format("Invalid option {}", *it)};
             }
         }
 

@@ -49,6 +49,7 @@ set(
     tests/unit/linux/epoll_device_test.cpp
     tests/unit/linux/io_device_test.cpp
     tests/unit/linux/linux_error_test.cpp
+    tests/unit/linux/pipe_device_test.cpp
     tests/unit/linux/signal_device_test.cpp
 
     tests/unit/user/permissions_test.cpp
