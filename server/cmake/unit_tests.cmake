@@ -26,13 +26,12 @@ set(
     TDS_UNIT_TESTS_SOURCES
 
     tests/unit/cli/cli_error_test.cpp
-    tests/unit/cli/command_interface_test.cpp
-    tests/unit/cli/command_runner_test.cpp
+    tests/unit/cli/command_executor_test.cpp
     tests/unit/cli/command_test.cpp
-    tests/unit/cli/config_command_test.cpp
     tests/unit/cli/help_command_test.cpp
     tests/unit/cli/init_command_test.cpp
-    tests/unit/cli/log_command_test.cpp
+    tests/unit/cli/invalid_command_arguments_error_test.cpp
+    tests/unit/cli/no_such_command_error_test.cpp
     tests/unit/cli/run_command_test.cpp
     tests/unit/cli/user_command_test.cpp
 

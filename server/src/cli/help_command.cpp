@@ -1,25 +1,12 @@
 #include "tds/cli/help_command.hpp"
 
+#include "tds/cli/invalid_command_arguments_error.hpp"
+
 #include <iostream>
 
 namespace tds::cli {
-    HelpCommand::HelpCommand()
-        : m_empty_args{true} { }
-
-    void HelpCommand::parse_arguments(std::span<const std::string_view> args) {
-        m_empty_args = args.empty();
-    }
-
-    void HelpCommand::execute() {
-        print_help();
-
-        if(!m_empty_args) {
-            set_error();
-        }
-    }
-
-    void HelpCommand::print_help() {
-        constexpr static std::string_view help_message = {
+    namespace {
+        inline constexpr std::string_view help_message = {
             "usage: tds <command> [args]\n"
             "\n"
             "These are TinDoxServer commands:\n"
@@ -40,6 +27,16 @@ namespace tds::cli {
             "* move     [m] - mv command\n"
             "* download [d] - dl and dlr commands\n"
             "* upload   [u] - ul and uls commands\n"};
+    }
+
+    void HelpCommand::parse_arguments(std::span<const std::string_view> args) {
+        m_empty_args = args.empty();
+    }
+
+    void HelpCommand::execute() {
         std::cout << help_message;
+        if(!m_empty_args) {
+            throw InvalidCommandArgumentsError{"help command takes no arguments", "tds help"};
+        }
     }
 }

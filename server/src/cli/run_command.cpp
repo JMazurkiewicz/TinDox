@@ -1,48 +1,55 @@
 #include "tds/cli/run_command.hpp"
 
+#include "tds/cli/invalid_command_arguments_error.hpp"
+#include "tds/cli/invalid_command_execution_error.hpp"
+#include "tds/cli/no_such_command_error.hpp"
 #include "tds/config/config_reader.hpp"
-#include "tds/linux/linux_error.hpp"
 #include "tds/server/server.hpp"
 
 #include <charconv>
 #include <filesystem>
 #include <stdexcept>
+#include <string_view>
 
 #include <fmt/core.h>
+#include <fmt/ostream.h>
 
 namespace fs = std::filesystem;
 
 namespace tds::cli {
+    namespace {
+        inline constexpr const char* port_argument_tip = "tds run --port <16 bit unsigned integer>";
+        inline constexpr const char* config_directory_argument_tip = "tds run --dir <path to instance>";
+    }
+
     void RunCommand::parse_arguments(std::span<const std::string_view> args) {
         const auto args_end = args.end();
 
         for(auto it = args.begin(); it != args_end; ++it) {
-            if(*it == "--port") {
+            if(*it == "--port" || *it == "-p") {
                 if(++it == args_end) {
-                    throw std::runtime_error{"--port expects port as argument"};
+                    throw InvalidCommandArgumentsError{"--port expects port as argument", port_argument_tip};
                 } else {
                     parse_port(*it);
                 }
-            } else if(*it == "--path") {
+            } else if(*it == "--dir" || *it == "-d") {
                 if(++it == args_end) {
-                    throw std::runtime_error{"--port expects valid path as argument"};
+                    throw InvalidCommandArgumentsError{"--dir expects valid path as argument",
+                                                       config_directory_argument_tip};
                 } else {
-                    parse_root(*it);
+                    parse_config_directory_path(*it);
                 }
             } else {
-                throw std::runtime_error{fmt::format("Invalid option {}", *it)};
+                throw InvalidCommandArgumentsError{std::string{*it}, "tds run"};
             }
         }
-
-        make_root_path();
-        read_config();
-        apply_arguments();
     }
 
     void RunCommand::execute() {
-        server::Server server{*m_root};
-        server.set_config(m_config);
-        server.launch();
+        make_config_directory_path();
+        read_config();
+        overwrite_config_with_cli_arguments();
+        launch_server();
     }
 
     void RunCommand::parse_port(std::string_view arg) {
@@ -51,41 +58,42 @@ namespace tds::cli {
         auto&& [end, errc] = std::from_chars(arg.data(), arg_end, port);
 
         if(errc != std::errc{} || end != arg_end || port == 0) {
-            throw std::runtime_error{
-                fmt::format("invalid --port value (should be 16 bit unsigned integer, got {})", arg)};
+            throw InvalidCommandArgumentsError{"invalid --port value", port_argument_tip};
         } else {
             m_port.emplace(port);
         }
     }
 
-    void RunCommand::parse_root(std::string_view arg) {
-        fs::path root = arg;
-        if(!fs::exists(root)) {
-            throw std::runtime_error{fmt::format("Path {} does not exist", root.native())};
-        }
-
-        const fs::path tds_config = fs::canonical(root) / ".tds";
+    void RunCommand::parse_config_directory_path(std::string_view arg) {
+        const fs::path instance_path = arg;
+        const fs::path tds_config = instance_path / ".tds";
         if(!fs::exists(tds_config)) {
-            throw std::runtime_error{fmt::format("{} is not valid TDS instance", tds_config.native())};
+            throw InvalidCommandExecutionError{fmt::format("{} is not valid tds config directory", tds_config)};
         } else {
-            m_root.emplace(std::move(root));
+            m_config_directory.emplace(fs::canonical(instance_path));
         }
     }
 
-    void RunCommand::make_root_path() {
-        if(!m_root.has_value()) {
-            parse_root(fs::current_path().native());
+    void RunCommand::make_config_directory_path() {
+        if(!m_config_directory.has_value()) {
+            parse_config_directory_path(fs::current_path().native());
         }
     }
 
     void RunCommand::read_config() {
-        config::ConfigReader reader{*m_root};
+        config::ConfigReader reader{*m_config_directory};
         m_config = reader.read_config();
     }
 
-    void RunCommand::apply_arguments() {
+    void RunCommand::overwrite_config_with_cli_arguments() {
         if(m_port.has_value()) {
             m_config.set_port(ip::Port{*m_port});
         }
+    }
+
+    void RunCommand::launch_server() {
+        server::Server server{*m_config_directory};
+        server.set_config(m_config);
+        server.launch();
     }
 }

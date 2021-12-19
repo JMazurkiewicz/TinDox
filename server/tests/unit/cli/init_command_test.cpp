@@ -1,25 +1,28 @@
 #include <catch2/catch_test_macros.hpp>
 #include <unit.hpp>
 
+#include "tds/cli/cli_error.hpp"
 #include "tds/cli/command.hpp"
 #include "tds/cli/init_command.hpp"
+#include "tds/cli/invalid_command_arguments_error.hpp"
+#include "tds/cli/invalid_command_execution_error.hpp"
 
 #include <array>
 #include <filesystem>
+#include <stdexcept>
 
 using namespace tds::cli;
 using namespace std::string_view_literals;
 namespace fs = std::filesystem;
 
 TEST_CASE("tds::cli::InitCommand", "[cli]") {
-    SECTION("Is `InitCommand` a valid command?") {
+    SECTION("Is 'InitCommand' a valid command?") {
         REQUIRE(Command<InitCommand>);
     }
 
     SECTION("Check name") {
         const std::string_view expected = "init";
         REQUIRE(InitCommand::name == expected);
-        REQUIRE(InitCommand::get_name() == expected);
     }
 
     SECTION("Test creating instance in current path") {
@@ -28,10 +31,10 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
         fs::current_path(test_dir);
 
         InitCommand init;
-        const int status = init({});
+        REQUIRE_NOTHROW(init.parse_arguments({}));
+        REQUIRE_NOTHROW(init.execute());
 
         const fs::path tds_root = test_dir / ".tds";
-        REQUIRE(status == 0);
         REQUIRE(fs::exists(tds_root));
         REQUIRE(fs::exists(tds_root / "config"));
         REQUIRE(fs::exists(tds_root / "users"));
@@ -40,29 +43,38 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
     SECTION("Test creating instance in different path") {
         const fs::path test_dir = "/tmp/tds_test2";
         fs::create_directory(test_dir);
-        const auto args = std::to_array<std::string_view>({test_dir.native()});
+        const std::array args = {std::string_view{test_dir.native()}};
 
         InitCommand init;
-        const int status = init(args);
+        REQUIRE_NOTHROW(init.parse_arguments(args));
+        REQUIRE_NOTHROW(init.execute());
 
         const fs::path tds_root = test_dir / ".tds";
-        REQUIRE(status == 0);
         REQUIRE(fs::exists(tds_root));
         REQUIRE(fs::exists(tds_root / "config"));
         REQUIRE(fs::exists(tds_root / "users"));
     }
 
-    SECTION("Test creating instance in different (invalid) path") {
-        const fs::path test_dir = "i/do/not/exist";
-        const auto args = std::to_array<std::string_view>({test_dir.native()});
+    SECTION("Test creating instance where instance already exists") {
+        const fs::path test_dir = "/tmp/tds_test2";
+        const std::array args = {std::string_view{test_dir.native()}};
 
         InitCommand init;
-        REQUIRE(init(args) != 0);
+        REQUIRE_NOTHROW(init.parse_arguments(args));
+        REQUIRE_THROWS_AS(init.execute(), InvalidCommandExecutionError);
+    }
+
+    SECTION("Test creating instance in different (invalid) path") {
+        const fs::path test_dir = "i/do/not/exist";
+        const std::array args = {std::string_view{test_dir.native()}};
+
+        InitCommand init;
+        REQUIRE_THROWS_AS(init.parse_arguments(args), InvalidCommandExecutionError);
     }
 
     SECTION("Test invalid arguments") {
-        const auto args = std::to_array<std::string_view>({"bad", "arguments"});
+        const std::array args = {"bad"sv, "arguments"sv};
         InitCommand init;
-        REQUIRE(init(args) != 0);
+        REQUIRE_THROWS_AS(init.parse_arguments(args), InvalidCommandArgumentsError);
     }
 }

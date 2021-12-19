@@ -1,48 +1,50 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "tds/cli/command_interface.hpp"
-#include "tds/cli/command_runner.hpp"
+#include "tds/cli/command_executor.hpp"
+#include "tds/cli/no_such_command_error.hpp"
 
 using namespace tds::cli;
 
-struct SpawnCommand : CommandInterface<SpawnCommand> {
+struct SpawnCommand {
     static constexpr std::string_view name = "spawn";
-
     void parse_arguments(std::span<const std::string_view>) { }
+
     void execute() { }
 };
 
-struct PrintCommand : CommandInterface<PrintCommand> {
+struct PrintCommand {
     static constexpr std::string_view name = "print";
-
     void parse_arguments(std::span<const std::string_view>) { }
-    void execute() {
-        set_error();
-    }
+
+    void execute() { }
 };
 
-TEST_CASE("tds::cli::CommandRunner", "[cli]") {
+TEST_CASE("tds::cli::CommandExecutor", "[cli]") {
     SECTION("Check commands") {
         REQUIRE(Command<SpawnCommand>);
         REQUIRE(Command<PrintCommand>);
     }
 
-    CommandRunner<SpawnCommand, PrintCommand> runner;
+    CommandExecutor<SpawnCommand, PrintCommand> executor;
     const std::span<std::string_view> args;
 
-    SECTION("Run spwan command") {
-        REQUIRE(runner.run("spawn", args) == 0);
+    SECTION("Run spawn command") {
+        executor.set_command("spawn");
+        executor.parse_arguments(args);
+        REQUIRE_NOTHROW(executor.execute());
     }
 
     SECTION("Run print command") {
-        REQUIRE(runner.run("print", args) == 1);
+        executor.set_command("print");
+        executor.parse_arguments(args);
+        REQUIRE_NOTHROW(executor.execute());
     }
 
     SECTION("Run invalid command") {
-        REQUIRE_THROWS_AS(runner.run("invalid", args), CliError);
+        REQUIRE_THROWS_AS(executor.set_command("invalid"), NoSuchCommandError);
 
         try {
-            runner.run("invalid", args);
+            executor.set_command("invalid");
         } catch(const std::exception& e) {
             const std::string expected = "tds: 'invalid' is not a tds command. See 'tds help'.";
             REQUIRE(e.what() == expected);

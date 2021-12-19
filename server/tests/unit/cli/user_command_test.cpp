@@ -6,13 +6,12 @@
 using namespace tds::cli;
 
 TEST_CASE("tds::cli::UserCommand", "[cli]") {
-    SECTION("Is `UserCommand` a valid command?") {
+    SECTION("Is 'UserCommand' a valid command?") {
         REQUIRE(Command<UserCommand>);
     }
 
     SECTION("Check name") {
         const std::string_view expected = "user";
         REQUIRE(UserCommand::name == expected);
-        REQUIRE(UserCommand::get_name() == expected);
     }
 }

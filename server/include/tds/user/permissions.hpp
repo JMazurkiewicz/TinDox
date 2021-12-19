@@ -47,7 +47,7 @@ namespace tds::user {
         return lhs = lhs ^ rhs;
     }
 
-    std::string to_string(Permissions);
+    std::string to_string(Permissions perms);
     Permissions perms_from_string(std::string_view str);
 
     std::istream& operator>>(std::istream& stream, Permissions& perms);

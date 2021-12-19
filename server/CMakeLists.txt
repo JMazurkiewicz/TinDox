@@ -35,7 +35,6 @@ else()
     endif()
 endif()
 
-set(TDS_POSITION_INDEPENDENT_CODE CMAKE_POSITION_INDEPENDENT_CODE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(fmt 8.0 QUIET)
 if(fmt_FOUND)
@@ -68,16 +67,20 @@ else()
         add_subdirectory("${spdlog_SOURCE_DIR}" EXCLUDE_FROM_ALL)
     endif()
 endif()
-set(CMAKE_POSITION_INDEPENDENT_CODE TDS_POSITION_INDEPENDENT_CODE)
 
 set(
     TDS_DEV_SOURCES
 
-    src/cli/command_base.cpp
-    src/cli/config_command.cpp
+    src/cli/user_commands/user_add_command.cpp
+    src/cli/user_commands/user_passwd_command.cpp
+    src/cli/user_commands/user_perms_command.cpp
+    src/cli/user_commands/user_remove_command.cpp
+    src/cli/user_commands/user_subcommand_base.cpp
+
     src/cli/help_command.cpp
     src/cli/init_command.cpp
-    src/cli/log_command.cpp
+    src/cli/invalid_command_arguments_error.cpp
+    src/cli/no_such_command_error.cpp
     src/cli/run_command.cpp
     src/cli/user_command.cpp
 
