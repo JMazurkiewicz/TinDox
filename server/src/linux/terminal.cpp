@@ -5,6 +5,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+#ifndef TDS_NO_TERMINAL
+
 namespace tds::linux {
     void Terminal::set_stdin_echo(bool visibility) {
         termios term;
@@ -23,3 +25,11 @@ namespace tds::linux {
         }
     }
 }
+
+#else
+
+namespace tds::linux {
+    void Terminal::set_stdin_echo(bool) { }
+}
+
+#endif

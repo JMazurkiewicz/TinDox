@@ -135,5 +135,6 @@ if(TDS_UNIT_TESTS)
 endif()
 
 if(TDS_INTEGRATION_TESTS)
+    target_compile_definitions(tds-dev PRIVATE TDS_NO_TERMINAL)
     include("cmake/integration_tests.cmake")
 endif()

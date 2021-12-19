@@ -47,18 +47,12 @@ jobs:
     - name: Run unit tests
       run: ctest --test-dir build --output-on-failure
 
-    - name: Install with CMake
-      run: |
-        sudo cmake --install build
-        tds help
-
-    - name: Run CPack
-      run: sudo cpack --config build/CPackConfig.cmake -B build
-
     - name: Run integration tests
       run: |
         cmake \
           -B build \
           -DTDS_UNIT_TESTS=OFF \
           -DTDS_INTEGRATION_TESTS=ON
+        cmake --build build
+        sudo cmake --install build
         ctest --test-dir build --output-on-failure

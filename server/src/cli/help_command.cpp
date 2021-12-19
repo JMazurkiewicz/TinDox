@@ -16,7 +16,7 @@ namespace tds::cli {
             "directory\n"
             "* log                                                    display logs\n"
             "* run                                                    run TinDoxServer\n"
-            "* user [<-p|--path> <tds-dir>] <add|remove|passwd|perms> add, modify or remove users\n"
+            "* user [<-d|--dir> <tds-dir>] <add|remove|passwd|perms>  add, modify or remove users\n"
             "* user remove <username>                                 remove specified user\n"
             "* user perms <username> [+perms] [-perms]                remove given perms of user\n"
             "\n"

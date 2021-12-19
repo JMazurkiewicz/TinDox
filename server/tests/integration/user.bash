@@ -9,89 +9,58 @@ mkdir /tmp/tds_user_command_test
 cd /tmp/tds_user_command_test
 tds init .
 
-cat <<EOT
-sample_user
-password
-password
-EOT | tds user add
+printf "SampleUser\npassword\npassword\n" | tds user add >/dev/null 2>/dev/null
 if [ $? -ne 0 ]
 then
     failure "Could not add valid user"
 fi
 
-cat <<EOT
-s##mple_user2
-password
-password
-EOT | tds user add
+printf "sample_user\npassword\npassword\n" | tds user add >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
     failure "Added user with invalid username"
 fi
 
-cat <<EOT
-sample_user
-password
-password
-EOT | tds user add
+printf "SampleUser\npassword\npassword\n" | tds user add >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
     failure "Repeated username"
 fi
 
-cat <<EOT
-user1
-password
-wrong
-wrong
-wrong
-wrong
-wrong
-EOT | tds user add
+printf "user1\npassword\nwrong\nwrong\nwrong\nwrong\nwrong\n" | tds user add >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
     failure "Too many password attempts"
 fi
 
-cat <<EOT
-unreachable
-unreachable
-unreachable
-EOT
-tds user add invalid_argument
+printf "unreachable\nunreachable\nunreachable\n" | tds user add invalid_argument >/dev/null 2>/dev/null
 if [ $? -eq 0 ]
 then
     failure "Command 'user add' takes no extra arguments"
 fi
 
-cat <<EOT
-newpass
-newpass
-EOT | tds user password admin
+printf "admin\nnewpass\nnewpass\n" | tds user passwd admin #>/dev/null 2>/dev/null
 if [ $? -ne 0 ]
 then
     failure "Password change failed"
 fi
 
-cat <<EOT
-newpass
-newpass
-EOT | tds user passwd nosuchuser
-if [ $? -ne 0 ]
+printf "newpass\nnewpass\n" | tds user passwd nosuchuser >/dev/null 2>/dev/null
+if [ $? -eq 0 ]
 then
     failure "Password change succeeded for non-existing user"
 fi
 
 # Todo: perms tests
 
-tds user remove nosuchuser
-if [ $? -ne 0 ]
+tds user remove nosuchuser >/dev/null 2>/dev/null
+if [ $? -ne 0 ] # SHOULD FAIL (-ne)
 then
     failure "Removed non-existing user"
 fi
 
-tds user remove sample_user
+tds user remove SampleUser >/dev/null 2>/dev/null
 if [ $? -ne 0 ]
 then
-    failure "Failed to remove 'sample_user' user"
+    failure "Failed to remove 'SampleUser' user"
 fi
