@@ -7,6 +7,7 @@
 #include <thread>
 
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 
 namespace tds::config::defaults {
     int get_default_max_thread_count() {

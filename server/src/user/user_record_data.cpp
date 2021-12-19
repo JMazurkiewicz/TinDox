@@ -52,4 +52,8 @@ namespace tds::user {
 
         return UserRecordData{std::move(username), std::move(password), perms_from_string(perms_str)};
     }
+
+    std::ostream& operator<<(std::ostream& stream, const UserRecordData& record) {
+        return stream << record.get_username() << ':' << record.get_password_hash() << ':' << record.get_permissions();
+    }
 }

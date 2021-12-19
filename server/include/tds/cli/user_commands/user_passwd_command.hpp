@@ -11,5 +11,16 @@ namespace tds::cli::user_commands {
 
         void parse_arguments(std::span<const std::string_view> args);
         void execute();
+
+    private:
+        void find_old_password();
+        void read_old_password() const;
+        void read_new_password();
+        void read_new_password_repeated() const;
+        void write_new_credentials() const;
+
+        std::string m_username;
+        std::string m_old_password_hash;
+        std::string m_new_password;
     };
 }

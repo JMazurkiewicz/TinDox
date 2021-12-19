@@ -2,6 +2,7 @@
 
 #include "tds/user/permissions.hpp"
 
+#include <ostream>
 #include <string>
 #include <string_view>
 
@@ -9,12 +10,6 @@ namespace tds::user {
     class UserRecordData {
     public:
         explicit UserRecordData(std::string username, std::string password_hash, Permissions perms);
-
-        UserRecordData(const UserRecordData&) = delete;
-        UserRecordData& operator=(const UserRecordData&) = delete;
-
-        UserRecordData(UserRecordData&&) = default;
-        UserRecordData& operator=(UserRecordData&&) = default;
 
         std::string_view get_username() const noexcept;
         std::string_view get_password_hash() const noexcept;
@@ -30,4 +25,6 @@ namespace tds::user {
     };
 
     UserRecordData make_user_record_data(std::string_view str);
+
+    std::ostream& operator<<(std::ostream& stream, const UserRecordData& record);
 }

@@ -2,6 +2,7 @@
 
 #include "tds/cli/invalid_command_arguments_error.hpp"
 #include "tds/cli/invalid_command_execution_error.hpp"
+#include "tds/config/limits.hpp"
 #include "tds/linux/hash.hpp"
 #include "tds/linux/terminal.hpp"
 #include "tds/user/permissions.hpp"
@@ -17,7 +18,7 @@ namespace tds::cli::user_commands {
     namespace {
         [[noreturn]] void throw_too_many_attempts_error() {
             throw InvalidCommandExecutionError{
-                fmt::format("too many attempts (max is {})", UserAddCommand::max_try_count)};
+                fmt::format("too many attempts (max is {})", config::limits::max_try_count)};
         }
     }
 
@@ -31,18 +32,19 @@ namespace tds::cli::user_commands {
         read_username();
         check_username_uniqueness();
         read_password();
+        read_repeated_password();
         write_new_user();
     }
 
     void UserAddCommand::read_username() {
-        for(int i = 0; i < max_try_count; ++i) {
+        for(int i = 0; i < config::limits::max_try_count; ++i) {
             if(i == 0) {
                 std::cout << "Enter username: ";
             } else {
                 std::cout << "Invalid username - use letters or numbers only. Try again: ";
             }
 
-            std::getline(std::cin, username);
+            std::getline(std::cin, m_username);
             if(is_username_valid()) {
                 return;
             }
@@ -59,20 +61,36 @@ namespace tds::cli::user_commands {
 
         for(std::string line; std::getline(users_file, line);) {
             const auto record = user::make_user_record_data(line);
-            if(record.get_username() == username) {
-                throw InvalidCommandExecutionError{fmt::format("user named '{}' already exists", username)};
+            if(record.get_username() == m_username) {
+                throw InvalidCommandExecutionError{fmt::format("user named '{}' already exists", m_username)};
             }
         }
     }
 
     void UserAddCommand::read_password() {
         linux::Terminal::set_stdin_echo(false);
-        std::cout << "Enter password: ";
-        std::getline(std::cin, password);
+        for(int i = 0; i < config::limits::max_try_count; ++i) {
+            if(i == 0) {
+                std::cout << "Enter password: ";
+            } else {
+                std::cout << "Password is too long, try something shorter: ";
+            }
 
-        std::string repeated_password;
-        for(int i = 0; i < max_try_count; ++i) {
+            std::getline(std::cin, m_password);
             std::cout << '\n';
+            if(is_password_valid()) {
+                linux::Terminal::set_stdin_echo(true);
+                return;
+            }
+        }
+
+        throw_too_many_attempts_error();
+    }
+
+    void UserAddCommand::read_repeated_password() const {
+        std::string repeated_password;
+        linux::Terminal::set_stdin_echo(false);
+        for(int i = 0; i < config::limits::max_try_count; ++i) {
             if(i == 0) {
                 std::cout << "Repeat password: ";
             } else {
@@ -80,19 +98,19 @@ namespace tds::cli::user_commands {
             }
 
             std::getline(std::cin, repeated_password);
-            if(repeated_password == password) {
+            std::cout << '\n';
+            if(repeated_password == m_password) {
                 linux::Terminal::set_stdin_echo(true);
                 return;
             }
         }
 
-        std::cout << '\n';
         throw_too_many_attempts_error();
     }
 
     void UserAddCommand::write_new_user() const {
         std::ofstream users_file{get_user_file_path(), std::ios_base::app};
-        users_file << username << ':' << linux::hash(password) << ':'
+        users_file << m_username << ':' << linux::hash(m_password) << ':'
                    << (user::Permissions::travel | user::Permissions::download | user::Permissions::upload) << '\n';
     }
 
@@ -101,6 +119,10 @@ namespace tds::cli::user_commands {
             return ('a' <= symbol && symbol <= 'z') || ('A' <= symbol && symbol <= 'Z') ||
                    ('0' <= symbol && symbol <= '9');
         };
-        return std::ranges::all_of(username, test_char);
+        return m_username.size() <= config::limits::max_username_length && std::ranges::all_of(m_username, test_char);
+    }
+
+    bool UserAddCommand::is_password_valid() const {
+        return m_password.size() <= config::limits::max_password_length;
     }
 }
