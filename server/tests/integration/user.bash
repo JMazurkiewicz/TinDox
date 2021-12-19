@@ -30,6 +30,41 @@ then
 fi
 
 cat <<EOT
+sample_user
+password
+password
+EOT | tds user add
+if [ $? -eq 0 ]
+then
+    failure "Repeated username"
+fi
+
+cat <<EOT
+user1
+password
+wrong
+wrong
+wrong
+wrong
+wrong
+EOT | tds user add
+if [ $? -eq 0 ]
+then
+    failure "Too many password attempts"
+fi
+
+cat <<EOT
+unreachable
+unreachable
+unreachable
+EOT
+tds user add invalid_argument
+if [ $? -eq 0 ]
+then
+    failure "Command 'user add' takes no extra arguments"
+fi
+
+cat <<EOT
 newpass
 newpass
 EOT | tds user password admin
@@ -41,7 +76,7 @@ fi
 cat <<EOT
 newpass
 newpass
-EOT | tds user password nosuchuser
+EOT | tds user passwd nosuchuser
 if [ $? -ne 0 ]
 then
     failure "Password change succeeded for non-existing user"

@@ -101,6 +101,7 @@ set(
     src/linux/linux_error.cpp
     src/linux/pipe_device.cpp
     src/linux/signal_device.cpp
+    src/linux/terminal.cpp
 
     src/server/server.cpp
 

@@ -1,6 +1,7 @@
 #include "tds/cli/command_executor.hpp"
 #include "tds/cli/help_command.hpp"
 #include "tds/cli/init_command.hpp"
+#include "tds/cli/invalid_command_execution_error.hpp"
 #include "tds/cli/no_such_command_error.hpp"
 #include "tds/cli/run_command.hpp"
 #include "tds/cli/user_command.hpp"
@@ -40,12 +41,14 @@ int main(int argc, char** argv) {
                       << e.source() << '\n';
         } catch(const tds::cli::NoSuchCommandError& e) {
             std::cerr << e.what() << '\n';
+        } catch(const tds::cli::InvalidCommandExecutionError& e) {
+            std::cerr << "tds: " << e.what() << '\n';
         } catch(const tds::cli::CliError& e) {
             std::cerr << "error: '" << e.what() << "'\n";
         } catch(const std::exception& e) {
             std::cerr << "fatal error: '" << e.what() << "'\n";
         } catch(...) {
-            std::cerr << "Fatal error!\n";
+            std::cerr << "Unknown fatal error!\n";
         }
     }
 
