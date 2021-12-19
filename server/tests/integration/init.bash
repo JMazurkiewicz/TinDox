@@ -32,3 +32,9 @@ if [ $? -ne 0 ]
 then
     failure "Command \`tds init\` should succeed - current path is valid"
 fi
+
+tds init
+if [ $? -eq 0 ]
+then
+    failure "Command \`tds init\` should fail - config already exists"
+fi

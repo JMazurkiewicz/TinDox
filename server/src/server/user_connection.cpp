@@ -3,6 +3,7 @@
 #include "tds/ip/endpoint_v4.hpp"
 #include "tds/linux/io_device.hpp"
 
+#include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
 
 namespace tds::server {
@@ -11,7 +12,7 @@ namespace tds::server {
         , m_endpoint{endpoint} { }
 
     UserConnection::~UserConnection() {
-        spdlog::info("Closed connection {}", to_string(m_endpoint));
+        spdlog::info("Closed connection {}", m_endpoint);
     }
 
     void UserConnection::handle() {
@@ -19,11 +20,11 @@ namespace tds::server {
             std::array<char, 256> buffer;
             const auto amount = read(buffer.data(), buffer.size());
             if(amount == 0) {
-                throw std::runtime_error{"Connection lost with " + to_string(m_endpoint)};
+                throw std::runtime_error{fmt::format("Connection lost with {}", m_endpoint)};
             }
 
             std::string_view msg{buffer.data(), static_cast<size_t>(amount)};
-            spdlog::info("[{}]: {}", to_string(m_endpoint), msg);
+            spdlog::info("[{}]: {}", m_endpoint, msg);
 
             ssize_t written = 0;
             do {

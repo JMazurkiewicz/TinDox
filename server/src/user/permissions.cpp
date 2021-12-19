@@ -38,4 +38,15 @@ namespace tds::user {
         }
         return result;
     }
+
+    std::istream& operator>>(std::istream& stream, Permissions& perms) {
+        std::string str;
+        stream >> str;
+        perms = perms_from_string(str);
+        return stream;
+    }
+
+    std::ostream& operator<<(std::ostream& stream, Permissions perms) {
+        return stream << to_string(perms);
+    }
 }

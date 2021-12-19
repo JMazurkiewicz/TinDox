@@ -19,16 +19,27 @@ namespace tds::cli {
     }
 
     void HelpCommand::print_help() {
-        constexpr std::string_view help_message = {
-            "usage: tds <command> [<args>]\n"
+        constexpr static std::string_view help_message = {
+            "usage: tds <command> [args]\n"
             "\n"
             "These are TinDoxServer commands:\n"
-            "* config               modify server's properties\n"
-            "* help                 display available options\n"
-            "* init [<location>]    creates server instance in current or specified directory\n"
-            "* log                  display logs\n"
-            "* run                  run TinDoxServer\n"
-            "* user                 add, modify or remove users\n"};
+            "* config                                                 modify server's properties\n"
+            "* help                                                   display available options\n"
+            "* init [dir]                                             creates server instance in current or specified "
+            "directory\n"
+            "* log                                                    display logs\n"
+            "* run                                                    run TinDoxServer\n"
+            "* user [<-p|--path> <tds-dir>] <add|remove|passwd|perms> add, modify or remove users\n"
+            "* user remove <username>                                 remove specified user\n"
+            "* user perms <username> [+perms] [-perms]                remove given perms of user\n"
+            "\n"
+            "Available permissions:\n"
+            "* travel   [t] - commands like ls, pwd, cd\n"
+            "* write    [w] - commands like rmdir, mkdir\n"
+            "* copy     [c] - cp command\n"
+            "* move     [m] - mv command\n"
+            "* download [d] - dl and dlr commands\n"
+            "* upload   [u] - ul and uls commands\n"};
         std::cout << help_message;
     }
 }

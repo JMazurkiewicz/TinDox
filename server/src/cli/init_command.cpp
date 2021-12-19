@@ -1,6 +1,8 @@
 #include "tds/cli/init_command.hpp"
 
 #include "tds/config/defaults.hpp"
+#include "tds/linux/hash.hpp"
+#include "tds/user/permissions.hpp"
 
 #include <array>
 #include <filesystem>
@@ -79,7 +81,7 @@ namespace tds::cli {
         if(!users_file.good()) {
             log_error() << "error: failed to create users file (" << file_name << ")\n";
         } else {
-            users_file << "admin:admin:all\n";
+            users_file << "admin:" << linux::hash("admin") << ':' << user::Permissions::all << '\n';
         }
     }
 

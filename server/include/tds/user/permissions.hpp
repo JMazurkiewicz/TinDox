@@ -49,4 +49,7 @@ namespace tds::user {
 
     std::string to_string(Permissions);
     Permissions perms_from_string(std::string_view str);
+
+    std::istream& operator>>(std::istream& stream, Permissions& perms);
+    std::ostream& operator<<(std::ostream& stream, Permissions perms);
 }

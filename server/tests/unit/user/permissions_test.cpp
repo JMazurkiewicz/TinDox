@@ -3,6 +3,7 @@
 #include "tds/user/permissions.hpp"
 
 #include <bit>
+#include <sstream>
 #include <stdexcept>
 
 using namespace tds::user;
@@ -39,5 +40,18 @@ TEST_CASE("tds::user::Permissions", "[user]") {
         REQUIRE(perms_from_string("cmwt") == (copy | move | write | travel));
         REQUIRE(perms_from_string("twcmdu") == all);
         REQUIRE_THROWS_AS(perms_from_string("x"), std::runtime_error);
+    }
+
+    SECTION("Test '>>' operator") {
+        std::istringstream stream{"twm"};
+        Permissions perms;
+        stream >> perms;
+        REQUIRE(perms == (travel | write | move));
+    }
+
+    SECTION("Test '<<' operator") {
+        std::ostringstream stream;
+        stream << (travel | download | upload);
+        REQUIRE(stream.str() == "tdu");
     }
 }
