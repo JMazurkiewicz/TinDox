@@ -85,7 +85,7 @@ fi
 # Todo: perms tests
 
 tds user remove nosuchuser
-if [ $? -eq 0 ]
+if [ $? -ne 0 ]
 then
     failure "Removed non-existing user"
 fi
