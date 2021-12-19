@@ -10,5 +10,8 @@ namespace tds::cli::user_commands {
 
         void parse_arguments(std::span<const std::string_view> args);
         void execute();
+
+    private:
+        std::string m_username;
     };
 }

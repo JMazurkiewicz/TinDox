@@ -81,3 +81,17 @@ if [ $? -ne 0 ]
 then
     failure "Password change succeeded for non-existing user"
 fi
+
+# Todo: perms tests
+
+tds user remove nosuchuser
+if [ $? -eq 0 ]
+then
+    failure "Removed non-existing user"
+fi
+
+tds user remove sample_user
+if [ $? -ne 0 ]
+then
+    failure "Failed to remove 'sample_user' user"
+fi
