@@ -7,7 +7,6 @@ function(AddIntegrationTest TEST_NAME)
     add_test(NAME ${TEST_NAME} COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/tests/integration/${TEST_NAME}.bash)
 endfunction()
 
-enable_testing()
 AddIntegrationTest(help)
 AddIntegrationTest(init)
 AddIntegrationTest(run)

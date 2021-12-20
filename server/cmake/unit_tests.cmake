@@ -20,7 +20,6 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 include(CTest)
 include(Catch)
-enable_testing()
 
 set(
     TDS_UNIT_TESTS_SOURCES

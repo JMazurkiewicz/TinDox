@@ -109,29 +109,37 @@ set(
     src/user/user_record_data.cpp
 )
 
-set(TDS_EXTERNAL_LIBS tomlplusplus::tomlplusplus fmt::fmt spdlog::spdlog)
-
-add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
-target_include_directories(tds-dev PUBLIC include)
-target_link_libraries(tds-dev PRIVATE ${TDS_EXTERNAL_LIBS} crypt)
-
 set(
-    TDS_SOURCES
+    TDS_DEV_LIBRARIES
 
-    src/main.cpp
+    tomlplusplus::tomlplusplus
+    fmt::fmt
+    spdlog::spdlog
+    crypt
 )
 
-add_executable(tds ${TDS_SOURCES})
+option(TDS_STATIC "Build static library instead of dynamic.")
+if(TDS_STATIC)
+    add_library(tds-dev STATIC ${TDS_DEV_SOURCES})
+else()
+    add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
+endif()
+
+target_include_directories(tds-dev PUBLIC include)
+target_link_libraries(tds-dev PRIVATE ${TDS_DEV_LIBRARIES})
+
+add_executable(tds src/main.cpp)
 target_link_libraries(tds PRIVATE ${TDS_EXTERNAL_LIBS})
-target_link_libraries(tds PUBLIC tds-dev)
+target_link_libraries(tds PUBLIC tds-dev tomlplusplus::tomlplusplus)
 
 include("cmake/install.cmake")
 
-option(TDS_TESTS "Enable tests for TinDox Server")
-option(TDS_UNIT_TESTS "Run unit tests for TinDox Server")
-option(TDS_INTEGRATION_TESTS "Run integration tests for TinDox Server")
+option(TDS_TESTS "Enable tests for TinDox Server.")
+option(TDS_UNIT_TESTS "Run unit tests for TinDox Server.")
+option(TDS_INTEGRATION_TESTS "Run integration tests for TinDox Server.")
 
 if(TDS_TESTS)
+    enable_testing()
     target_compile_definitions(tds-dev PRIVATE TDS_NO_TERMIOS)
 
     if(TDS_UNIT_TESTS)
