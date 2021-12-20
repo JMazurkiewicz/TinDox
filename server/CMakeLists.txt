@@ -127,14 +127,18 @@ target_link_libraries(tds PUBLIC tds-dev)
 
 include("cmake/install.cmake")
 
+option(TDS_TESTS "Enable tests for TinDox Server")
 option(TDS_UNIT_TESTS "Run unit tests for TinDox Server")
 option(TDS_INTEGRATION_TESTS "Run integration tests for TinDox Server")
 
-if(TDS_UNIT_TESTS)
-    include("cmake/unit_tests.cmake")
-endif()
+if(TDS_TESTS)
+    target_compile_definitions(tds-dev PRIVATE TDS_NO_TERMIOS)
 
-if(TDS_INTEGRATION_TESTS)
-    target_compile_definitions(tds-dev PRIVATE TDS_NO_TERMINAL)
-    include("cmake/integration_tests.cmake")
+    if(TDS_UNIT_TESTS)
+        include("cmake/unit_tests.cmake")
+    endif()
+
+    if(TDS_INTEGRATION_TESTS)
+        include("cmake/integration_tests.cmake")
+    endif()
 endif()

@@ -2,10 +2,12 @@
 
 #include "tds/linux/linux_error.hpp"
 
+#ifndef TDS_NO_TERMIOS
+
+// clang-format off
 #include <termios.h>
 #include <unistd.h>
-
-#ifndef TDS_NO_TERMINAL
+// clang-format on
 
 namespace tds::linux {
     void Terminal::set_stdin_echo(bool visibility) {

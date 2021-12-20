@@ -38,11 +38,17 @@ jobs:
         cmake \
           -B build \
           -DCMAKE_BUILD_TYPE=${{matrix.build_type}} \
+          -DTDS_TESTS=ON \
           -DTDS_UNIT_TESTS=ON \
           -DTDS_INTEGRATION_TESTS=OFF
 
     - name: Build project
       run: cmake --build build
+
+    - name: Install with CMake
+      run: |
+        sudo cmake --install build
+        tds help
 
     - name: Run unit tests
       run: ctest --test-dir build --output-on-failure
@@ -53,6 +59,4 @@ jobs:
           -B build \
           -DTDS_UNIT_TESTS=OFF \
           -DTDS_INTEGRATION_TESTS=ON
-        cmake --build build
-        sudo cmake --install build
         ctest --test-dir build --output-on-failure
