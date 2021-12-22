@@ -63,14 +63,14 @@ then
 fi
 
 start_test
-tds user perms SampleUser +rw -u
+tds user perms SampleUser +dw -u
 if [ $? -ne 0 ]
 then
     failure "Failed to change permissions of user"
 fi
 
 start_test
-tds user perms SampleUser -rw +u
+tds user perms SampleUser -dw +u
 if [ $? -ne 0 ]
 then
     failure "Failed to change permissions of user"

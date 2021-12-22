@@ -46,7 +46,7 @@ namespace tds::user {
         std::erase_if(m_users, [&](const UserData& user) { return user.m_name == username; });
     }
 
-    std::string_view UserTable::get_password_hash_of_user(std::string_view username) {
+    std::string_view UserTable::get_password_hash_of_user(std::string_view username) const {
         return get_user(username).m_password_hash;
     }
 
@@ -58,7 +58,7 @@ namespace tds::user {
         get_user(username).m_password_hash = linux::hash(new_password);
     }
 
-    Permissions UserTable::get_perms_of_user(std::string_view username) {
+    Permissions UserTable::get_perms_of_user(std::string_view username) const {
         return get_user(username).m_perms;
     }
 

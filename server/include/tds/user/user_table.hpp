@@ -29,11 +29,11 @@ namespace tds::user {
         void add_user(std::string_view username, const std::string& password);
         void remove_user(std::string_view username);
 
-        std::string_view get_password_hash_of_user(std::string_view username);
+        std::string_view get_password_hash_of_user(std::string_view username) const;
         bool verify_password_of_user(std::string_view username, const std::string& password) const;
         void set_password_of_user(std::string_view username, const std::string& new_password);
 
-        Permissions get_perms_of_user(std::string_view username);
+        Permissions get_perms_of_user(std::string_view username) const;
         void set_perms_of_user(std::string_view username, Permissions new_perms);
 
         void commit_table();
