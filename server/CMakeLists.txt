@@ -129,8 +129,8 @@ target_include_directories(tds-dev PUBLIC include)
 target_link_libraries(tds-dev PRIVATE ${TDS_DEV_LIBRARIES})
 
 add_executable(tds src/main.cpp)
-target_link_libraries(tds PRIVATE ${TDS_EXTERNAL_LIBS})
-target_link_libraries(tds PUBLIC tds-dev tomlplusplus::tomlplusplus)
+target_link_libraries(tds PRIVATE tomlplusplus::tomlplusplus)
+target_link_libraries(tds PUBLIC tds-dev)
 
 include("cmake/install.cmake")
 
