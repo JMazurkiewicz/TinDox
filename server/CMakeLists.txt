@@ -109,15 +109,6 @@ set(
     src/user/user_table.cpp
 )
 
-set(
-    TDS_DEV_LIBRARIES
-
-    tomlplusplus::tomlplusplus
-    fmt::fmt
-    spdlog::spdlog
-    crypt
-)
-
 option(TDS_STATIC "Build static library instead of dynamic.")
 if(TDS_STATIC)
     add_library(tds-dev STATIC ${TDS_DEV_SOURCES})
@@ -126,7 +117,8 @@ else()
 endif()
 
 target_include_directories(tds-dev PUBLIC include)
-target_link_libraries(tds-dev PRIVATE ${TDS_DEV_LIBRARIES})
+target_link_libraries(tds-dev PRIVATE fmt::fmt spdlog::spdlog crypt)
+target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus)
 
 add_executable(tds src/main.cpp)
 target_link_libraries(tds PRIVATE tomlplusplus::tomlplusplus)
