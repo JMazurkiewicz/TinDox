@@ -104,6 +104,11 @@ set(
     src/linux/signal_device.cpp
     src/linux/terminal.cpp
 
+    src/server/client_context.cpp
+    src/server/client_pool.cpp
+    src/server/client_service_supervisor.cpp
+    src/server/client_service.cpp
+    src/server/client.cpp
     src/server/server.cpp
 
     src/user/permissions.cpp

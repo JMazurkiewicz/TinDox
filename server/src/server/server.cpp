@@ -10,29 +10,16 @@
 namespace tds::server {
     Server::Server(std::filesystem::path root)
         : m_root{std::move(root)}
-        , m_running{true} { }
+        , m_running{true}
+        , m_pipe_write{-1} { }
 
     void Server::set_config(const config::ServerConfig& config) {
         m_config = config;
     }
 
     void Server::launch() {
-        if(!configure()) {
-            return;
-        }
-
-        for(linux::EpollBuffer buffer{4}; m_running;) {
-            m_main_epoll.wait_for_events(buffer);
-
-            for(auto [fd, events] : buffer.get_events()) {
-                if(fd == m_signal_device.get_fd()) {
-                    m_signal_device.handle_signal();
-                } else if(fd == m_tcp_listener.get_fd()) {
-                    m_tcp_listener.handle_connection();
-                } else {
-                    spdlog::warn("Main epoll: unspecified file descriptor {}", fd);
-                }
-            }
+        if(configure()) {
+            main_loop();
         }
     }
 
@@ -41,6 +28,7 @@ namespace tds::server {
             configure_signals();
             configure_listener();
             configure_main_epoll();
+            configure_client_service();
         } catch(const std::system_error& e) {
             spdlog::error("Server error: {} (code: {})", e.what(), e.code().value());
             return false;
@@ -67,6 +55,15 @@ namespace tds::server {
         m_main_epoll.add_device(m_tcp_listener);
     }
 
+    void Server::configure_client_service() {
+        auto&& [read, write] = linux::make_pipe(true);
+        m_pipe_write = std::move(write);
+
+        m_supervisor.set_read_pipe(std::move(read));
+        m_supervisor.set_config(m_config);
+        m_supervisor.create_services();
+    }
+
     void Server::handle_stop_signal(int code) {
         const std::string_view signal_name = [code] {
             if(code == SIGINT) {
@@ -83,10 +80,28 @@ namespace tds::server {
     }
 
     void Server::handle_connection(ip::TcpSocket connection) {
-        spdlog::info("Got connection ({}) from {}", connection.get_fd(), connection.get_endpoint());
+        m_supervisor.add_connection(std::move(connection));
+    }
+
+    void Server::main_loop() {
+        for(linux::EpollBuffer buffer{4}; m_running;) {
+            m_main_epoll.wait_for_events(buffer);
+
+            for(auto [fd, events] : buffer.get_events()) {
+                if(fd == m_signal_device.get_fd()) {
+                    m_signal_device.handle_signal();
+                } else if(fd == m_tcp_listener.get_fd()) {
+                    m_tcp_listener.handle_connection();
+                } else {
+                    spdlog::warn("Main epoll: unspecified file descriptor {}", fd);
+                }
+            }
+        }
     }
 
     void Server::stop() {
         m_running = false;
+        const std::string stop_request(2 * m_config.get_max_thread_count(), 'A');
+        m_pipe_write.write(stop_request.data(), stop_request.size());
     }
 }
