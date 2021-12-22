@@ -4,6 +4,7 @@
 
 #include <csignal>
 
+#include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
 
 namespace tds::server {
@@ -25,9 +26,9 @@ namespace tds::server {
 
             for(int fd : buffer.get_available_events()) {
                 if(fd == m_signal_device.get_fd()) {
-                    m_signal_device.handle_last_signal();
+                    m_signal_device.handle_signal();
                 } else if(fd == m_tcp_listener.get_fd()) {
-                    m_tcp_listener.handle_last_connection();
+                    m_tcp_listener.handle_connection();
                 } else {
                     spdlog::warn("Main epoll: unspecified file descriptor {}", fd);
                 }
@@ -81,7 +82,9 @@ namespace tds::server {
         stop();
     }
 
-    void Server::handle_connection(int fd, ip::EndpointV4 client_endpoint) { }
+    void Server::handle_connection(ip::TcpSocket connection) {
+        spdlog::info("Got connection ({}) from {}", connection.get_fd(), connection.get_endpoint());
+    }
 
     void Server::stop() {
         m_running = false;

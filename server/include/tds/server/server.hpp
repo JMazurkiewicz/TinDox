@@ -3,6 +3,7 @@
 #include "tds/config/server_config.hpp"
 #include "tds/ip/endpoint_v4.hpp"
 #include "tds/ip/tcp_listener.hpp"
+#include "tds/ip/tcp_socket.hpp"
 #include "tds/linux/epoll_device.hpp"
 #include "tds/linux/signal_device.hpp"
 
@@ -27,7 +28,7 @@ namespace tds::server {
         void configure_main_epoll();
 
         void handle_stop_signal(int code);
-        void handle_connection(int fd, ip::EndpointV4 client_endpoint);
+        void handle_connection(ip::TcpSocket connection);
         void stop();
 
         const std::filesystem::path m_root;

@@ -93,6 +93,7 @@ set(
     src/ip/ip_error.cpp
     src/ip/port.cpp
     src/ip/tcp_listener.cpp
+    src/ip/tcp_socket.cpp
 
     src/linux/epoll_buffer.cpp
     src/linux/epoll_device.cpp

@@ -25,7 +25,7 @@ namespace tds::linux {
         create_fd();
     }
 
-    void SignalDevice::handle_last_signal() {
+    void SignalDevice::handle_signal() {
         signalfd_siginfo info;
         if(read(&info, sizeof(info)) != sizeof(info)) {
             throw std::runtime_error{"SignalDevice could not read enough bytes"};
