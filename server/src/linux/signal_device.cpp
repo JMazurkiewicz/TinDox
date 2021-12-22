@@ -7,6 +7,7 @@
 #include <span>
 #include <stdexcept>
 
+#include <fmt/core.h>
 #include <signal.h>
 #include <unistd.h>
 
@@ -36,7 +37,7 @@ namespace tds::linux {
         if(handler != m_handlers.end()) {
             handler->second(signo);
         } else {
-            throw std::runtime_error{"No handler for signal with '" + std::to_string(signo) + "' code"};
+            throw std::runtime_error{fmt::format("No handler for signal with '{}' code", signo)};
         }
     }
 

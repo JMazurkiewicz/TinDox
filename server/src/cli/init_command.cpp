@@ -1,51 +1,44 @@
 #include "tds/cli/init_command.hpp"
 
+#include "tds/cli/invalid_command_arguments_error.hpp"
+#include "tds/cli/invalid_command_execution_error.hpp"
 #include "tds/config/defaults.hpp"
+#include "tds/user/permissions.hpp"
 
-#include <array>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
+#include <stdexcept>
+
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
 namespace fs = std::filesystem;
 
 namespace tds::cli {
     void InitCommand::parse_arguments(std::span<const std::string_view> args) {
-        switch(args.size()) {
-        case 0:
+        if(const auto size = args.size(); size == 0) {
             m_location = fs::current_path();
-            break;
-
-        case 1:
+        } else if(size == 1) {
             m_location = args[0];
             if(!fs::exists(m_location)) {
-                log_error() << "error: location " << m_location << " does not exist\n";
+                throw InvalidCommandExecutionError{fmt::format("location {} does not exist", m_location)};
             }
-            break;
-
-        default:
-            log_error() << "error: invalid arguments\n"
-                           "usage: tds init [<location>]\n";
-            break;
+        } else {
+            throw InvalidCommandArgumentsError{"invalid argument", "tds init [<location>]"};
         }
     }
 
     void InitCommand::execute() {
-        try {
-            execute_steps(&InitCommand::create_config_directory, &InitCommand::create_default_config,
-                          &InitCommand::create_default_users);
-        } catch(const fs::filesystem_error& e) {
-            handle_filesystem_error(e);
-        } catch(const std::exception& e) {
-            handle_exception(e);
-        }
+        create_config_directory();
+        create_default_config();
+        create_default_users();
     }
 
     void InitCommand::create_config_directory() {
-        const fs::path config_name = m_location / ".tds";
+        fs::path config_name = fs::canonical(m_location) / ".tds";
 
         if(fs::exists(config_name)) {
-            log_error() << "error: config already exists in " << m_location << '\n';
+            throw InvalidCommandExecutionError{fmt::format("tds config already exists in {}", m_location)};
         } else {
             fs::create_directory(config_name);
             m_location = std::move(config_name);
@@ -56,17 +49,9 @@ namespace tds::cli {
         const fs::path file_name = m_location / "config";
         std::ofstream config_file{file_name};
         if(!config_file.good()) {
-            log_error() << "error: failed to create config file (" << file_name << ")\n";
+            throw InvalidCommandExecutionError{fmt::format("failed to create config file ({})", file_name)};
         } else {
-            config_file << "[config]\n"
-                           "max_thread_count = "
-                        << config::defaults::get_default_max_thread_count()
-                        << "\n"
-                           "max_user_count = "
-                        << config::defaults::get_default_max_user_count()
-                        << "\n"
-                           "backlog = "
-                        << config::defaults::get_default_backlog() << '\n';
+            config_file << config::defaults::get_default_config_file();
         }
     }
 
@@ -74,18 +59,9 @@ namespace tds::cli {
         const fs::path file_name = m_location / "users";
         std::ofstream users_file{file_name};
         if(!users_file.good()) {
-            log_error() << "error: failed to create users file (" << file_name << ")\n";
+            throw InvalidCommandExecutionError{fmt::format("failed to create users file ({})", file_name)};
         } else {
-            users_file << "admin:admin:all\n";
+            users_file << config::defaults::get_default_users_file();
         }
-    }
-
-    void InitCommand::handle_filesystem_error(const fs::filesystem_error& e) {
-        log_error() << "error: " << e.what() << "\npath1: " << e.path1() << "\npath2: " << e.path2()
-                    << "\ncode: " << e.code() << '\n';
-    }
-
-    void InitCommand::handle_exception(const std::exception& e) {
-        log_error() << "error: " << e.what() << '\n';
     }
 }

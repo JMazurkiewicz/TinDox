@@ -20,23 +20,22 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 include(CTest)
 include(Catch)
-enable_testing()
 
 set(
-    TDS_UNIT_TESTS
+    TDS_UNIT_TESTS_SOURCES
 
     tests/unit/cli/cli_error_test.cpp
-    tests/unit/cli/command_interface_test.cpp
-    tests/unit/cli/command_runner_test.cpp
+    tests/unit/cli/command_executor_test.cpp
     tests/unit/cli/command_test.cpp
-    tests/unit/cli/config_command_test.cpp
     tests/unit/cli/help_command_test.cpp
     tests/unit/cli/init_command_test.cpp
-    tests/unit/cli/log_command_test.cpp
+    tests/unit/cli/invalid_command_arguments_error_test.cpp
+    tests/unit/cli/no_such_command_error_test.cpp
     tests/unit/cli/run_command_test.cpp
     tests/unit/cli/user_command_test.cpp
 
     tests/unit/config/defaults_test.cpp
+    tests/unit/config/server_config_test.cpp
 
     tests/unit/ip/address_v4_test.cpp
     tests/unit/ip/endpoint_v4_test.cpp
@@ -48,10 +47,13 @@ set(
     tests/unit/linux/epoll_device_test.cpp
     tests/unit/linux/io_device_test.cpp
     tests/unit/linux/linux_error_test.cpp
+    tests/unit/linux/pipe_device_test.cpp
     tests/unit/linux/signal_device_test.cpp
+
+    tests/unit/user/permissions_test.cpp
 )
 
-add_executable(tds-unit-tests ${TDS_UNIT_TESTS})
+add_executable(tds-unit-tests ${TDS_UNIT_TESTS_SOURCES})
 target_link_libraries(tds-unit-tests PRIVATE Catch2::Catch2WithMain tds-dev Threads::Threads)
 target_include_directories(tds-unit-tests PRIVATE tests/unit)
 catch_discover_tests(tds-unit-tests)

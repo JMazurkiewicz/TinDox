@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <string>
 
 namespace tds::cli {
     class CliError : public std::runtime_error {

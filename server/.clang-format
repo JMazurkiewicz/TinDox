@@ -53,9 +53,6 @@ IncludeCategories:
   # C++ standard headers
   - Regex: '^<(experimental\/)?[a-z_]+>$'
     Priority: 3
-  # C, POSIX and non-standard (e.g. libstdc++) headers
-  - Regex: '^<([a-z]+\/)?[a-z_]+\.h>$'
-    Priority: 4
 IndentAccessModifiers: false
 IndentCaseLabels: false
 IndentCaseBlocks: false
