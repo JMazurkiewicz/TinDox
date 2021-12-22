@@ -43,7 +43,11 @@ namespace tds::user {
     }
 
     void UserTable::remove_user(std::string_view username) {
-        std::erase_if(m_users, [&](const UserData& user) { return user.m_name == username; });
+        if(has_user(username)) {
+            std::erase_if(m_users, [&](const UserData& user) { return user.m_name == username; });
+        } else {
+            throw UserTableError{fmt::format("user '{}' does not exist", username)};
+        }
     }
 
     std::string_view UserTable::get_password_hash_of_user(std::string_view username) const {
