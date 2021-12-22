@@ -61,7 +61,7 @@ TEST_CASE("tds::linux::{SignalDevice+EpollDevice}", "[linux]") {
 
             EpollBuffer buffer{4};
             epoll_device.wait_for_events(buffer);
-            for(int fd : buffer.get_available_events()) {
+            for(auto [fd, events] : buffer.get_events()) {
                 REQUIRE(fd == signal_device.get_fd());
                 signal_device.handle_signal();
             }
@@ -85,7 +85,7 @@ TEST_CASE("tds::linux::{SignalDevice+EpollDevice}", "[linux]") {
 
                 EpollBuffer buffer{4};
                 epoll_device.wait_for_events(buffer);
-                for(int fd : buffer.get_available_events()) {
+                for(auto [fd, events] : buffer.get_events()) {
                     REQUIRE(fd == signal_device.get_fd());
                     signal_device.handle_signal();
                 }

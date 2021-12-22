@@ -24,7 +24,7 @@ namespace tds::server {
         for(linux::EpollBuffer buffer{4}; m_running;) {
             m_main_epoll.wait_for_events(buffer);
 
-            for(int fd : buffer.get_available_events()) {
+            for(auto [fd, events] : buffer.get_events()) {
                 if(fd == m_signal_device.get_fd()) {
                     m_signal_device.handle_signal();
                 } else if(fd == m_tcp_listener.get_fd()) {

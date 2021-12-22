@@ -93,7 +93,7 @@ TEST_CASE("tds::ip::{TcpListener+EpollDevice}", "[ip]") {
             tds::linux::EpollBuffer buffer{16};
             epoll_device.wait_for_events(buffer);
 
-            for(int fd : buffer.get_available_events()) {
+            for(auto [fd, events] : buffer.get_events()) {
                 if(fd == tcp.get_fd()) {
                     tcp.handle_connection();
                 }
