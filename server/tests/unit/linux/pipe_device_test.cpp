@@ -105,7 +105,7 @@ TEST_CASE("tds::linux::{Pipe{}+EpollDevice}", "[linux]") {
     SECTION("Test in main thread with nonblocking pipe and edge-triggered epoll") {
         auto&& [read_device, write_device] = make_pipe(false);
         EpollDevice epoll_device;
-        epoll_device.add_device(read_device, EventType::edge_triggered);
+        epoll_device.add_device(read_device, EventType::in | EventType::edge_triggered);
 
         const std::string_view msg = "Epoll";
         const ssize_t write_count = write_device.write(msg.data(), msg.size());
@@ -131,7 +131,7 @@ TEST_CASE("tds::linux::{Pipe{}+EpollDevice}", "[linux]") {
 
         std::thread reader{[&] {
             EpollDevice epoll_device;
-            epoll_device.add_device(read_device, EventType::edge_triggered);
+            epoll_device.add_device(read_device, EventType::in | EventType::edge_triggered);
 
             EpollBuffer buffer{2};
             epoll_device.wait_for_events(buffer);
