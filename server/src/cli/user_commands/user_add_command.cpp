@@ -3,10 +3,8 @@
 #include "tds/cli/invalid_command_arguments_error.hpp"
 #include "tds/cli/invalid_command_execution_error.hpp"
 #include "tds/config/limits.hpp"
-#include "tds/linux/hash.hpp"
 #include "tds/linux/terminal.hpp"
-#include "tds/user/permissions.hpp"
-#include "tds/user/user_record_data.hpp"
+#include "tds/user/user_table.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -33,7 +31,7 @@ namespace tds::cli::user_commands {
         check_username_uniqueness();
         read_password();
         read_repeated_password();
-        write_new_user();
+        get_user_table().add_user(m_username, m_password);
     }
 
     void UserAddCommand::read_username() {
@@ -45,7 +43,7 @@ namespace tds::cli::user_commands {
             }
 
             std::getline(std::cin, m_username);
-            if(is_username_valid()) {
+            if(user::UserTable::is_username_ok(m_username)) {
                 return;
             }
         }
@@ -54,16 +52,8 @@ namespace tds::cli::user_commands {
     }
 
     void UserAddCommand::check_username_uniqueness() const {
-        std::ifstream users_file{get_user_file_path()};
-        if(!users_file.is_open()) {
-            throw InvalidCommandExecutionError{"program failed to open 'users' configuration file"};
-        }
-
-        for(std::string line; std::getline(users_file, line);) {
-            const auto record = user::make_user_record_data(line);
-            if(record.get_username() == m_username) {
-                throw InvalidCommandExecutionError{fmt::format("user named '{}' already exists", m_username)};
-            }
+        if(get_user_table().has_user(m_username)) {
+            throw InvalidCommandExecutionError{fmt::format("user named '{}' already exists", m_username)};
         }
     }
 
@@ -78,7 +68,7 @@ namespace tds::cli::user_commands {
 
             std::getline(std::cin, m_password);
             std::cout << '\n';
-            if(is_password_valid()) {
+            if(user::UserTable::is_password_ok(m_password)) {
                 linux::Terminal::set_stdin_echo(true);
                 return;
             }
@@ -106,23 +96,5 @@ namespace tds::cli::user_commands {
         }
 
         throw_too_many_attempts_error();
-    }
-
-    void UserAddCommand::write_new_user() const {
-        std::ofstream users_file{get_user_file_path(), std::ios_base::app};
-        users_file << m_username << ':' << linux::hash(m_password) << ':'
-                   << (user::Permissions::travel | user::Permissions::download | user::Permissions::upload) << '\n';
-    }
-
-    bool UserAddCommand::is_username_valid() const {
-        const auto test_char = [](unsigned char symbol) {
-            return ('a' <= symbol && symbol <= 'z') || ('A' <= symbol && symbol <= 'Z') ||
-                   ('0' <= symbol && symbol <= '9');
-        };
-        return m_username.size() <= config::limits::max_username_length && std::ranges::all_of(m_username, test_char);
-    }
-
-    bool UserAddCommand::is_password_valid() const {
-        return m_password.size() <= config::limits::max_password_length;
     }
 }

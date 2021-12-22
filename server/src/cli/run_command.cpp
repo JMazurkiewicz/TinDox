@@ -28,13 +28,13 @@ namespace tds::cli {
         for(auto it = args.begin(); it != args_end; ++it) {
             if(*it == "--port" || *it == "-p") {
                 if(++it == args_end) {
-                    throw InvalidCommandArgumentsError{"--port expects port as argument", port_argument_tip};
+                    throw InvalidCommandArgumentsError{"--port (-p) expects port as argument", port_argument_tip};
                 } else {
                     parse_port(*it);
                 }
             } else if(*it == "--dir" || *it == "-d") {
                 if(++it == args_end) {
-                    throw InvalidCommandArgumentsError{"--dir expects valid path as argument",
+                    throw InvalidCommandArgumentsError{"--dir (-d) expects valid path as argument",
                                                        config_directory_argument_tip};
                 } else {
                     parse_config_directory_path(*it);
@@ -46,9 +46,9 @@ namespace tds::cli {
     }
 
     void RunCommand::execute() {
-        make_config_directory_path();
+        prepare_config_directory();
         read_config();
-        overwrite_config_with_cli_arguments();
+        overwrite_port_if_possible();
         launch_server();
     }
 
@@ -74,7 +74,7 @@ namespace tds::cli {
         }
     }
 
-    void RunCommand::make_config_directory_path() {
+    void RunCommand::prepare_config_directory() {
         if(!m_config_directory.has_value()) {
             parse_config_directory_path(fs::current_path().native());
         }
@@ -85,7 +85,7 @@ namespace tds::cli {
         m_config = reader.read_config();
     }
 
-    void RunCommand::overwrite_config_with_cli_arguments() {
+    void RunCommand::overwrite_port_if_possible() {
         if(m_port.has_value()) {
             m_config.set_port(ip::Port{*m_port});
         }

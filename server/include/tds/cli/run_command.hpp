@@ -17,9 +17,9 @@ namespace tds::cli {
         void parse_port(std::string_view arg);
         void parse_config_directory_path(std::string_view arg);
 
-        void make_config_directory_path();
+        void prepare_config_directory();
         void read_config();
-        void overwrite_config_with_cli_arguments();
+        void overwrite_port_if_possible();
         void launch_server();
 
         std::optional<std::uint16_t> m_port;

@@ -13,11 +13,9 @@ namespace tds::cli::user_commands {
         void execute();
 
     private:
-        void find_old_password();
         void read_old_password() const;
         void read_new_password();
         void read_new_password_repeated() const;
-        void write_new_credentials() const;
 
         std::string m_username;
         std::string m_old_password_hash;

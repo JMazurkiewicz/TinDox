@@ -12,6 +12,8 @@ namespace tds::user {
         move = 1 << 3,
         download = 1 << 4,
         upload = 1 << 5,
+
+        initial = travel | download,
         all = travel | write | copy | move | download | upload,
     };
 

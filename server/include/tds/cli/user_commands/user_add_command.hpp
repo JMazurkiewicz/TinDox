@@ -17,10 +17,6 @@ namespace tds::cli::user_commands {
         void check_username_uniqueness() const;
         void read_password();
         void read_repeated_password() const;
-        void write_new_user() const;
-
-        bool is_username_valid() const;
-        bool is_password_valid() const;
 
         std::string m_username;
         std::string m_password;

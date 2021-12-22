@@ -1,5 +1,7 @@
 #pragma once
 
+#include "tds/user/user_table.hpp"
+
 #include <filesystem>
 #include <span>
 #include <string_view>
@@ -13,10 +15,10 @@ namespace tds::cli {
         void execute();
 
     private:
-        void parse_config_directory_path(std::filesystem::path path);
+        void load_user_table(std::filesystem::path path);
 
-        std::filesystem::path m_users_file;
         std::string_view m_subcommand;
         std::span<const std::string_view> m_subcommand_args;
+        user::UserTable m_user_table;
     };
 }

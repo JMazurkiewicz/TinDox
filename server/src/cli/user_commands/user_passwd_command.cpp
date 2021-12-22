@@ -5,8 +5,7 @@
 #include "tds/config/limits.hpp"
 #include "tds/linux/hash.hpp"
 #include "tds/linux/terminal.hpp"
-#include "tds/user/permissions.hpp"
-#include "tds/user/user_record_data.hpp"
+#include "tds/user/user_table.hpp"
 
 #include <algorithm>
 #include <filesystem>
@@ -34,28 +33,13 @@ namespace tds::cli::user_commands {
     }
 
     void UserPasswdCommand::execute() {
-        find_old_password();
+        m_old_password_hash = get_user_table().get_password_hash_of_user(m_username);
+
         read_old_password();
         read_new_password();
         read_new_password_repeated();
-        write_new_credentials();
-    }
 
-    void UserPasswdCommand::find_old_password() {
-        std::ifstream users_file{get_user_file_path()};
-        if(!users_file.is_open()) {
-            throw InvalidCommandExecutionError{"program failed to open 'users' configuration file"};
-        }
-
-        for(std::string line; std::getline(users_file, line);) {
-            const auto record = user::make_user_record_data(line);
-            if(record.get_username() == m_username) {
-                m_old_password_hash = record.get_password_hash();
-                return;
-            }
-        }
-
-        throw InvalidCommandExecutionError{fmt::format("user with name '{}' not found", m_username)};
+        get_user_table().set_password_of_user(m_username, m_new_password);
     }
 
     void UserPasswdCommand::read_old_password() const {
@@ -70,7 +54,7 @@ namespace tds::cli::user_commands {
 
             std::getline(std::cin, old_password);
             std::cout << '\n';
-            if(linux::hash(old_password) == m_old_password_hash) {
+            if(get_user_table().verify_password_of_user(m_username, old_password)) {
                 linux::Terminal::set_stdin_echo(true);
                 return;
             }
@@ -90,7 +74,7 @@ namespace tds::cli::user_commands {
 
             std::getline(std::cin, m_new_password);
             std::cout << '\n';
-            if(m_new_password.size() <= config::limits::max_password_length) {
+            if(user::UserTable::is_password_ok(m_new_password)) {
                 linux::Terminal::set_stdin_echo(true);
                 return;
             }
@@ -119,33 +103,4 @@ namespace tds::cli::user_commands {
 
         throw_too_many_attempts_error();
     }
-
-    void UserPasswdCommand::write_new_credentials() const {
-        std::ifstream users_file_in{get_user_file_path()};
-        if(!users_file_in.is_open()) {
-            throw InvalidCommandExecutionError{"program failed to open 'users' configuration file"};
-        }
-
-        std::vector<user::UserRecordData> records;
-        user::Permissions perms;
-
-        for(std::string line; std::getline(users_file_in, line);) {
-            const auto record = user::make_user_record_data(line);
-            if(record.get_username() == m_username) {
-                perms = record.get_permissions();
-            } else {
-                records.emplace_back(std::move(record));
-            }
-        }
-
-        users_file_in.close();
-        std::ofstream users_file_out{get_user_file_path()};
-        if(!users_file_out.is_open()) {
-            throw InvalidCommandExecutionError{"program failed to open 'users' configuration file"};
-        }
-
-        std::ranges::copy(records, std::ostream_iterator<user::UserRecordData>{users_file_out, "\n"});
-        users_file_out << m_username << ':' << linux::hash(m_new_password) << ':' << perms << '\n';
-    }
-
 }

@@ -3,6 +3,7 @@
 #include "tds/cli/user_commands/user_subcommand_base.hpp"
 
 #include <span>
+
 namespace tds::cli::user_commands {
     class UserRemoveCommand : public UserSubcommandBase {
     public:

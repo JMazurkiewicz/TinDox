@@ -62,7 +62,26 @@ then
     failure "Password change succeeded for non-existing user"
 fi
 
-# Todo: perms tests
+start_test
+tds user perms SampleUser +rw -u
+if [ $? -ne 0 ]
+then
+    failure "Failed to change permissions of user"
+fi
+
+start_test
+tds user perms SampleUser -rw +u
+if [ $? -ne 0 ]
+then
+    failure "Failed to change permissions of user"
+fi
+
+start_test
+tds user perms SampleUser +h
+if [ $? -eq 0 ]
+then
+    failure "Succeeded to add invalid perms"
+fi
 
 start_test
 tds user remove nosuchuser

@@ -1,14 +1,17 @@
 #pragma once
 
-#include <filesystem>
+#include "tds/user/user_table.hpp"
 
 namespace tds::cli::user_commands {
     class UserSubcommandBase {
     public:
-        const std::filesystem::path& get_user_file_path() const;
-        void set_users_file_path(std::string_view users_path);
+        void set_user_table(user::UserTable& user_table);
+
+    protected:
+        user::UserTable& get_user_table();
+        const user::UserTable& get_user_table() const;
 
     private:
-        std::filesystem::path m_users_path;
+        user::UserTable* m_user_table_ptr = nullptr;
     };
 }

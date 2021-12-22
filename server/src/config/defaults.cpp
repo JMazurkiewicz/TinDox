@@ -32,10 +32,15 @@ namespace tds::config::defaults {
         string_builder << "\nmax_user_count = " << config::defaults::get_default_max_user_count();
         string_builder << "\nbacklog = " << config::defaults::get_default_backlog();
         string_builder << "\nport = " << config::defaults::get_default_port() << '\n';
-        return string_builder.str();
+        return std::move(string_builder.str());
     }
 
     std::string get_default_users_file() {
-        return fmt::format("admin:{}:{}\n", linux::hash("admin"), user::Permissions::all);
+        std::ostringstream string_builder;
+        string_builder << "[[users]]\n";
+        string_builder << "name = \"admin\"\n";
+        string_builder << "passwd = \"" << linux::hash("admin");
+        string_builder << "\"\nperms = \"" << user::Permissions::initial << "\"\n";
+        return std::move(string_builder.str());
     }
 }

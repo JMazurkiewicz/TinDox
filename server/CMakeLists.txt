@@ -106,7 +106,7 @@ set(
     src/server/server.cpp
 
     src/user/permissions.cpp
-    src/user/user_record_data.cpp
+    src/user/user_table.cpp
 )
 
 set(
