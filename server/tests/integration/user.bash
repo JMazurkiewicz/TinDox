@@ -21,7 +21,7 @@ then
 fi
 
 start_test
-printf "sample_user\npassword\npassword\n" | tds user add
+printf "sample-user\npassword\npassword\n" | tds user add
 if [ $? -eq 0 ]
 then
     failure "Added user with invalid username"
