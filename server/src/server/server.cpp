@@ -1,10 +1,13 @@
 #include "tds/server/server.hpp"
 
+#include "tds/ip/endpoint_v4.hpp"
 #include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/terminal.hpp"
 #include "tds/server/server_logger.hpp"
 
 #include <csignal>
+#include <cstring>
+#include <stdexcept>
 
 namespace tds::server {
     Server::Server(std::filesystem::path root)
@@ -49,6 +52,7 @@ namespace tds::server {
     void Server::configure_listener() {
         m_tcp_listener.listen(m_config.get_port());
         m_tcp_listener.set_backlog(m_config.get_backlog());
+        m_tcp_listener.set_connection_type(ip::SocketType::nonblocking);
         m_tcp_listener.set_connection_handler(std::bind_front(&Server::handle_connection, this));
     }
 
@@ -63,24 +67,21 @@ namespace tds::server {
     }
 
     void Server::handle_stop_signal(int code) {
-        const std::string_view signal_name = [code] {
-            if(code == SIGINT) {
-                return "SIGINT";
-            } else if(code == SIGTERM) {
-                return "SIGTERM";
-            } else if(code == SIGQUIT) {
-                return "SIGQUIT";
-            } else {
-                return "undefined";
-            }
-        }();
-
-        server_logger->warn("Got stop signal: {} (code {})", signal_name, code);
+        server_logger->warn("Got stop signal: {} (code {})", strsignal(code), code);
         stop();
     }
 
     void Server::handle_connection(ip::TcpSocket connection) {
-        m_supervisor.add_connection(std::move(connection));
+        const ip::EndpointV4 endpoint = connection.get_endpoint();
+
+        try {
+            server_logger->info("New connection from {} (fd = {})", endpoint, connection.get_fd());
+            m_supervisor.add_connection(std::move(connection));
+        } catch(const std::system_error& e) {
+            server_logger->error("Failed to add connection from {}: {} ({})", endpoint, e.what(), e.code());
+        } catch(const std::runtime_error& e) {
+            server_logger->error("Failed to add connection from {}: {}", endpoint, e.what());
+        }
     }
 
     void Server::main_loop() {

@@ -25,7 +25,7 @@ namespace tds::server {
 
         void add_connection(ip::TcpSocket connection);
 
-        bool has_client(int fd) const;
+        bool has_client(int fd);
         Client& get_client(int fd);
         int get_pipe_fd() const noexcept;
         void wait_for_events(linux::EpollBuffer& buffer);

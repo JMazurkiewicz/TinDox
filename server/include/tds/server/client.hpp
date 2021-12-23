@@ -10,6 +10,8 @@ namespace tds::server {
 
         Client(const Client&) = delete;
         Client& operator=(const Client&) = delete;
+        Client(Client&&) = default;
+        Client& operator=(Client&&) = default;
 
         int get_fd() const noexcept;
         void handle();

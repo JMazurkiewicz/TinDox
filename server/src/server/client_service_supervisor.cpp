@@ -35,7 +35,7 @@ namespace tds::server {
         m_clients.add_client(std::move(connection));
     }
 
-    bool ClientServiceSupervisor::has_client(int fd) const {
+    bool ClientServiceSupervisor::has_client(int fd) {
         return m_clients.has_client(fd);
     }
 

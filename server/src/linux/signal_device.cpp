@@ -3,12 +3,11 @@
 #include "tds/linux/linux_error.hpp"
 
 #include <algorithm>
+#include <csignal>
 #include <ranges>
-#include <span>
 #include <stdexcept>
 
 #include <fmt/core.h>
-#include <signal.h>
 #include <unistd.h>
 
 namespace tds::linux {
