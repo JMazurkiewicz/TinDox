@@ -1,5 +1,6 @@
 #include "tds/server/client_service.hpp"
 
+#include "tds/ip/tcp_socket.hpp"
 #include "tds/linux/epoll_buffer.hpp"
 #include "tds/server/server_logger.hpp"
 
@@ -39,17 +40,19 @@ namespace tds::server {
     }
 
     void ClientService::process_client_input(Client& client) {
+        ip::TcpSocket& socket = client.get_socket();
+
         try {
             client.handle();
         } catch(const std::system_error& e) {
-            server_logger->error("ClientService: system error caused by client {}: {} ({})",
-                                 client.get_socket().get_fd(), e.what(), e.code());
+            server_logger->error("ClientService: error caused by client from {} (fd = {}): {} ({})",
+                                 socket.get_endpoint(), socket.get_fd(), e.what(), e.code());
         } catch(const std::exception& e) {
-            server_logger->error("ClientService: fatal error caused by client {}: {}", client.get_socket().get_fd(),
-                                 e.what());
+            server_logger->error("ClientService: error caused by client from {} (fd = {}): {}", socket.get_endpoint(),
+                                 socket.get_fd(), e.what());
         } catch(...) {
-            server_logger->error("ClientService: unknown fatal error caused by client {}",
-                                 client.get_socket().get_fd());
+            server_logger->error("ClientService: unknown fatal error caused by client from {} (fd = {})",
+                                 socket.get_endpoint(), client.get_socket().get_fd());
         }
 
         m_supervisor->rearm_device(client.get_socket());

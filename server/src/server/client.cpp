@@ -26,13 +26,10 @@ namespace tds::server {
         ssize_t total_count = 0;
         ssize_t count;
         std::errc code = {};
-        server_logger->set_level(spdlog::level::debug); // TOREMOVE
 
         do {
-            std::array<char, 8> buffer;
-            server_logger->debug("READING BYTEST...");
+            std::array<char, 4096> buffer;
             count = m_socket.read(buffer.data(), buffer.size(), code);
-            server_logger->debug("GOT {} BYTES...", count);
 
             if(count == -1) {
                 break;
@@ -42,14 +39,12 @@ namespace tds::server {
             }
         } while(code == std::errc{} && count != 0);
 
-        server_logger->debug("ERRC = {}...", std::make_error_code(code).message());
-
-        if(code != std::errc::resource_unavailable_try_again && code != std::errc{}) {
+        if(code != std::errc::resource_unavailable_try_again && code != std::errc::operation_would_block &&
+           (total_count == 0 || code != std::errc{})) {
             m_alive = false;
         } else {
             std::string_view str{m_buffer.data(), m_buffer.size()};
-            server_logger->debug("INTERNAL BUFFER SIZE: {}", m_buffer.size());
-            server_logger->debug("FROM {} GOT: {}", m_socket.get_endpoint(), str);
+            server_logger->info("Message from {}: {}", m_socket.get_endpoint(), str);
         }
     }
 
