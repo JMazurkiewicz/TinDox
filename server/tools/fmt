@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-modules="cli;cli/user_commands;config;ip;linux;server;user"
+modules="cli;cli/user_commands;config;ip;linux;protocol;server;user"
 for name in ${modules//;/ }
 do
     echo "Formatting $name"
