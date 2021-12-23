@@ -3,12 +3,11 @@
 #include "tds/linux/linux_error.hpp"
 
 #include <algorithm>
+#include <csignal>
 #include <ranges>
-#include <span>
 #include <stdexcept>
 
 #include <fmt/core.h>
-#include <signal.h>
 #include <unistd.h>
 
 namespace tds::linux {
@@ -25,7 +24,7 @@ namespace tds::linux {
         create_fd();
     }
 
-    void SignalDevice::handle_last_signal() {
+    void SignalDevice::handle_signal() {
         signalfd_siginfo info;
         if(read(&info, sizeof(info)) != sizeof(info)) {
             throw std::runtime_error{"SignalDevice could not read enough bytes"};

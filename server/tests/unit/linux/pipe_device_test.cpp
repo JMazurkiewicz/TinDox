@@ -60,7 +60,7 @@ TEST_CASE("tds::linux::{Pipe{}+EpollDevice}", "[linux]") {
 
         EpollBuffer buffer{2};
         epoll_device.wait_for_events(buffer);
-        for(int fd : buffer.get_available_events()) {
+        for(auto [fd, events] : buffer.get_events()) {
             REQUIRE(fd == read_device.get_fd());
             std::array<char, 5> buffer;
             const ssize_t read_count = read_device.read(buffer.data(), buffer.size());
@@ -82,7 +82,7 @@ TEST_CASE("tds::linux::{Pipe{}+EpollDevice}", "[linux]") {
 
             EpollBuffer buffer{2};
             epoll_device.wait_for_events(buffer);
-            for(int fd : buffer.get_available_events()) {
+            for(auto [fd, events] : buffer.get_events()) {
                 REQUIRE(fd == read_device.get_fd());
                 std::array<char, 5> buffer;
                 const ssize_t read_count = read_device.read(buffer.data(), buffer.size());
@@ -105,7 +105,7 @@ TEST_CASE("tds::linux::{Pipe{}+EpollDevice}", "[linux]") {
     SECTION("Test in main thread with nonblocking pipe and edge-triggered epoll") {
         auto&& [read_device, write_device] = make_pipe(false);
         EpollDevice epoll_device;
-        epoll_device.add_device(read_device, EpollMode::edge_triggered);
+        epoll_device.add_device(read_device, EventType::in | EventType::edge_triggered);
 
         const std::string_view msg = "Epoll";
         const ssize_t write_count = write_device.write(msg.data(), msg.size());
@@ -113,7 +113,7 @@ TEST_CASE("tds::linux::{Pipe{}+EpollDevice}", "[linux]") {
 
         EpollBuffer buffer{2};
         epoll_device.wait_for_events(buffer);
-        for(int fd : buffer.get_available_events()) {
+        for(auto [fd, events] : buffer.get_events()) {
             REQUIRE(fd == read_device.get_fd());
             std::array<char, 5> buffer;
             const ssize_t read_count = read_device.read(buffer.data(), buffer.size());
@@ -131,11 +131,11 @@ TEST_CASE("tds::linux::{Pipe{}+EpollDevice}", "[linux]") {
 
         std::thread reader{[&] {
             EpollDevice epoll_device;
-            epoll_device.add_device(read_device, EpollMode::edge_triggered);
+            epoll_device.add_device(read_device, EventType::in | EventType::edge_triggered);
 
             EpollBuffer buffer{2};
             epoll_device.wait_for_events(buffer);
-            for(int fd : buffer.get_available_events()) {
+            for(auto [fd, events] : buffer.get_events()) {
                 REQUIRE(fd == read_device.get_fd());
                 std::array<char, 5> buffer;
                 const ssize_t read_count = read_device.read(buffer.data(), buffer.size());

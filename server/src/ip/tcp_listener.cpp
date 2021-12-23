@@ -13,7 +13,8 @@
 
 namespace tds::ip {
     TcpListener::TcpListener()
-        : m_backlog{32} {
+        : m_backlog{32}
+        , m_connection_type{SocketType::blocking} {
         if(const int socket_fd = socket(AF_INET, SOCK_STREAM, 0); socket_fd == -1) {
             throw linux::LinuxError{"socket(2)"};
         } else {
@@ -33,8 +34,12 @@ namespace tds::ip {
         m_connection_handler = std::move(connection_handler);
     }
 
+    void TcpListener::set_connection_type(SocketType connection_type) {
+        m_connection_type = connection_type;
+    }
+
     void TcpListener::listen(Port port) {
-        listen(EndpointV4(AddressV4::any, port));
+        listen(EndpointV4{AddressV4::any, port});
     }
 
     void TcpListener::listen(EndpointV4 endpoint) {
@@ -53,13 +58,14 @@ namespace tds::ip {
         }
     }
 
-    void TcpListener::handle_last_connection() {
+    void TcpListener::handle_connection() {
         sockaddr_in addrbuf = {};
         socklen_t addr_length = sizeof(sockaddr_in);
-        const int connection_fd = accept(get_fd(), reinterpret_cast<sockaddr*>(&addrbuf), &addr_length);
+        const int connection_fd =
+            accept4(get_fd(), reinterpret_cast<sockaddr*>(&addrbuf), &addr_length, static_cast<int>(m_connection_type));
 
         if(connection_fd == -1) {
-            throw linux::LinuxError{"accept(2)"};
+            throw linux::LinuxError{"accept4(2)"};
         } else if(addr_length != sizeof(sockaddr_in)) {
             ::close(connection_fd);
             throw std::runtime_error{"Listener: accept(2) returned invalid addrlen"};
@@ -71,7 +77,9 @@ namespace tds::ip {
 
             const AddressV4 address{ntohl(addr->sin_addr.s_addr)};
             const Port port{ntohs(addr->sin_port)};
-            m_connection_handler(connection_fd, EndpointV4(address, port));
+            const EndpointV4 endpoint{address, port};
+
+            m_connection_handler(TcpSocket{connection_fd, endpoint});
         }
     }
 }

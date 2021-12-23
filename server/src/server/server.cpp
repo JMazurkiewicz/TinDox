@@ -1,37 +1,31 @@
 #include "tds/server/server.hpp"
 
+#include "tds/ip/endpoint_v4.hpp"
 #include "tds/linux/epoll_buffer.hpp"
+#include "tds/linux/terminal.hpp"
+#include "tds/server/server_logger.hpp"
 
 #include <csignal>
-
-#include <spdlog/spdlog.h>
+#include <cstring>
+#include <stdexcept>
 
 namespace tds::server {
     Server::Server(std::filesystem::path root)
-        : m_root{std::move(root)}
+        : m_context{std::move(root)}
         , m_running{true} { }
+
+    Server::~Server() {
+        stop();
+    }
 
     void Server::set_config(const config::ServerConfig& config) {
         m_config = config;
     }
 
     void Server::launch() {
-        if(!configure()) {
-            return;
-        }
-
-        for(linux::EpollBuffer buffer{4}; m_running;) {
-            m_main_epoll.wait_for_events(buffer);
-
-            for(int fd : buffer.get_available_events()) {
-                if(fd == m_signal_device.get_fd()) {
-                    m_signal_device.handle_last_signal();
-                } else if(fd == m_tcp_listener.get_fd()) {
-                    m_tcp_listener.handle_last_connection();
-                } else {
-                    spdlog::warn("Main epoll: unspecified file descriptor {}", fd);
-                }
-            }
+        if(configure()) {
+            server_logger->info("Server: starting");
+            main_loop();
         }
     }
 
@@ -40,8 +34,10 @@ namespace tds::server {
             configure_signals();
             configure_listener();
             configure_main_epoll();
+            m_supervisor.create_services(m_config);
+            linux::Terminal::set_stdin_echo(false);
         } catch(const std::system_error& e) {
-            spdlog::error("Server error: {} (code: {})", e.what(), e.code().value());
+            server_logger->error("Configuration failed: {} ({})", e.what(), e.code());
             return false;
         }
 
@@ -49,41 +45,76 @@ namespace tds::server {
     }
 
     void Server::configure_signals() {
+        server_logger->info("Server: creating signal handlers");
         const auto handler = std::bind_front(&Server::handle_stop_signal, this);
         m_signal_device.add_handler(SIGINT, handler);
+        m_signal_device.add_handler(SIGQUIT, handler);
         m_signal_device.add_handler(SIGTERM, handler);
         m_signal_device.apply();
     }
 
     void Server::configure_listener() {
-        m_tcp_listener.listen(m_config.get_port());
-        m_tcp_listener.set_backlog(m_config.get_backlog());
+        const ip::Port port = m_config.get_port();
+        const int backlog = m_config.get_backlog();
+
+        server_logger->info("Server: creating TCP listener (port = {}, backlog = {})", port, backlog);
+        m_tcp_listener.listen(port);
+        m_tcp_listener.set_backlog(backlog);
+        m_tcp_listener.set_connection_type(ip::SocketType::nonblocking);
         m_tcp_listener.set_connection_handler(std::bind_front(&Server::handle_connection, this));
     }
 
     void Server::configure_main_epoll() {
-        m_main_epoll.add_device(m_signal_device);
-        m_main_epoll.add_device(m_tcp_listener);
+        server_logger->info("Server: configuring main epoll device");
+        m_epoll.add_device(m_signal_device);
+        m_epoll.add_device(m_tcp_listener);
     }
 
     void Server::handle_stop_signal(int code) {
-        const std::string_view signal_name = [code] {
-            if(code == SIGINT) {
-                return "SIGINT";
-            } else if(code == SIGTERM) {
-                return "SIGTERM";
-            } else {
-                return "SIG?";
-            }
-        }();
-
-        spdlog::warn("Got stop signal: {} (code {})", signal_name, code);
+        server_logger->warn("Got stop signal: {} (code {})", strsignal(code), code);
         stop();
     }
 
-    void Server::handle_connection(int fd, ip::EndpointV4 client_endpoint) { }
+    void Server::handle_connection(ip::TcpSocket connection) {
+        const ip::EndpointV4 endpoint = connection.get_endpoint();
+
+        try {
+            server_logger->info("New connection from {} (fd = {})", endpoint, connection.get_fd());
+
+            if(m_supervisor.get_client_count() < m_config.get_max_user_count()) {
+                m_supervisor.accept_connection(std::move(connection));
+            } else {
+                server_logger->error("Server: too many clients, cannot accept {}", endpoint);
+            }
+
+        } catch(const std::system_error& e) {
+            server_logger->error("Failed to add connection from {}: {} ({})", endpoint, e.what(), e.code());
+        } catch(const std::runtime_error& e) {
+            server_logger->error("Failed to add connection from {}: {}", endpoint, e.what());
+        }
+    }
+
+    void Server::main_loop() {
+        for(linux::EpollBuffer buffer{4}; m_running;) {
+            m_epoll.wait_for_events(buffer);
+
+            for(auto [fd, events] : buffer.get_events()) {
+                if(fd == m_signal_device.get_fd()) {
+                    m_signal_device.handle_signal();
+                } else if(fd == m_tcp_listener.get_fd()) {
+                    m_tcp_listener.handle_connection();
+                } else {
+                    server_logger->warn("Main epoll: unknown file descriptor {}", fd);
+                }
+            }
+        }
+    }
 
     void Server::stop() {
-        m_running = false;
+        if(m_running) {
+            server_logger->warn("Server: stop requested");
+            m_running = false;
+            m_supervisor.stop();
+        }
     }
 }

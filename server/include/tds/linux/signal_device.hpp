@@ -16,7 +16,7 @@ namespace tds::linux {
 
         void add_handler(int signal, SignalHandler handler);
         void apply();
-        void handle_last_signal();
+        void handle_signal();
 
     private:
         void create_mask();

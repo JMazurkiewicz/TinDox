@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(
     TinDoxServer
     LANGUAGES CXX
-    VERSION 0.0.1
+    VERSION 0.0.2
     HOMEPAGE_URL https://github.com/JMazurkiewicz/TinDox/server
     DESCRIPTION "TinDox Server"
 )
@@ -93,6 +93,7 @@ set(
     src/ip/ip_error.cpp
     src/ip/port.cpp
     src/ip/tcp_listener.cpp
+    src/ip/tcp_socket.cpp
 
     src/linux/epoll_buffer.cpp
     src/linux/epoll_device.cpp
@@ -103,6 +104,13 @@ set(
     src/linux/signal_device.cpp
     src/linux/terminal.cpp
 
+    src/server/client_context.cpp
+    src/server/client_pool.cpp
+    src/server/client_service_supervisor.cpp
+    src/server/client_service.cpp
+    src/server/client.cpp
+    src/server/server_context.cpp
+    src/server/server_logger.cpp
     src/server/server.cpp
 
     src/user/permissions.cpp
@@ -117,11 +125,10 @@ else()
 endif()
 
 target_include_directories(tds-dev PUBLIC include)
-target_link_libraries(tds-dev PRIVATE fmt::fmt spdlog::spdlog crypt)
-target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus)
+target_link_libraries(tds-dev PRIVATE fmt::fmt crypt)
+target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus spdlog::spdlog)
 
 add_executable(tds src/main.cpp)
-target_link_libraries(tds PRIVATE tomlplusplus::tomlplusplus)
 target_link_libraries(tds PUBLIC tds-dev)
 
 include("cmake/install.cmake")

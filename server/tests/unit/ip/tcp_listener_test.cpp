@@ -25,12 +25,11 @@ TEST_CASE("tds::ip::TcpListener", "[ip]") {
     std::thread server{[&] {
         try {
             TcpListener tcp;
-            tcp.set_connection_handler([&](int fd, EndpointV4 endpoint) {
-                connection_established = (fd >= 0) && (endpoint.get_address() == AddressV4::localhost);
-                close(fd);
+            tcp.set_connection_handler([&](TcpSocket socket) {
+                connection_established = (socket.get_fd() >= 0) && (socket.get_address() == AddressV4::localhost);
             });
             tcp.listen(server_port);
-            tcp.handle_last_connection();
+            tcp.handle_connection();
         } catch(...) {
             server_error = true;
         }
@@ -82,10 +81,9 @@ TEST_CASE("tds::ip::{TcpListener+EpollDevice}", "[ip]") {
     std::thread server{[&] {
         try {
             TcpListener tcp;
-            tcp.set_connection_handler([&](int fd, EndpointV4 endpoint) {
+            tcp.set_connection_handler([&](TcpSocket socket) {
                 epoll_handled = true;
-                connection_established = (fd >= 0) && (endpoint.get_address() == AddressV4::localhost);
-                close(fd);
+                connection_established = (socket.get_fd() >= 0) && (socket.get_address() == AddressV4::localhost);
             });
             tcp.listen(server_port);
 
@@ -95,9 +93,9 @@ TEST_CASE("tds::ip::{TcpListener+EpollDevice}", "[ip]") {
             tds::linux::EpollBuffer buffer{16};
             epoll_device.wait_for_events(buffer);
 
-            for(int fd : buffer.get_available_events()) {
+            for(auto [fd, events] : buffer.get_events()) {
                 if(fd == tcp.get_fd()) {
-                    tcp.handle_last_connection();
+                    tcp.handle_connection();
                 }
             }
 
