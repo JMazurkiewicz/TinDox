@@ -2,6 +2,7 @@
 
 #include "tds/linux/linux_error.hpp"
 
+#include <system_error>
 #include <utility>
 
 #include <unistd.h>
@@ -34,28 +35,40 @@ namespace tds::linux {
         return std::exchange(m_fd, -1);
     }
 
-    ssize_t IoDevice::read(std::span<std::byte> buffer) {
-        return read(buffer.data(), buffer.size());
-    }
-
     ssize_t IoDevice::read(void* buffer, std::size_t size) {
-        if(const ssize_t count = ::read(get_fd(), buffer, size); count == -1) {
+        std::errc code = {};
+        const ssize_t count = read(buffer, size, code);
+        if(code != std::errc{}) {
             throw LinuxError{"read(2)"};
         } else {
             return count;
         }
     }
 
-    ssize_t IoDevice::write(std::span<const std::byte> buffer) {
-        return write(buffer.data(), buffer.size());
+    ssize_t IoDevice::read(void* buffer, std::size_t size, std::errc& code) noexcept {
+        const ssize_t count = ::read(get_fd(), buffer, size);
+        if(count == -1) {
+            code = static_cast<std::errc>(errno);
+        }
+        return count;
     }
 
     ssize_t IoDevice::write(const void* buffer, std::size_t size) {
-        if(const ssize_t count = ::write(get_fd(), buffer, size); count == -1) {
+        std::errc code = {};
+        const ssize_t count = write(buffer, size, code);
+        if(code != std::errc{}) {
             throw LinuxError{"write(2)"};
         } else {
             return count;
         }
+    }
+
+    ssize_t IoDevice::write(const void* buffer, std::size_t size, std::errc& code) noexcept {
+        const ssize_t count = ::write(get_fd(), buffer, size);
+        if(count == -1) {
+            code = static_cast<std::errc>(errno);
+        }
+        return count;
     }
 
     bool IoDevice::operator==(const IoDevice& other) const noexcept {

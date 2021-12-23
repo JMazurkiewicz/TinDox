@@ -8,7 +8,7 @@ namespace tds::server {
         , m_epoll_buffer{32}
         , m_running{true} { }
 
-    void ClientService::operator()() {
+    void ClientService::launch() {
         while(m_running) {
             process_events();
         }
@@ -18,13 +18,18 @@ namespace tds::server {
 
         for(auto [fd, events] : m_epoll_buffer.get_events()) {
             if(m_supervisor->has_client(fd)) {
-                m_supervisor->get_client(fd).handle();
+                process_client_input(m_supervisor->get_client(fd));
             } else if(fd == m_supervisor->get_pipe_fd()) {
                 process_pipe_input();
             } else {
                 server_logger->warn("Unknown device spotted ({})", fd);
             }
         }
+    }
+
+    void ClientService::process_client_input(Client& client) {
+        client.handle_input();
+        m_supervisor->rearm_device(client.get_socket());
     }
 
     void ClientService::process_pipe_input() {

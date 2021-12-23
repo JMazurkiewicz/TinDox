@@ -3,7 +3,6 @@
 #include "tds/linux/linux_error.hpp"
 
 #include <algorithm>
-#include <stdexcept>
 
 namespace tds::linux {
     EpollDevice::EpollDevice()
@@ -20,19 +19,15 @@ namespace tds::linux {
     }
 
     void EpollDevice::add_device(IoDevice& dev, EventType events) {
-        const int dev_fd = dev.get_fd();
-        epoll_event event = {
-            .events = static_cast<std::uint32_t>(events),
-            .data = {.fd = dev_fd},
-        };
+        epoll_ctl(dev.get_fd(), EPOLL_CTL_ADD, events);
+    }
 
-        if(epoll_ctl(get_fd(), EPOLL_CTL_ADD, dev_fd, &event) == -1) {
-            throw LinuxError{"epoll_ctl(2)"};
-        }
+    void EpollDevice::rearm_device(IoDevice& dev, EventType events) {
+        epoll_ctl(dev.get_fd(), EPOLL_CTL_MOD, events);
     }
 
     void EpollDevice::remove_device(const IoDevice& dev) {
-        if(epoll_ctl(get_fd(), EPOLL_CTL_DEL, dev.get_fd(), nullptr) == -1) {
+        if(::epoll_ctl(get_fd(), EPOLL_CTL_DEL, dev.get_fd(), nullptr) == -1) {
             throw LinuxError{"epoll_ctl(2)"};
         }
     }
@@ -43,6 +38,17 @@ namespace tds::linux {
             return count;
         } else {
             throw LinuxError{"epoll_wait(2)"};
+        }
+    }
+
+    void EpollDevice::epoll_ctl(int fd, int op, EventType events) {
+        epoll_event event = {
+            .events = static_cast<std::uint32_t>(events),
+            .data = {.fd = fd},
+        };
+
+        if(::epoll_ctl(get_fd(), op, fd, &event) == -1) {
+            throw LinuxError{"epoll_ctl(2)"};
         }
     }
 }

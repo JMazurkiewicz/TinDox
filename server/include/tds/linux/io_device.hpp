@@ -1,6 +1,6 @@
 #pragma once
 
-#include <span>
+#include <system_error>
 
 #include <unistd.h>
 
@@ -21,11 +21,11 @@ namespace tds::linux {
 
         int release() noexcept;
 
-        ssize_t read(std::span<std::byte> buffer);
         ssize_t read(void* buffer, std::size_t size);
+        ssize_t read(void* buffer, std::size_t size, std::errc& code) noexcept;
 
-        ssize_t write(std::span<const std::byte> buffer);
         ssize_t write(const void* buffer, std::size_t size);
+        ssize_t write(const void* buffer, std::size_t size, std::errc& code) noexcept;
 
         bool operator==(const IoDevice& other) const noexcept;
 

@@ -4,6 +4,8 @@
 #include "tds/ip/tcp_socket.hpp"
 #include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/epoll_device.hpp"
+#include "tds/linux/event_type.hpp"
+#include "tds/linux/io_device.hpp"
 #include "tds/linux/pipe_device.hpp"
 #include "tds/server/client.hpp"
 #include "tds/server/client_pool.hpp"
@@ -14,11 +16,14 @@
 namespace tds::server {
     class ClientServiceSupervisor {
     public:
+        static constexpr linux::EventType socket_type =
+            linux::EventType::in | linux::EventType::edge_triggered | linux::EventType::one_shot;
+
         ClientServiceSupervisor();
+        ~ClientServiceSupervisor();
+
         ClientServiceSupervisor(const ClientServiceSupervisor&) = delete;
         ClientServiceSupervisor& operator=(const ClientServiceSupervisor&) = delete;
-
-        ~ClientServiceSupervisor();
 
         void set_config(const config::ServerConfig& config);
         void create_services();
@@ -28,7 +33,9 @@ namespace tds::server {
         bool has_client(int fd);
         Client& get_client(int fd);
         int get_pipe_fd() const noexcept;
+
         void wait_for_events(linux::EpollBuffer& buffer);
+        void rearm_device(linux::IoDevice& device);
 
         void stop();
 

@@ -17,8 +17,11 @@ namespace tds::server {
         bool has_client(int fd);
         Client& get_client(int fd);
 
+        void close_one(int fd);
+        void close_all();
+
     private:
         std::mutex m_mut;
-        std::unordered_map<int, Client> m_clients;
+        std::unordered_map<int, Client> m_pool;
     };
 }

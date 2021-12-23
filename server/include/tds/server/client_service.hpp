@@ -10,13 +10,13 @@ namespace tds::server {
 
         ClientService(const ClientService&) = delete;
         ClientService& operator=(const ClientService&) = delete;
-        ClientService(ClientService&&) noexcept = default;
-        ClientService& operator=(ClientService&&) noexcept = default;
 
-        void operator()();
+        void launch();
 
     private:
         void process_events();
+
+        void process_client_input(Client& client);
         void process_pipe_input();
 
         ClientServiceSupervisor* m_supervisor;

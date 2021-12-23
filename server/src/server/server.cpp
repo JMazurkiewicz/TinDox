@@ -14,6 +14,10 @@ namespace tds::server {
         : m_root{std::move(root)}
         , m_running{true} { }
 
+    Server::~Server() {
+        stop();
+    }
+
     void Server::set_config(const config::ServerConfig& config) {
         m_config = config;
     }
@@ -101,7 +105,10 @@ namespace tds::server {
     }
 
     void Server::stop() {
-        m_running = false;
-        m_supervisor.stop();
+        if(m_running) {
+            server_logger->warn("Server: stop requested");
+            m_running = false;
+            m_supervisor.stop();
+        }
     }
 }

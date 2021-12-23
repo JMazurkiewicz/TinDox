@@ -1,5 +1,6 @@
 #include "tds/server/client_service_supervisor.hpp"
 
+#include "tds/linux/event_type.hpp"
 #include "tds/linux/pipe_device.hpp"
 #include "tds/server/client_service.hpp"
 #include "tds/server/server_logger.hpp"
@@ -16,9 +17,7 @@ namespace tds::server {
     }
 
     ClientServiceSupervisor::~ClientServiceSupervisor() {
-        if(m_running) {
-            stop();
-        }
+        stop();
     }
 
     void ClientServiceSupervisor::set_config(const config::ServerConfig& config) {
@@ -27,11 +26,15 @@ namespace tds::server {
 
     void ClientServiceSupervisor::create_services() {
         for(int _ : std::views::iota(0, m_config->get_max_thread_count())) {
-            m_jobs.emplace_back(ClientService{*this});
+            m_jobs.emplace_back([this] {
+                ClientService job{*this};
+                job.launch();
+            });
         }
     }
 
     void ClientServiceSupervisor::add_connection(ip::TcpSocket connection) {
+        m_epoll.add_device(connection, socket_type);
         m_clients.add_client(std::move(connection));
     }
 
@@ -51,14 +54,27 @@ namespace tds::server {
         m_epoll.wait_for_events(buffer);
     }
 
+    void ClientServiceSupervisor::rearm_device(linux::IoDevice& device) {
+        const int fd = device.get_fd();
+        Client& client = m_clients.get_client(fd);
+
+        if(client.get_socket().is_valid()) {
+            m_epoll.rearm_device(device, socket_type);
+        } else {
+            m_clients.close_one(fd);
+        }
+    }
+
     void ClientServiceSupervisor::stop() {
-        server_logger->warn("Client supervisor: stop requested");
+        if(m_running) {
+            server_logger->warn("Client supervisor: stop requested");
 
-        const std::string stop_request(m_config->get_max_thread_count(), 'A');
-        m_pipes.m_write_device.write(stop_request.data(), stop_request.size());
+            const std::string stop_request(m_config->get_max_thread_count(), 'A');
+            m_pipes.m_write_device.write(stop_request.data(), stop_request.size());
 
-        std::ranges::for_each(m_jobs, [](std::thread& t) { t.join(); });
-        // close connections
-        m_running = false;
+            std::ranges::for_each(m_jobs, [](std::thread& t) { t.join(); });
+            m_clients.close_all();
+            m_running = false;
+        }
     }
 }

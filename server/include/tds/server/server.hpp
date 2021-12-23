@@ -16,6 +16,7 @@ namespace tds::server {
     class Server {
     public:
         explicit Server(std::filesystem::path root);
+        ~Server();
 
         Server(const Server&) = delete;
         Server& operator=(const Server&) = delete;

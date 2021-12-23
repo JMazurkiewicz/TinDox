@@ -13,8 +13,8 @@ namespace tds::server {
         Client(Client&&) = default;
         Client& operator=(Client&&) = default;
 
-        int get_fd() const noexcept;
-        void handle();
+        ip::TcpSocket& get_socket() noexcept;
+        void handle_input();
 
     private:
         ip::TcpSocket m_socket;
