@@ -16,9 +16,8 @@ namespace tds::server {
         void operator()();
 
     private:
-        void wait_for_events();
         void process_events();
-        void process_pipe_request();
+        void process_pipe_input();
 
         ClientServiceSupervisor* m_supervisor;
         linux::EpollBuffer m_epoll_buffer;

@@ -21,7 +21,6 @@ namespace tds::server {
         ~ClientServiceSupervisor();
 
         void set_config(const config::ServerConfig& config);
-        void set_read_pipe(linux::PipeReadDevice read_pipe);
         void create_services();
 
         void add_connection(ip::TcpSocket connection);
@@ -29,11 +28,15 @@ namespace tds::server {
         bool has_client(int fd) const;
         Client& get_client(int fd);
         int get_pipe_fd() const noexcept;
+        void wait_for_events(linux::EpollBuffer& buffer);
+
+        void stop();
 
     private:
         const config::ServerConfig* m_config;
+        bool m_running;
         linux::EpollDevice m_epoll;
-        linux::PipeReadDevice m_read_pipe;
+        linux::PipeDevices m_pipes;
         ClientPool m_clients;
         std::vector<std::thread> m_jobs;
     };

@@ -109,6 +109,7 @@ set(
     src/server/client_service_supervisor.cpp
     src/server/client_service.cpp
     src/server/client.cpp
+    src/server/server_logger.cpp
     src/server/server.cpp
 
     src/user/permissions.cpp
@@ -123,11 +124,10 @@ else()
 endif()
 
 target_include_directories(tds-dev PUBLIC include)
-target_link_libraries(tds-dev PRIVATE fmt::fmt spdlog::spdlog crypt)
-target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus)
+target_link_libraries(tds-dev PRIVATE fmt::fmt crypt)
+target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus spdlog::spdlog)
 
 add_executable(tds src/main.cpp)
-target_link_libraries(tds PRIVATE tomlplusplus::tomlplusplus)
 target_link_libraries(tds PUBLIC tds-dev)
 
 include("cmake/install.cmake")

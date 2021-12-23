@@ -43,7 +43,6 @@ namespace tds::server {
         linux::SignalDevice m_signal_device;
         ip::TcpListener m_tcp_listener;
         linux::EpollDevice m_main_epoll;
-        linux::PipeWriteDevice m_pipe_write;
         ClientServiceSupervisor m_supervisor;
     };
 }

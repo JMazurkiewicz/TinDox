@@ -1,17 +1,15 @@
 #include "tds/server/server.hpp"
 
 #include "tds/linux/epoll_buffer.hpp"
+#include "tds/linux/terminal.hpp"
+#include "tds/server/server_logger.hpp"
 
 #include <csignal>
-
-#include <fmt/ostream.h>
-#include <spdlog/spdlog.h>
 
 namespace tds::server {
     Server::Server(std::filesystem::path root)
         : m_root{std::move(root)}
-        , m_running{true}
-        , m_pipe_write{-1} { }
+        , m_running{true} { }
 
     void Server::set_config(const config::ServerConfig& config) {
         m_config = config;
@@ -19,18 +17,21 @@ namespace tds::server {
 
     void Server::launch() {
         if(configure()) {
+            server_logger->info("Server: starting");
             main_loop();
         }
     }
 
     bool Server::configure() {
         try {
+            server_logger->info("Server: basic configuration");
             configure_signals();
             configure_listener();
             configure_main_epoll();
             configure_client_service();
+            linux::Terminal::set_stdin_echo(false);
         } catch(const std::system_error& e) {
-            spdlog::error("Server error: {} (code: {})", e.what(), e.code().value());
+            server_logger->error("Configuration failed: {} ({})", e.what(), e.code());
             return false;
         }
 
@@ -40,6 +41,7 @@ namespace tds::server {
     void Server::configure_signals() {
         const auto handler = std::bind_front(&Server::handle_stop_signal, this);
         m_signal_device.add_handler(SIGINT, handler);
+        m_signal_device.add_handler(SIGQUIT, handler);
         m_signal_device.add_handler(SIGTERM, handler);
         m_signal_device.apply();
     }
@@ -56,10 +58,6 @@ namespace tds::server {
     }
 
     void Server::configure_client_service() {
-        auto&& [read, write] = linux::make_pipe(true);
-        m_pipe_write = std::move(write);
-
-        m_supervisor.set_read_pipe(std::move(read));
         m_supervisor.set_config(m_config);
         m_supervisor.create_services();
     }
@@ -70,12 +68,14 @@ namespace tds::server {
                 return "SIGINT";
             } else if(code == SIGTERM) {
                 return "SIGTERM";
+            } else if(code == SIGQUIT) {
+                return "SIGQUIT";
             } else {
-                return "SIG?";
+                return "undefined";
             }
         }();
 
-        spdlog::warn("Got stop signal: {} (code {})", signal_name, code);
+        server_logger->warn("Got stop signal: {} (code {})", signal_name, code);
         stop();
     }
 
@@ -93,7 +93,7 @@ namespace tds::server {
                 } else if(fd == m_tcp_listener.get_fd()) {
                     m_tcp_listener.handle_connection();
                 } else {
-                    spdlog::warn("Main epoll: unspecified file descriptor {}", fd);
+                    server_logger->warn("Main epoll: unknown file descriptor {}", fd);
                 }
             }
         }
@@ -101,7 +101,6 @@ namespace tds::server {
 
     void Server::stop() {
         m_running = false;
-        const std::string stop_request(2 * m_config.get_max_thread_count(), 'A');
-        m_pipe_write.write(stop_request.data(), stop_request.size());
+        m_supervisor.stop();
     }
 }

@@ -1,24 +1,28 @@
 #include "tds/server/client_service_supervisor.hpp"
 
+#include "tds/linux/pipe_device.hpp"
 #include "tds/server/client_service.hpp"
+#include "tds/server/server_logger.hpp"
 
 #include <algorithm>
 #include <ranges>
 
 namespace tds::server {
     ClientServiceSupervisor::ClientServiceSupervisor()
-        : m_read_pipe{-1} { }
+        : m_config{nullptr}
+        , m_running{true}
+        , m_pipes{linux::make_pipe(true)} {
+        m_epoll.add_device(m_pipes.m_read_device);
+    }
 
     ClientServiceSupervisor::~ClientServiceSupervisor() {
-        std::ranges::for_each(m_jobs, [](std::thread& t) { t.join(); });
+        if(m_running) {
+            stop();
+        }
     }
 
     void ClientServiceSupervisor::set_config(const config::ServerConfig& config) {
         m_config = &config;
-    }
-
-    void ClientServiceSupervisor::set_read_pipe(linux::PipeReadDevice read_pipe) {
-        m_read_pipe = std::move(read_pipe);
     }
 
     void ClientServiceSupervisor::create_services() {
@@ -40,6 +44,21 @@ namespace tds::server {
     }
 
     int ClientServiceSupervisor::get_pipe_fd() const noexcept {
-        return m_read_pipe.get_fd();
+        return m_pipes.m_read_device.get_fd();
+    }
+
+    void ClientServiceSupervisor::wait_for_events(linux::EpollBuffer& buffer) {
+        m_epoll.wait_for_events(buffer);
+    }
+
+    void ClientServiceSupervisor::stop() {
+        server_logger->warn("Client supervisor: stop requested");
+
+        const std::string stop_request(m_config->get_max_thread_count(), 'A');
+        m_pipes.m_write_device.write(stop_request.data(), stop_request.size());
+
+        std::ranges::for_each(m_jobs, [](std::thread& t) { t.join(); });
+        // close connections
+        m_running = false;
     }
 }
