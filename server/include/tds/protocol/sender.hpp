@@ -1,7 +1,7 @@
 #pragma once
 
-#include "tds/protocol/response.hpp"
 #include "tds/linux/io_device.hpp"
+#include "tds/protocol/response.hpp"
 
 #include <queue>
 
