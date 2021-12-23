@@ -19,10 +19,10 @@ namespace tds::linux {
         m_timeout = std::ranges::max(new_timeout, -1);
     }
 
-    void EpollDevice::add_device(IoDevice& dev, EventType mode) {
+    void EpollDevice::add_device(IoDevice& dev, EventType events) {
         const int dev_fd = dev.get_fd();
         epoll_event event = {
-            .events = static_cast<std::uint32_t>(mode),
+            .events = static_cast<std::uint32_t>(events),
             .data = {.fd = dev_fd},
         };
 

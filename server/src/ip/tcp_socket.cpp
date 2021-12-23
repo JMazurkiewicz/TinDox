@@ -1,7 +1,5 @@
 #include "tds/ip/tcp_socket.hpp"
 
-#include "tds/ip/endpoint_v4.hpp"
-
 namespace tds::ip {
     TcpSocket::TcpSocket(int fd, EndpointV4 endpoint)
         : IoDevice(fd)
