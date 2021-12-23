@@ -52,6 +52,7 @@ namespace tds::server {
 
     void ClientPool::close_all() {
         std::lock_guard lock{m_mut};
+        server_logger->info("ClientPool: closing all current connections");
         m_pool.clear();
     }
 }

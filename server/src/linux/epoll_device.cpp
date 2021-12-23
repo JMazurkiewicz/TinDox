@@ -41,13 +41,13 @@ namespace tds::linux {
         }
     }
 
-    void EpollDevice::epoll_ctl(int fd, int op, EventType events) {
+    void EpollDevice::epoll_ctl(int fd, int operation, EventType events) {
         epoll_event event = {
             .events = static_cast<std::uint32_t>(events),
             .data = {.fd = fd},
         };
 
-        if(::epoll_ctl(get_fd(), op, fd, &event) == -1) {
+        if(::epoll_ctl(get_fd(), operation, fd, &event) == -1) {
             throw LinuxError{"epoll_ctl(2)"};
         }
     }

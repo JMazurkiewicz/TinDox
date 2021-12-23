@@ -16,7 +16,7 @@ namespace tds::linux {
         int wait_for_events(EpollBuffer& buffer);
 
     private:
-        void epoll_ctl(int fd, int op, EventType events);
+        void epoll_ctl(int fd, int operation, EventType events);
 
         int m_timeout;
     };
