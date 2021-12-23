@@ -1,6 +1,5 @@
 #pragma once
 
-#include "tds/linux/epoll_buffer.hpp"
 #include "tds/server/client_service_supervisor.hpp"
 
 namespace tds::server {
@@ -14,13 +13,11 @@ namespace tds::server {
         void launch();
 
     private:
-        void process_events();
-
+        void main_loop();
         void process_client_input(Client& client);
         void process_pipe_input();
 
         ClientServiceSupervisor* m_supervisor;
-        linux::EpollBuffer m_epoll_buffer;
         bool m_running;
     };
 }

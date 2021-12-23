@@ -8,6 +8,7 @@
 #include "tds/linux/pipe_device.hpp"
 #include "tds/linux/signal_device.hpp"
 #include "tds/server/client_service_supervisor.hpp"
+#include "tds/server/server_context.hpp"
 
 #include <filesystem>
 #include <system_error>
@@ -29,7 +30,6 @@ namespace tds::server {
         void configure_signals();
         void configure_listener();
         void configure_main_epoll();
-        void configure_client_service();
 
         void handle_stop_signal(int code);
         void handle_connection(ip::TcpSocket connection);
@@ -37,13 +37,13 @@ namespace tds::server {
         void main_loop();
         void stop();
 
-        const std::filesystem::path m_root;
-        bool m_running;
+        ServerContext m_context;
         config::ServerConfig m_config;
+        bool m_running;
 
         linux::SignalDevice m_signal_device;
         ip::TcpListener m_tcp_listener;
-        linux::EpollDevice m_main_epoll;
+        linux::EpollDevice m_epoll;
         ClientServiceSupervisor m_supervisor;
     };
 }

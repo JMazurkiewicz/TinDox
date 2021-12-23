@@ -10,8 +10,7 @@
 
 namespace tds::server {
     ClientServiceSupervisor::ClientServiceSupervisor()
-        : m_config{nullptr}
-        , m_running{true}
+        : m_running{true}
         , m_pipes{linux::make_pipe(true)} {
         m_epoll.add_device(m_pipes.m_read_device);
     }
@@ -20,12 +19,8 @@ namespace tds::server {
         stop();
     }
 
-    void ClientServiceSupervisor::set_config(const config::ServerConfig& config) {
-        m_config = &config;
-    }
-
-    void ClientServiceSupervisor::create_services() {
-        for(int _ : std::views::iota(0, m_config->get_max_thread_count())) {
+    void ClientServiceSupervisor::create_services(const config::ServerConfig& config) {
+        for(int _ : std::views::iota(0, config.get_max_thread_count())) {
             m_jobs.emplace_back([this] {
                 ClientService job{*this};
                 job.launch();
@@ -33,9 +28,13 @@ namespace tds::server {
         }
     }
 
-    void ClientServiceSupervisor::add_connection(ip::TcpSocket connection) {
+    void ClientServiceSupervisor::accept_connection(ip::TcpSocket connection) {
         m_epoll.add_device(connection, socket_type);
         m_clients.add_client(std::move(connection));
+    }
+
+    std::size_t ClientServiceSupervisor::get_client_count() {
+        return m_clients.get_client_count();
     }
 
     bool ClientServiceSupervisor::has_client(int fd) {
@@ -58,7 +57,7 @@ namespace tds::server {
         const int fd = device.get_fd();
         Client& client = m_clients.get_client(fd);
 
-        if(client.get_socket().is_valid()) {
+        if(client.is_alive()) {
             m_epoll.rearm_device(device, socket_type);
         } else {
             m_clients.close_one(fd);
@@ -69,10 +68,10 @@ namespace tds::server {
         if(m_running) {
             server_logger->warn("Client supervisor: stop requested");
 
-            const std::string stop_request(m_config->get_max_thread_count(), 'A');
-            m_pipes.m_write_device.write(stop_request.data(), stop_request.size());
-
+            const char stop_signal = 'A';
+            m_pipes.m_write_device.write(&stop_signal, 1);
             std::ranges::for_each(m_jobs, [](std::thread& t) { t.join(); });
+
             m_clients.close_all();
             m_running = false;
         }

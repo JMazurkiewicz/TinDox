@@ -11,7 +11,7 @@
 
 namespace tds::server {
     Server::Server(std::filesystem::path root)
-        : m_root{std::move(root)}
+        : m_context{std::move(root)}
         , m_running{true} { }
 
     Server::~Server() {
@@ -31,11 +31,10 @@ namespace tds::server {
 
     bool Server::configure() {
         try {
-            server_logger->info("Server: basic configuration");
             configure_signals();
             configure_listener();
             configure_main_epoll();
-            configure_client_service();
+            m_supervisor.create_services(m_config);
             linux::Terminal::set_stdin_echo(false);
         } catch(const std::system_error& e) {
             server_logger->error("Configuration failed: {} ({})", e.what(), e.code());
@@ -46,6 +45,7 @@ namespace tds::server {
     }
 
     void Server::configure_signals() {
+        server_logger->info("Server: creating signal handlers");
         const auto handler = std::bind_front(&Server::handle_stop_signal, this);
         m_signal_device.add_handler(SIGINT, handler);
         m_signal_device.add_handler(SIGQUIT, handler);
@@ -54,20 +54,20 @@ namespace tds::server {
     }
 
     void Server::configure_listener() {
-        m_tcp_listener.listen(m_config.get_port());
-        m_tcp_listener.set_backlog(m_config.get_backlog());
+        const ip::Port port = m_config.get_port();
+        const int backlog = m_config.get_backlog();
+
+        server_logger->info("Server: creating TCP listener (port = {}, backlog = {})", port, backlog);
+        m_tcp_listener.listen(port);
+        m_tcp_listener.set_backlog(backlog);
         m_tcp_listener.set_connection_type(ip::SocketType::nonblocking);
         m_tcp_listener.set_connection_handler(std::bind_front(&Server::handle_connection, this));
     }
 
     void Server::configure_main_epoll() {
-        m_main_epoll.add_device(m_signal_device);
-        m_main_epoll.add_device(m_tcp_listener);
-    }
-
-    void Server::configure_client_service() {
-        m_supervisor.set_config(m_config);
-        m_supervisor.create_services();
+        server_logger->info("Server: configuring main epoll device");
+        m_epoll.add_device(m_signal_device);
+        m_epoll.add_device(m_tcp_listener);
     }
 
     void Server::handle_stop_signal(int code) {
@@ -80,7 +80,13 @@ namespace tds::server {
 
         try {
             server_logger->info("New connection from {} (fd = {})", endpoint, connection.get_fd());
-            m_supervisor.add_connection(std::move(connection));
+
+            if(m_supervisor.get_client_count() < m_config.get_max_user_count()) {
+                m_supervisor.accept_connection(std::move(connection));
+            } else {
+                server_logger->error("Server: too many clients, cannot accept {}", endpoint);
+            }
+
         } catch(const std::system_error& e) {
             server_logger->error("Failed to add connection from {}: {} ({})", endpoint, e.what(), e.code());
         } catch(const std::runtime_error& e) {
@@ -90,7 +96,7 @@ namespace tds::server {
 
     void Server::main_loop() {
         for(linux::EpollBuffer buffer{4}; m_running;) {
-            m_main_epoll.wait_for_events(buffer);
+            m_epoll.wait_for_events(buffer);
 
             for(auto [fd, events] : buffer.get_events()) {
                 if(fd == m_signal_device.get_fd()) {

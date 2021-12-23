@@ -109,6 +109,7 @@ set(
     src/server/client_service_supervisor.cpp
     src/server/client_service.cpp
     src/server/client.cpp
+    src/server/server_context.cpp
     src/server/server_logger.cpp
     src/server/server.cpp
 

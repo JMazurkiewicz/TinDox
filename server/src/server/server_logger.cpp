@@ -6,7 +6,7 @@ namespace tds::server {
     namespace {
         auto make_server_logger() {
             auto logger = spdlog::stdout_color_mt("server_logger");
-            logger->set_pattern("[%T.%e %t] [%^%l%$] %v");
+            logger->set_pattern("[%T.%f Thread:%t] [%^%l%$] %v");
             return logger;
         }
     }

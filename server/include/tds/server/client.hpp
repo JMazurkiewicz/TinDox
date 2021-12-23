@@ -3,6 +3,8 @@
 #include "tds/ip/tcp_socket.hpp"
 #include "tds/server/client_context.hpp"
 
+#include <vector>
+
 namespace tds::server {
     class Client {
     public:
@@ -14,10 +16,17 @@ namespace tds::server {
         Client& operator=(Client&&) = default;
 
         ip::TcpSocket& get_socket() noexcept;
-        void handle_input();
+        bool is_alive();
+        void handle();
 
     private:
+        void read_requtests();
+        void write_responses();
+
         ip::TcpSocket m_socket;
+        bool m_alive;
         ClientContext m_context;
+
+        std::vector<char> m_buffer;
     };
 }

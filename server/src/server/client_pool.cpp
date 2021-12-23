@@ -1,5 +1,8 @@
 #include "tds/server/client_pool.hpp"
 
+#include "tds/server/server_logger.hpp"
+
+#include <mutex>
 #include <stdexcept>
 #include <utility>
 
@@ -15,6 +18,11 @@ namespace tds::server {
             throw std::runtime_error{
                 fmt::format("ClientPool failed to accept new connection (fd = {})", socket.get_fd())};
         }
+    }
+
+    std::size_t ClientPool::get_client_count() {
+        std::lock_guard lock{m_mut};
+        return m_pool.size();
     }
 
     bool ClientPool::has_client(int fd) {
@@ -33,8 +41,12 @@ namespace tds::server {
 
     void ClientPool::close_one(int fd) {
         std::lock_guard lock{m_mut};
-        if(m_pool.erase(fd) == 0) {
-            throw std::runtime_error{fmt::format("ClientPool failed to remove client (fd = {})", fd)};
+        if(auto it = m_pool.find(fd); it != m_pool.end()) {
+            server_logger->info("ClientPool: closing connection with client from {} (fd = {})",
+                                it->second.get_socket().get_endpoint(), fd);
+            m_pool.erase(it);
+        } else {
+            throw std::runtime_error{fmt::format("No client with fd {}", fd)};
         }
     }
 

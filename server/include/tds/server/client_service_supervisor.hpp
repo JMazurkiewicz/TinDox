@@ -25,11 +25,10 @@ namespace tds::server {
         ClientServiceSupervisor(const ClientServiceSupervisor&) = delete;
         ClientServiceSupervisor& operator=(const ClientServiceSupervisor&) = delete;
 
-        void set_config(const config::ServerConfig& config);
-        void create_services();
+        void create_services(const config::ServerConfig& config);
+        void accept_connection(ip::TcpSocket connection);
 
-        void add_connection(ip::TcpSocket connection);
-
+        std::size_t get_client_count();
         bool has_client(int fd);
         Client& get_client(int fd);
         int get_pipe_fd() const noexcept;
@@ -40,7 +39,6 @@ namespace tds::server {
         void stop();
 
     private:
-        const config::ServerConfig* m_config;
         bool m_running;
         linux::EpollDevice m_epoll;
         linux::PipeDevices m_pipes;
