@@ -14,7 +14,9 @@ namespace tds::protocol {
 
         void set_device(linux::IoDevice& device);
 
+        void add_response(Response response);
         bool has_responses() const noexcept;
+
         void send();
 
     private:

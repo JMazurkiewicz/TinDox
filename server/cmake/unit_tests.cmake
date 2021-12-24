@@ -50,6 +50,8 @@ set(
     tests/unit/linux/pipe_device_test.cpp
     tests/unit/linux/signal_device_test.cpp
 
+    tests/unit/protocol/response_test.cpp
+
     tests/unit/user/permissions_test.cpp
 )
 
