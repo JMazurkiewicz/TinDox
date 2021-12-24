@@ -2,6 +2,7 @@
 
 #include "tds/protocol/field_value.hpp"
 
+#include <optional>
 #include <string_view>
 
 namespace tds::protocol {
@@ -19,8 +20,12 @@ namespace tds::protocol {
         FieldValueType get_value_type() const noexcept;
         const FieldValue& get_value() const noexcept;
 
+        std::optional<bool> get_boolean() const noexcept;
+        std::optional<std::uintmax_t> get_integer() const noexcept;
+        std::optional<std::string_view> get_string() const noexcept;
+
         template<typename F>
-        void visit_value(F&& visitor) const;
+        void visit(F&& visitor) const;
 
     private:
         std::string m_name;
@@ -28,7 +33,7 @@ namespace tds::protocol {
     };
 
     template<typename F>
-    void Field::visit_value(F&& visitor) const {
-        std::visit(std::forward<F>(visitor), m_value);
+    void Field::visit(F&& visitor) const {
+        std::visit(std::forward<F>(visitor), get_value());
     }
 }

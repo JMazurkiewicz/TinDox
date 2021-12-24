@@ -10,6 +10,7 @@
 namespace tds::protocol {
     class Request {
     public:
+        Request() = default;
         Request(const Request&) = delete;
         Request& operator=(const Request&) = delete;
         Request(Request&&) = default;
