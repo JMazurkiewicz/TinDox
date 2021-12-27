@@ -1,61 +1,54 @@
 #include "tds/server/client.hpp"
 
+#include "tds/linux/event_type.hpp"
 #include "tds/linux/linux_error.hpp"
+#include "tds/protocol/response.hpp"
 #include "tds/server/server_logger.hpp"
+
+#include <exception>
 
 namespace tds::server {
     Client::Client(ip::TcpSocket socket)
         : m_socket{std::move(socket)}
-        , m_alive{true} { }
+        , m_alive{true} {
+        m_receiver.set_device(m_socket);
+        m_sender.set_device(m_socket);
+    }
 
     ip::TcpSocket& Client::get_socket() noexcept {
         return m_socket;
     }
 
-    bool Client::is_alive() {
+    int Client::get_fd() const noexcept {
+        return m_socket.get_fd();
+    }
+
+    bool Client::is_alive() const noexcept {
         return m_alive;
     }
 
-    void Client::handle() {
-        read_requtests();
-        write_responses();
-        m_buffer.clear();
-    }
-
-    void Client::read_requtests() {
-        ssize_t total_count = 0;
-        ssize_t count;
-        std::errc code = {};
-
-        do {
-            std::array<char, 4096> buffer;
-            count = m_socket.read(buffer.data(), buffer.size(), code);
-
-            if(count == -1) {
-                break;
-            } else {
-                total_count += count;
-                m_buffer.insert(m_buffer.end(), buffer.begin(), buffer.begin() + count);
-            }
-        } while(code == std::errc{} && count != 0);
-
-        if(code != std::errc::resource_unavailable_try_again && code != std::errc::operation_would_block &&
-           (total_count == 0 || code != std::errc{})) {
-            m_alive = false;
-        } else {
-            std::string_view str{m_buffer.data(), m_buffer.size()};
-            server_logger->info("Message from {}: {}", m_socket.get_endpoint(), str);
+    linux::EventType Client::get_required_events() const noexcept {
+        auto events = linux::EventType::in;
+        if(m_sender.has_responses()) {
+            events |= linux::EventType::out;
         }
+        return events;
     }
 
-    void Client::write_responses() try {
-        ssize_t count = 0;
+    void Client::handle() {
+        try {
+            const auto data = m_receiver.receive();
+            server_logger->info("Received {} bytes from {} client", data.size(), m_socket.get_endpoint());
 
-        do {
-            count += m_socket.write(m_buffer.data() + count, m_buffer.size() - count);
-        } while(count != m_buffer.size());
-    } catch(const std::exception& e) {
-        m_alive = false;
-        throw;
+            protocol::Response response{
+                std::string{data.data(), data.size()}
+            };
+            m_sender.add_response(std::move(response));
+            const auto count = m_sender.send();
+            server_logger->info("Sent {} bytes to {} client", count, m_socket.get_endpoint());
+        } catch(const std::exception&) {
+            server_logger->error("Client {} caught fatal error", m_socket.get_endpoint());
+            m_alive = false;
+        }
     }
 }

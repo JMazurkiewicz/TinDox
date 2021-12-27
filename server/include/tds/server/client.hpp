@@ -1,9 +1,11 @@
 #pragma once
 
 #include "tds/ip/tcp_socket.hpp"
+#include "tds/linux/event_type.hpp"
+#include "tds/protocol/interpreter_mode.hpp"
+#include "tds/protocol/receiver.hpp"
+#include "tds/protocol/sender.hpp"
 #include "tds/server/client_context.hpp"
-
-#include <vector>
 
 namespace tds::server {
     class Client {
@@ -12,21 +14,22 @@ namespace tds::server {
 
         Client(const Client&) = delete;
         Client& operator=(const Client&) = delete;
-        Client(Client&&) = default;
-        Client& operator=(Client&&) = default;
 
         ip::TcpSocket& get_socket() noexcept;
-        bool is_alive();
+        int get_fd() const noexcept;
+
+        bool is_alive() const noexcept;
+        linux::EventType get_required_events() const noexcept;
         void handle();
 
     private:
-        void read_requtests();
-        void write_responses();
-
         ip::TcpSocket m_socket;
-        bool m_alive;
         ClientContext m_context;
 
-        std::vector<char> m_buffer;
+        bool m_alive;
+        linux::EventType m_required_events;
+
+        protocol::Receiver m_receiver;
+        protocol::Sender m_sender;
     };
 }

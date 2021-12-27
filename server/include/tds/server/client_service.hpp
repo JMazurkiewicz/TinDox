@@ -13,7 +13,6 @@ namespace tds::server {
         void launch();
 
     private:
-        void main_loop();
         void process_client_input(Client& client);
         void process_pipe_input();
 

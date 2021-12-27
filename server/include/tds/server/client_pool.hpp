@@ -3,13 +3,14 @@
 #include "tds/ip/tcp_socket.hpp"
 #include "tds/server/client.hpp"
 
+#include <memory>
 #include <mutex>
 #include <unordered_map>
 
 namespace tds::server {
     class ClientPool {
     public:
-        ClientPool();
+        ClientPool() = default;
         ClientPool(const ClientPool&) = delete;
         ClientPool& operator=(const ClientPool&) = delete;
 
@@ -24,6 +25,6 @@ namespace tds::server {
 
     private:
         std::mutex m_mut;
-        std::unordered_map<int, Client> m_pool;
+        std::unordered_map<int, std::unique_ptr<Client>> m_pool;
     };
 }

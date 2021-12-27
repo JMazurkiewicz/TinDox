@@ -29,7 +29,8 @@ namespace tds::server {
     }
 
     void ClientServiceSupervisor::accept_connection(ip::TcpSocket connection) {
-        m_epoll.add_device(connection, socket_type);
+        m_epoll.add_device(connection,
+                           linux::EventType::in | linux::EventType::edge_triggered | linux::EventType::one_shot);
         m_clients.add_client(std::move(connection));
     }
 
@@ -58,7 +59,8 @@ namespace tds::server {
         Client& client = m_clients.get_client(fd);
 
         if(client.is_alive()) {
-            m_epoll.rearm_device(device, socket_type);
+            m_epoll.rearm_device(device, linux::EventType::edge_triggered | linux::EventType::one_shot |
+                                             client.get_required_events());
         } else {
             m_clients.close_one(fd);
         }

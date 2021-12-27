@@ -12,18 +12,6 @@ namespace tds::server {
         , m_running{true} { }
 
     void ClientService::launch() {
-        try {
-            main_loop();
-        } catch(const std::system_error& e) {
-            server_logger->error("ClientService: fatal system error: {} ({})", e.what(), e.code());
-        } catch(const std::exception& e) {
-            server_logger->error("ClientService: fatal error: {}", e.what());
-        } catch(...) {
-            server_logger->error("ClientService: unknown fatal error");
-        }
-    }
-
-    void ClientService::main_loop() {
         for(linux::EpollBuffer buffer{32}; m_running;) {
             m_supervisor->wait_for_events(buffer);
 

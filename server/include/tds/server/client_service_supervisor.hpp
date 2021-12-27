@@ -16,9 +16,6 @@
 namespace tds::server {
     class ClientServiceSupervisor {
     public:
-        static constexpr linux::EventType socket_type =
-            linux::EventType::in | linux::EventType::edge_triggered | linux::EventType::one_shot;
-
         ClientServiceSupervisor();
         ~ClientServiceSupervisor();
 
