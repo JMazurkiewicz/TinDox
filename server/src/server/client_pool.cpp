@@ -40,8 +40,6 @@ namespace tds::server {
     void ClientPool::close_one(int fd) {
         std::lock_guard lock{m_mut};
         if(auto it = m_pool.find(fd); it != m_pool.end()) {
-            server_logger->warn("ClientPool: closing connection with client from {} (fd = {})",
-                                it->second->get_socket().get_endpoint(), fd);
             m_pool.erase(it);
         } else {
             throw std::runtime_error{fmt::format("Could not close connection with client (fd = {})", fd)};
@@ -50,7 +48,6 @@ namespace tds::server {
 
     void ClientPool::close_all() {
         std::lock_guard lock{m_mut};
-        server_logger->warn("ClientPool: closing all current connections");
         m_pool.clear();
     }
 }

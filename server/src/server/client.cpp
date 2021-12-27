@@ -15,6 +15,10 @@ namespace tds::server {
         m_sender.set_device(m_socket);
     }
 
+    Client::~Client() {
+        server_logger->warn("Closed connection with client from {}", m_socket.get_endpoint());
+    }
+
     ip::TcpSocket& Client::get_socket() noexcept {
         return m_socket;
     }
@@ -35,17 +39,21 @@ namespace tds::server {
         return events;
     }
 
-    void Client::handle() {
+    void Client::handle(linux::EventType events) {
         try {
-            const auto data = m_receiver.receive();
-            server_logger->info("Received {} bytes from {} client", data.size(), m_socket.get_endpoint());
+            if((events & linux::EventType::in) != linux::EventType{}) {
+                const auto data = m_receiver.receive();
+                server_logger->info("Received {} bytes from {} client", data.size(), m_socket.get_endpoint());
+                protocol::Response response{
+                    std::string{data.data(), data.size()}
+                };
+                m_sender.add_response(std::move(response));
+            }
 
-            protocol::Response response{
-                std::string{data.data(), data.size()}
-            };
-            m_sender.add_response(std::move(response));
-            const auto count = m_sender.send();
-            server_logger->info("Sent {} bytes to {} client", count, m_socket.get_endpoint());
+            if((events & linux::EventType::out) != linux::EventType{}) {
+                const auto count = m_sender.send();
+                server_logger->info("Sent {} bytes to {} client", count, m_socket.get_endpoint());
+            }
         } catch(const std::exception&) {
             server_logger->error("Client {} caught fatal error", m_socket.get_endpoint());
             m_alive = false;

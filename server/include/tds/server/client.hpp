@@ -11,6 +11,7 @@ namespace tds::server {
     class Client {
     public:
         explicit Client(ip::TcpSocket socket);
+        ~Client();
 
         Client(const Client&) = delete;
         Client& operator=(const Client&) = delete;
@@ -20,7 +21,7 @@ namespace tds::server {
 
         bool is_alive() const noexcept;
         linux::EventType get_required_events() const noexcept;
-        void handle();
+        void handle(linux::EventType events);
 
     private:
         ip::TcpSocket m_socket;

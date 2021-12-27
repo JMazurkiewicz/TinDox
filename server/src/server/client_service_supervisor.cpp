@@ -68,7 +68,7 @@ namespace tds::server {
 
     void ClientServiceSupervisor::stop() {
         if(m_running) {
-            server_logger->warn("Client supervisor: stop requested");
+            server_logger->warn("ClientServiceSupervisor: stop requested");
 
             const char stop_signal = 'A';
             m_pipes.m_write_device.write(&stop_signal, 1);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tds/linux/event_type.hpp"
 #include "tds/server/client_service_supervisor.hpp"
 
 namespace tds::server {
@@ -13,7 +14,7 @@ namespace tds::server {
         void launch();
 
     private:
-        void process_client_input(Client& client);
+        void process_client_input(Client& client, linux::EventType events);
         void process_pipe_input();
 
         ClientServiceSupervisor* m_supervisor;
