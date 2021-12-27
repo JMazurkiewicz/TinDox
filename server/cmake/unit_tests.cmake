@@ -51,6 +51,7 @@ set(
     tests/unit/linux/signal_device_test.cpp
 
     tests/unit/protocol/field_test.cpp
+    tests/unit/protocol/receiver_test.cpp
     tests/unit/protocol/request_test.cpp
     tests/unit/protocol/response_test.cpp
 

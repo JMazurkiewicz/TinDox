@@ -18,7 +18,6 @@ using namespace std::chrono_literals;
 TEST_CASE("tds::ip::TcpListener", "[ip]") {
     bool connection_established = false;
     bool server_error = false;
-    bool client_error = false;
 
     const Port server_port{44444};
 
@@ -36,6 +35,7 @@ TEST_CASE("tds::ip::TcpListener", "[ip]") {
     }};
 
     std::this_thread::sleep_for(2s);
+    bool client_error = false;
 
     std::thread client{[&] {
         try {
@@ -74,7 +74,6 @@ TEST_CASE("tds::ip::{TcpListener+EpollDevice}", "[ip]") {
     bool epoll_handled = false;
     bool connection_established = false;
     bool server_error = false;
-    bool client_error = false;
 
     const Port server_port{55555};
 
@@ -105,6 +104,7 @@ TEST_CASE("tds::ip::{TcpListener+EpollDevice}", "[ip]") {
     }};
 
     std::this_thread::sleep_for(2s);
+    bool client_error = false;
 
     std::thread client{[&] {
         try {

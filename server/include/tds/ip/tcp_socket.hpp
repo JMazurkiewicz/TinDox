@@ -6,6 +6,7 @@
 namespace tds::ip {
     class TcpSocket : public linux::IoDevice {
     public:
+        TcpSocket();
         explicit TcpSocket(int fd, EndpointV4 endpoint);
 
         TcpSocket(TcpSocket&&) = default;
