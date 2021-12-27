@@ -1,4 +1,3 @@
-#include <netdb.h>
 #pragma once
 
 #include <cstdint>

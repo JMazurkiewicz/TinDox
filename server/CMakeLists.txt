@@ -108,7 +108,9 @@ set(
     src/protocol/field.cpp
     src/protocol/receiver.cpp
     src/protocol/request.cpp
+    src/protocol/response_builder.cpp
     src/protocol/response.cpp
+    src/protocol/sender.cpp
 
     src/server/client_context.cpp
     src/server/client_pool.cpp

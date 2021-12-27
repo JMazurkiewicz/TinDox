@@ -54,6 +54,7 @@ set(
     tests/unit/protocol/receiver_test.cpp
     tests/unit/protocol/request_test.cpp
     tests/unit/protocol/response_test.cpp
+    tests/unit/protocol/sender_test.cpp
 
     tests/unit/user/permissions_test.cpp
 )

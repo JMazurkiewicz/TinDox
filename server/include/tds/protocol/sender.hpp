@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tds/linux/io_device.hpp"
+#include "tds/ip/tcp_socket.hpp"
 #include "tds/protocol/response.hpp"
 
 #include <queue>
@@ -12,15 +12,19 @@ namespace tds::protocol {
         Sender(const Sender&) = delete;
         Sender& operator=(const Sender&) = delete;
 
-        void set_device(linux::IoDevice& device);
-
         void add_response(Response response);
         bool has_responses() const noexcept;
 
-        void send();
+        void set_device(ip::TcpSocket& socket);
+        std::size_t send();
 
     private:
-        linux::IoDevice* m_dev;
+        void write();
+        void check_error();
+
+        linux::IoDevice* m_socket;
         std::queue<Response> m_responses;
+        std::errc m_errc;
+        std::size_t m_sent_byte_count;
     };
 }
