@@ -8,13 +8,12 @@ using namespace tds::protocol;
 TEST_CASE("tds::protocol::Request", "[protocol]") {
     SECTION("Test name") {
         const std::string_view name = "pwd";
-        Request request;
-        request.set_name(std::string{name});
+        Request request{std::string{name}};
         REQUIRE(request.get_name() == name);
     }
 
     SECTION("Test adding fields") {
-        Request request;
+        Request request{"fields"};
         request.add_field(Field{"field0", 123u});
         request.add_field(Field{"field1", 321U});
 

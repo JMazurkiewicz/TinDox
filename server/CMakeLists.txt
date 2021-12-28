@@ -106,6 +106,7 @@ set(
 
     src/protocol/code.cpp
     src/protocol/field.cpp
+    src/protocol/protocol_interpreter.cpp
     src/protocol/receiver.cpp
     src/protocol/request.cpp
     src/protocol/response_builder.cpp
