@@ -3,7 +3,7 @@ project(TinDox---console-client)
 add_subdirectory(connection/)
 
 # The main program
-add_executable(ccl
+add_executable(cli
         main.cpp)
 
-target_link_libraries(ccl PRIVATE connection)
+target_link_libraries(cli PRIVATE connection)
