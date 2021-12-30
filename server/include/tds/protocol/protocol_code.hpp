@@ -10,6 +10,7 @@ namespace tds::protocol {
         too_long_line = 300,
         too_many_fields = 301,
         bad_field = 302,
+        bad_command = 303,
 
         not_logged_in = 402,
         invalid_field = 403,

@@ -1,10 +1,11 @@
+#include "tds/cli/cli_error.hpp"
 #include "tds/cli/command_executor.hpp"
 #include "tds/cli/help_command.hpp"
 #include "tds/cli/init_command.hpp"
 #include "tds/cli/invalid_command_execution_error.hpp"
-#include "tds/cli/no_such_command_error.hpp"
 #include "tds/cli/run_command.hpp"
 #include "tds/cli/user_command.hpp"
+#include "tds/command/no_such_command_error.hpp"
 
 #include <csignal>
 #include <cstdlib>
@@ -39,8 +40,8 @@ int main(int argc, char** argv) {
                       << "\n"
                          "Source file: "
                       << e.source() << '\n';
-        } catch(const tds::cli::NoSuchCommandError& e) {
-            std::cerr << e.what() << '\n';
+        } catch(const tds::command::NoSuchCommandError& e) {
+            std::cerr << "tds: '" << e.what() << "' is not a tds command. See 'tds help'" << '\n';
         } catch(const tds::cli::InvalidCommandExecutionError& e) {
             std::cerr << "tds: " << e.what() << '\n';
         } catch(const tds::cli::CliError& e) {

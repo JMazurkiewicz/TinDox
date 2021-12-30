@@ -2,7 +2,6 @@
 
 #include "tds/cli/invalid_command_arguments_error.hpp"
 #include "tds/cli/invalid_command_execution_error.hpp"
-#include "tds/cli/no_such_command_error.hpp"
 #include "tds/config/config_reader.hpp"
 #include "tds/server/server.hpp"
 #include "tds/server/server_logger.hpp"

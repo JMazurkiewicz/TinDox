@@ -1,27 +1,21 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "tds/cli/command.hpp"
+#include "tds/command/command.hpp"
 
-using namespace tds::cli;
+using namespace tds::command;
 
 struct GoodCommand1 {
     static constexpr std::string_view name = "good_command1";
-
-    void parse_arguments(std::span<const std::string_view>) { }
     void execute() { }
 };
 
 struct GoodCommand2 {
     static constexpr const char* name = "good_command2";
-
-    void parse_arguments(std::span<const std::string_view>) { }
     void execute() { }
 };
 
 struct BadCommand1 {
     static std::string name;
-
-    void parse_arguments(std::span<std::string_view>) { }
     void execute() { }
 };
 

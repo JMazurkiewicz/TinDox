@@ -80,7 +80,6 @@ set(
     src/cli/help_command.cpp
     src/cli/init_command.cpp
     src/cli/invalid_command_arguments_error.cpp
-    src/cli/no_such_command_error.cpp
     src/cli/run_command.cpp
     src/cli/user_command.cpp
 

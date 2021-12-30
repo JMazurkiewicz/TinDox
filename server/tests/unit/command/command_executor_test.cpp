@@ -1,22 +1,26 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "tds/cli/command_executor.hpp"
-#include "tds/cli/no_such_command_error.hpp"
+#include "tds/command/command_executor.hpp"
+#include "tds/command/no_such_command_error.hpp"
 
-using namespace tds::cli;
+using namespace tds::command;
 
 struct SpawnCommand {
     static constexpr std::string_view name = "spawn";
-    void parse_arguments(std::span<const std::string_view>) { }
+    int i = 0;
 
-    void execute() { }
+    void execute() {
+        i = 1;
+    }
 };
 
 struct PrintCommand {
     static constexpr std::string_view name = "print";
-    void parse_arguments(std::span<const std::string_view>) { }
+    long i = 0;
 
-    void execute() { }
+    void execute() {
+        i = 2;
+    }
 };
 
 TEST_CASE("tds::cli::CommandExecutor", "[cli]") {
@@ -30,24 +34,21 @@ TEST_CASE("tds::cli::CommandExecutor", "[cli]") {
 
     SECTION("Run spawn command") {
         executor.set_command("spawn");
-        executor.parse_arguments(args);
         REQUIRE_NOTHROW(executor.execute());
+        executor.visit_command([](auto& command) {
+            REQUIRE(command.i == 1);
+        });
     }
 
     SECTION("Run print command") {
         executor.set_command("print");
-        executor.parse_arguments(args);
         REQUIRE_NOTHROW(executor.execute());
+        executor.visit_command([](auto& command) {
+            REQUIRE(command.i == 2);
+        });
     }
 
     SECTION("Run invalid command") {
         REQUIRE_THROWS_AS(executor.set_command("invalid"), NoSuchCommandError);
-
-        try {
-            executor.set_command("invalid");
-        } catch(const std::exception& e) {
-            const std::string expected = "tds: 'invalid' is not a tds command. See 'tds help'.";
-            REQUIRE(e.what() == expected);
-        }
     }
 }

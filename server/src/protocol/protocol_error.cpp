@@ -25,6 +25,9 @@ namespace tds::protocol {
                 case bad_field:
                     return "invalid field";
 
+                case bad_command:
+                    return "invalid command";
+
                 case not_enough_perms:
                     return "not enough permissions";
 
