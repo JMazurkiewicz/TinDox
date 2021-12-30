@@ -1,4 +1,3 @@
-
 #include <catch2/catch_test_macros.hpp>
 
 #include "tds/protocol/field_value.hpp"

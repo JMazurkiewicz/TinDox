@@ -1,8 +1,12 @@
 #include "tds/protocol/protocol_interpreter.hpp"
 
+#include "tds/protocol/protocol_error.hpp"
+
 #include <algorithm>
 #include <ranges>
 #include <stdexcept>
+
+#include <fmt/core.h>
 
 namespace tds::protocol {
     ProtocolInterpreter::ProtocolInterpreter()
@@ -53,16 +57,17 @@ namespace tds::protocol {
         }
 
         if(too_long_line) {
-            // TODO THROW PROTOCOL ERROR
+            throw ProtocolError{ProtocolCode::too_long_line,
+                                fmt::format("Too long line ({} bytes)", m_lines.back().size())};
         } else if(too_many_lines) {
-            // TODO THROW PROTOCOL ERROR
+            throw ProtocolError{ProtocolCode::too_many_fields, fmt::format("Too many fields ({})", m_lines.size())};
         }
     }
 
     void ProtocolInterpreter::commit_request() {
-        // TODO: throws are temporary solution -- THROW PROTOCOL ERROR!!!
         if(m_request.has_value()) {
-            throw std::exception(); // TODO THROW: UNREAD REQUEST EXCEPTION
+            throw std::runtime_error{
+                fmt::format("ProtocolInterpreter: last request '{}' was not properly handled", m_request->get_name())};
         }
 
         Request request{std::move(m_lines.front())};

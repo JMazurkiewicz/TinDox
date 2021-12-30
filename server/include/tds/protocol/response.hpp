@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tds/protocol/code.hpp"
+#include <string>
 
 namespace tds::protocol {
     class Response {

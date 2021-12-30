@@ -104,8 +104,8 @@ set(
     src/linux/signal_device.cpp
     src/linux/terminal.cpp
 
-    src/protocol/code.cpp
     src/protocol/field.cpp
+    src/protocol/protocol_error.cpp
     src/protocol/protocol_interpreter.cpp
     src/protocol/receiver.cpp
     src/protocol/request.cpp

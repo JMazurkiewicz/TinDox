@@ -3,7 +3,7 @@
 #include <fmt/core.h>
 
 namespace tds::protocol {
-    void ResponseBuilder::set_code(Code code) {
+    void ResponseBuilder::set_code(ProtocolCode code) {
         m_code = code;
     }
 

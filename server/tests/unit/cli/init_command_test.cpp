@@ -1,5 +1,4 @@
 #include <catch2/catch_test_macros.hpp>
-#include <unit.hpp>
 
 #include "tds/cli/cli_error.hpp"
 #include "tds/cli/command.hpp"
