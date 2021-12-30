@@ -36,4 +36,6 @@ namespace tds::protocol {
     void Field::visit(F&& visitor) const {
         std::visit(std::forward<F>(visitor), get_value());
     }
+
+    Field field_from_string(std::string_view str);
 }

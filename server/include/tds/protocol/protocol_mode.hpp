@@ -3,8 +3,8 @@
 #include <cstdint>
 
 namespace tds::protocol {
-    enum class InterpreterMode : std::uint8_t {
-        protocol,
+    enum class ProtocolMode : std::uint8_t {
+        command,
         download,
         upload,
     };

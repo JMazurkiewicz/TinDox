@@ -2,6 +2,7 @@
 
 #include "tds/protocol/request.hpp"
 
+#include <optional>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -11,29 +12,25 @@ namespace tds::protocol {
     public:
         static constexpr std::size_t max_line_length = 2048;
         static constexpr std::size_t max_line_count = 16;
-
         static constexpr char line_separator = '\n';
-        static constexpr char field_separator = ':';
-        static constexpr std::string_view allowed_whitespaces = " \t";
 
         ProtocolInterpreter();
         ProtocolInterpreter(const ProtocolInterpreter&) = delete;
         ProtocolInterpreter& operator=(const ProtocolInterpreter&) = delete;
 
-        void add_bytes(std::span<const char> input);
+        [[nodiscard]] std::span<const char> commit_bytes(std::span<const char> bytes);
 
-        bool has_available_requests();
-        [[nodiscard]] std::vector<Request> get_requests();
+        [[nodiscard]] bool has_available_request() const noexcept;
+        [[nodiscard]] Request get_request();
 
     private:
-        void add_line(std::string line);
-        void check_lines();
-        void add_response();
+        void commit_line(std::span<const char> line);
+        void check_for_protocol_errors();
+        void commit_request();
 
         std::vector<std::string> m_lines;
-        std::vector<Request> m_requests;
+        std::optional<Request> m_request;
 
         bool m_last_line_complete : 1;
-        int m_last_checked_line;
     };
 }
