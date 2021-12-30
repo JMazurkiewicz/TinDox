@@ -110,7 +110,6 @@ TEST_CASE("tds::protocol::Field", "[protocol]") {
         const std::string str =
             GENERATE(as<std::string>{}, "bad", "bad:", "  bad    :    ", "    worse : 18446744073709551617   ",
                      "   inva_liD-NAME  :    hello ", "   bad__ : true   ");
-        INFO("TEST: " << str);
         REQUIRE_THROWS_AS(field_from_string(str), ProtocolError);
     }
 }

@@ -42,7 +42,7 @@ namespace tds::protocol {
             if(m_errc != std::errc{}) {
                 throw linux::LinuxError{static_cast<int>(m_errc), "Receiver::read(2)"};
             } else if(m_data.size() == 0) {
-                throw std::runtime_error{"Receiver: no data available (connection lost?)"}; // TODO: sure?
+                throw linux::LinuxError{ENOTCONN, "Receiver::read(2)"};
             }
         }
     }

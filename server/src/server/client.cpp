@@ -2,16 +2,14 @@
 
 #include "tds/linux/event_type.hpp"
 #include "tds/linux/linux_error.hpp"
+#include "tds/protocol/protocol_error.hpp"
 #include "tds/protocol/protocol_mode.hpp"
 #include "tds/protocol/request.hpp"
 #include "tds/protocol/response.hpp"
 #include "tds/server/server_logger.hpp"
 
 #include <exception>
-#include <ranges> // TODO REMOVE
 #include <system_error>
-
-#include <fmt/ranges.h> // TODO REMOVE
 
 namespace tds::server {
     Client::Client(ip::TcpSocket socket)
@@ -54,15 +52,19 @@ namespace tds::server {
             if((events & linux::EventType::in) != linux::EventType{}) {
                 handle_input();
             }
-        } catch(const std::exception&) { // TODO better error handling
-            server_logger->error("Client {} caught fatal error", m_socket.get_endpoint());
+
+            if((events & linux::EventType::out) != linux::EventType{}) {
+                handle_output();
+            }
+        } catch(const std::exception& e) {
+            server_logger->error("Client {} caught fatal error: {}", m_socket.get_endpoint(), e.what());
             m_context.kill();
         }
     }
 
     void Client::handle_input() {
         const std::span<const char> input = m_receiver.receive();
-        server_logger->info("Received {} bytes from {} client", input.size(), m_socket.get_endpoint());
+        server_logger->debug("Received {} bytes from {} client", input.size(), m_socket.get_endpoint());
 
         switch(m_mode) {
         case protocol::ProtocolMode::command:
@@ -85,13 +87,16 @@ namespace tds::server {
                 if(m_interpreter.has_available_request()) {
                     const protocol::Request request = m_interpreter.get_request();
                     // TODO: push request to the queue of executor
-                    server_logger->info("Message: {}, {}", request.get_name(),
-                                        request.get_fields() | std::views::transform(&protocol::Field::get_name));
+                    m_sender.add_response(protocol::Response{std::string{request.get_name()}});
                 }
             } while(!input.empty());
-        } catch(...) {
-            //  ^^^ test for protocol_error!!!
+        } catch(const protocol::ProtocolError& e) {
             // TODO handle protocol error and send error response
         }
+    }
+
+    void Client::handle_output() {
+        const std::size_t sent_byte_count = m_sender.send();
+        server_logger->debug("Sent {} bytes to {} client", sent_byte_count, m_socket.get_endpoint());
     }
 }

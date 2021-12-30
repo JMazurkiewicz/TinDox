@@ -52,8 +52,8 @@ set(
 
     tests/unit/protocol/field_test.cpp
     tests/unit/protocol/protocol_code_test.cpp
-    tests/unit/protocol/receiver_test.cpp
     tests/unit/protocol/protocol_interpreter_test.cpp
+    tests/unit/protocol/receiver_test.cpp
     tests/unit/protocol/request_test.cpp
     tests/unit/protocol/response_test.cpp
     tests/unit/protocol/sender_test.cpp

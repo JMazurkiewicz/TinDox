@@ -28,6 +28,8 @@ namespace tds::server {
         void handle_input();
         void handle_commands(std::span<const char> input);
 
+        void handle_output();
+
         ip::TcpSocket m_socket;
         ClientContext m_context;
         linux::EventType m_required_events;
