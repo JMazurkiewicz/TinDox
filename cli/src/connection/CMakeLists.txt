@@ -4,6 +4,6 @@ project(TinDox---console-client)
 add_library(connection STATIC
             connection.h
             connection.cpp
-            )
+        )
 
 target_include_directories(connection PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
