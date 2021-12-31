@@ -23,7 +23,7 @@ public:
 
     void closeConnection();
 
-    bool sendToServer(std::string &message) const;
+    bool sendToServer(std::string &message);
 
     bool receiveAllReadyFromServer(std::string &message);
 

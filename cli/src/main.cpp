@@ -19,12 +19,14 @@ int main(int argc, char** argv) {
         Connection con;
         con.connectToServer(argv[1], stoi(argv[2]));
         string message;
-        con.receiveAllReadyFromServer(message);
+        while(!con.receiveAllReadyFromServer(message));
         cout << message << endl;
+        string m = "Hello server!\n\n";
+        con.sendToServer(m);
         con.closeConnection();
     } catch (const std::system_error& ex) {
         std::stringstream error_message("");
-        error_message << ex.code() << '\n' << ex.what() << '\n';
+        error_message << ex.code() << '\n' << ex.what();
         perror(error_message.str().c_str());
     }
     return 0;
