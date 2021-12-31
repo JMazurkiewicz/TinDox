@@ -1,35 +1,34 @@
 #ifndef TINDOX_CONSOLE_CLIENT_CONNECTION_H
 #define TINDOX_CONSOLE_CLIENT_CONNECTION_H
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <string>
-#include <unistd.h>
+#include <netdb.h>
+#include <sys/epoll.h>
+
+#define MAX_EPOLL_EVENTS 64
+#define BUF_SIZE 2048
 
 using std::string;
 
 class Connection {
 public:
 
-    Connection() {}
+    Connection() = default;
 
     ~Connection() {
         closeConnection();
     }
 
-    void connectToServer(string serv_ip, int serv_port);
+    void connectToServer(const string& serv_ip, int serv_port);
 
     void closeConnection();
 
     bool sendToServer(std::string &message);
 
-    bool receiveFromServer(std::string &message, int len);
+    bool receiveAllReadyFromServer(std::string &message);
 
 
-    bool isOpenedConnection() {
+    bool isOpenedConnection() const {
         return isConnectionOpen;
     }
 
@@ -37,9 +36,10 @@ private:
 
     void createSocket();
 
-    int sock;
+    int sock, epfd;
     bool isConnectionOpen = false;
     struct sockaddr_in server;
+    struct epoll_event events[MAX_EPOLL_EVENTS];
 };
 
 
