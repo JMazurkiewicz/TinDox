@@ -5,7 +5,7 @@ bool TDPService::initConnection(const string& serv_ip, int serv_port) {
     try {
         connectionToServer.connectToServer(serv_ip, serv_port);
         std::string greetings = "";
-        while(!connectionToServer.receiveAllReadyFromServer(greetings));
+        connectionToServer.receiveAllReadyFromServer(greetings);
         if(greetings.starts_with("Hello") && greetings.ends_with("\n")) {
             response = greetings;
             return true;
