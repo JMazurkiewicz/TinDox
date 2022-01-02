@@ -32,13 +32,13 @@ TEST_CASE("tds::user::Permissions", "[user]") {
     SECTION("Test 'to_string'") {
         REQUIRE(to_string(copy | move) == "cm");
         REQUIRE(to_string(upload | download) == "du");
-        REQUIRE(to_string(all) == "twcmdu");
+        REQUIRE(to_string(all) == "wcmdu");
     }
 
-    SECTION("Test 'from_string'") {
+    SECTION("Test 'perms_from_string'") {
         REQUIRE(perms_from_string("du") == (download | upload));
         REQUIRE(perms_from_string("cmw") == (copy | move | write));
-        REQUIRE(perms_from_string("twcmdu") == all);
+        REQUIRE(perms_from_string("wcmdu") == all);
         REQUIRE_THROWS_AS(perms_from_string("x"), std::runtime_error);
     }
 

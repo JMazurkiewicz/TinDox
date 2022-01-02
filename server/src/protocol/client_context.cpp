@@ -1,5 +1,7 @@
 #include "tds/protocol/client_context.hpp"
 
+#include "tds/protocol/protocol_error.hpp"
+
 namespace fs = std::filesystem;
 
 namespace tds::protocol {
@@ -29,7 +31,7 @@ namespace tds::protocol {
 
     void ClientContext::set_new_token(AuthToken new_token) {
         if(is_authorized()) {
-            // TODO throw error??
+            throw ProtocolError{ProtocolCode::user_already_logged};
         } else {
             m_token.emplace(std::move(new_token));
         }

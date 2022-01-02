@@ -16,7 +16,6 @@ namespace tds::server {
         , m_command_executor{server_context, m_context} {
         m_receiver.set_device(m_socket);
         m_sender.set_device(m_socket);
-
         m_context.set_current_path(
             server_context.get_root_path()); // TODO temporaray solution -- should be performed by `auth` command
     }
