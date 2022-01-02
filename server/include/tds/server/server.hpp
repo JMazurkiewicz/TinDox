@@ -7,8 +7,8 @@
 #include "tds/linux/epoll_device.hpp"
 #include "tds/linux/pipe_device.hpp"
 #include "tds/linux/signal_device.hpp"
+#include "tds/protocol/server_context.hpp"
 #include "tds/server/client_service_supervisor.hpp"
-#include "tds/server/server_context.hpp"
 
 #include <filesystem>
 #include <system_error>
@@ -37,7 +37,7 @@ namespace tds::server {
         void main_loop();
         void stop();
 
-        ServerContext m_context;
+        protocol::ServerContext m_context;
         config::ServerConfig m_config;
         bool m_running;
 

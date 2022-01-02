@@ -35,17 +35,13 @@ TEST_CASE("tds::cli::CommandExecutor", "[cli]") {
     SECTION("Run spawn command") {
         executor.set_command("spawn");
         REQUIRE_NOTHROW(executor.execute());
-        executor.visit_command([](auto& command) {
-            REQUIRE(command.i == 1);
-        });
+        executor.visit_command([](auto& command) { REQUIRE(command.i == 1); });
     }
 
     SECTION("Run print command") {
         executor.set_command("print");
         REQUIRE_NOTHROW(executor.execute());
-        executor.visit_command([](auto& command) {
-            REQUIRE(command.i == 2);
-        });
+        executor.visit_command([](auto& command) { REQUIRE(command.i == 2); });
     }
 
     SECTION("Run invalid command") {

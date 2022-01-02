@@ -2,17 +2,20 @@
 
 #include "tds/ip/tcp_socket.hpp"
 #include "tds/linux/event_type.hpp"
+#include "tds/protocol/client_context.hpp"
+#include "tds/protocol/default_command_executor.hpp"
 #include "tds/protocol/protocol_interpreter.hpp"
-#include "tds/protocol/protocol_mode.hpp"
 #include "tds/protocol/receiver.hpp"
 #include "tds/protocol/request.hpp"
 #include "tds/protocol/sender.hpp"
-#include "tds/server/client_context.hpp"
+#include "tds/protocol/server_context.hpp"
+
+#include <queue>
 
 namespace tds::server {
     class Client {
     public:
-        explicit Client(ip::TcpSocket socket);
+        explicit Client(ip::TcpSocket socket, const protocol::ServerContext& server_context);
         ~Client();
 
         Client(const Client&) = delete;
@@ -27,19 +30,21 @@ namespace tds::server {
     private:
         void handle_input();
         void handle_commands(std::span<const char> input);
+        void handle_upload(std::span<const char> input);
+
+        void process();
+        void process_commands();
+        void process_download();
 
         void handle_output();
 
         ip::TcpSocket m_socket;
-        ClientContext m_context;
-        linux::EventType m_required_events;
-
-        protocol::ProtocolMode m_mode;
-        protocol::ProtocolInterpreter m_interpreter;
+        protocol::ClientContext m_context;
 
         protocol::Receiver m_receiver;
-        // std::queue<protocol::Request> m_requests; TODO request queue will be in protocol::Executor!!!
-
+        std::queue<protocol::Request> m_request_queue;
+        protocol::ProtocolInterpreter m_interpreter;
+        protocol::DefaultCommandExecutor m_command_executor;
         protocol::Sender m_sender;
     };
 }

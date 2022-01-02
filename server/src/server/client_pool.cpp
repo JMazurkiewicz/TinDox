@@ -9,9 +9,13 @@
 #include <fmt/core.h>
 
 namespace tds::server {
+    ClientPool::ClientPool(const protocol::ServerContext& server_context)
+        : m_server_context{server_context} { }
+
     void ClientPool::add_client(ip::TcpSocket socket) {
         std::lock_guard lock{m_mut};
-        auto [_, inserted] = m_pool.insert({socket.get_fd(), std::make_unique<Client>(std::move(socket))});
+        const int socket_fd = socket.get_fd();
+        auto [_, inserted] = m_pool.insert({socket_fd, std::make_unique<Client>(std::move(socket), m_server_context)});
         if(!inserted) {
             throw std::runtime_error{
                 fmt::format("ClientPool failed to accept new connection (fd = {})", socket.get_fd())};

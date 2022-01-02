@@ -9,9 +9,10 @@
 #include <ranges>
 
 namespace tds::server {
-    ClientServiceSupervisor::ClientServiceSupervisor()
+    ClientServiceSupervisor::ClientServiceSupervisor(const protocol::ServerContext& server_context)
         : m_running{true}
-        , m_pipes{linux::make_pipe(true)} {
+        , m_pipes{linux::make_pipe(true)}
+        , m_clients{server_context} {
         m_epoll.add_device(m_pipes.m_read_device);
     }
 

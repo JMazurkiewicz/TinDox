@@ -16,7 +16,7 @@ namespace tds::protocol {
         void set_command_name(std::string command_name);
         void add_line(std::string_view line);
 
-        std::string get_response();
+        [[nodiscard]] Response get_response();
 
     private:
         ProtocolCode m_code;

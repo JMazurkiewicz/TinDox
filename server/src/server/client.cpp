@@ -2,21 +2,23 @@
 
 #include "tds/linux/event_type.hpp"
 #include "tds/linux/linux_error.hpp"
+#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 #include "tds/protocol/protocol_mode.hpp"
 #include "tds/protocol/request.hpp"
 #include "tds/protocol/response.hpp"
+#include "tds/protocol/response_builder.hpp"
 #include "tds/server/server_logger.hpp"
 
-#include <exception>
-#include <system_error>
-
 namespace tds::server {
-    Client::Client(ip::TcpSocket socket)
+    Client::Client(ip::TcpSocket socket, const protocol::ServerContext& server_context)
         : m_socket{std::move(socket)}
-        , m_mode{protocol::ProtocolMode::command} {
+        , m_command_executor{server_context, m_context} {
         m_receiver.set_device(m_socket);
         m_sender.set_device(m_socket);
+
+        m_context.set_current_path(
+            server_context.get_root_path()); // TODO temporaray solution -- should be performed by `auth` command
     }
 
     Client::~Client() {
@@ -33,12 +35,11 @@ namespace tds::server {
 
     linux::EventType Client::get_required_events() const noexcept {
         linux::EventType events;
-        if(m_mode == protocol::ProtocolMode::command || m_mode == protocol::ProtocolMode::upload) {
+        protocol::ProtocolMode mode = m_context.get_mode();
+        if(mode == protocol::ProtocolMode::command || mode == protocol::ProtocolMode::upload) {
             events |= linux::EventType::in;
-        } else if(m_mode == protocol::ProtocolMode::download) {
+        } else if(mode == protocol::ProtocolMode::download) {
             events |= linux::EventType::out;
-        } else {
-            __builtin_unreachable();
         }
 
         if(m_sender.has_responses()) {
@@ -52,7 +53,7 @@ namespace tds::server {
             if((events & linux::EventType::in) != linux::EventType{}) {
                 handle_input();
             }
-
+            process();
             if((events & linux::EventType::out) != linux::EventType{}) {
                 handle_output();
             }
@@ -66,13 +67,13 @@ namespace tds::server {
         const std::span<const char> input = m_receiver.receive();
         server_logger->debug("Received {} bytes from {} client", input.size(), m_socket.get_endpoint());
 
-        switch(m_mode) {
+        switch(m_context.get_mode()) {
         case protocol::ProtocolMode::command:
             handle_commands(input);
             break;
 
         case protocol::ProtocolMode::upload:
-            // handle upload
+            handle_upload(input);
             break;
 
         default:
@@ -81,18 +82,66 @@ namespace tds::server {
     }
 
     void Client::handle_commands(std::span<const char> input) {
-        try {
-            do {
+        do {
+            try {
                 input = m_interpreter.commit_bytes(input);
                 if(m_interpreter.has_available_request()) {
-                    const protocol::Request request = m_interpreter.get_request();
-                    // TODO: push request to the queue of executor
-                    m_sender.add_response(protocol::Response{std::string{request.get_name()}});
+                    m_request_queue.push(m_interpreter.get_request());
                 }
-            } while(!input.empty());
-        } catch(const protocol::ProtocolError& e) {
-            // TODO handle protocol error and send error response
+            } catch(...) { // TODO CATCH PARSING ERRORS
+            }
+
+            // TODO very special case -- break if upload start/resume happened
+        } while(!input.empty());
+
+        if(!input.empty()) {
+            handle_upload(input);
         }
+    }
+
+    void Client::handle_upload(std::span<const char> input) {
+        // TODO upload file with UploadManager!
+    }
+
+    void Client::process() {
+        switch(m_context.get_mode()) {
+        case protocol::ProtocolMode::command:
+            process_commands();
+            break;
+
+        case protocol::ProtocolMode::download:
+            process_download();
+            break;
+
+        case protocol::ProtocolMode::upload:
+            // TODO process upload??
+            break;
+        }
+    }
+
+    void Client::process_commands() {
+        while(m_context.get_mode() == protocol::ProtocolMode::command && !m_request_queue.empty()) {
+            const protocol::Request& request = m_request_queue.front();
+
+            try {
+                m_command_executor.set_command(request.get_name());
+                m_command_executor.parse_fields(request.get_fields());
+                m_command_executor.execute();
+                m_sender.add_response(m_command_executor.get_response());
+            } catch(const protocol::ProtocolError& e) { // TODO what about NoSuchCommand?
+                protocol::ResponseBuilder builder;
+                builder.set_code(e.get_code());
+                builder.set_command_name(std::string{request.get_name()});
+                builder.add_line(e.what()); // TODO for sure? -- discuss
+                m_sender.add_response(builder.get_response());
+            }
+
+            m_request_queue.pop();
+        }
+    }
+
+    void Client::process_download() {
+        // TODO handle download with download manager
     }
 
     void Client::handle_output() {

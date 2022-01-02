@@ -28,7 +28,6 @@ set(
     tests/unit/cli/help_command_test.cpp
     tests/unit/cli/init_command_test.cpp
     tests/unit/cli/invalid_command_arguments_error_test.cpp
-
     tests/unit/cli/run_command_test.cpp
     tests/unit/cli/user_command_test.cpp
 

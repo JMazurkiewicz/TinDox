@@ -103,6 +103,13 @@ set(
     src/linux/signal_device.cpp
     src/linux/terminal.cpp
 
+    src/protocol/execution/cd.cpp
+    src/protocol/execution/command_base.cpp
+    src/protocol/execution/ls.cpp
+    src/protocol/execution/pwd.cpp
+
+    src/protocol/auth_token.cpp
+    src/protocol/client_context.cpp
     src/protocol/field.cpp
     src/protocol/protocol_error.cpp
     src/protocol/protocol_interpreter.cpp
@@ -111,13 +118,12 @@ set(
     src/protocol/response_builder.cpp
     src/protocol/response.cpp
     src/protocol/sender.cpp
+    src/protocol/server_context.cpp
 
-    src/server/client_context.cpp
     src/server/client_pool.cpp
     src/server/client_service_supervisor.cpp
     src/server/client_service.cpp
     src/server/client.cpp
-    src/server/server_context.cpp
     src/server/server_logger.cpp
     src/server/server.cpp
 

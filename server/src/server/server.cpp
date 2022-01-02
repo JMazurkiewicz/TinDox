@@ -12,7 +12,8 @@
 namespace tds::server {
     Server::Server(std::filesystem::path root)
         : m_context{std::move(root)}
-        , m_running{true} { }
+        , m_running{true}
+        , m_supervisor{m_context} { }
 
     Server::~Server() {
         stop();

@@ -68,7 +68,8 @@ TEST_CASE("tds::protocol::Receiver", "[protocol]") {
         "ultricies. Ut fringilla sodales quam, et egestas lacus aliquam a. Donec tempus dignissim dui, vel euismod "
         "ligula facilisis vitae. Phasellus et lorem orci. Nam tincidunt lectus sem, eget dictum ante faucibus mollis. "
         "Duis et elementum diam. Suspendisse ut sed.";
-    write(client_fd, message.data(), message.size());
+    const ssize_t written = write(client_fd, message.data(), message.size());
+    CHECK(written == message.size());
 
     Receiver receiver;
     receiver.set_device(socket);

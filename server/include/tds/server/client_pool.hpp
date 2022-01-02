@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tds/ip/tcp_socket.hpp"
+#include "tds/protocol/server_context.hpp"
 #include "tds/server/client.hpp"
 
 #include <memory>
@@ -10,7 +11,7 @@
 namespace tds::server {
     class ClientPool {
     public:
-        ClientPool() = default;
+        explicit ClientPool(const protocol::ServerContext& server_context);
         ClientPool(const ClientPool&) = delete;
         ClientPool& operator=(const ClientPool&) = delete;
 
@@ -24,6 +25,7 @@ namespace tds::server {
         void close_all();
 
     private:
+        const protocol::ServerContext& m_server_context;
         std::mutex m_mut;
         std::unordered_map<int, std::unique_ptr<Client>> m_pool;
     };

@@ -16,7 +16,7 @@ namespace tds::protocol {
         m_lines += '\n';
     }
 
-    std::string ResponseBuilder::get_response() {
-        return fmt::format("{} {}\n{}", static_cast<int>(m_code), m_command_name, m_lines);
+    Response ResponseBuilder::get_response() {
+        return Response{fmt::format("{} {}\n{}", static_cast<int>(m_code), m_command_name, m_lines)};
     }
 }
