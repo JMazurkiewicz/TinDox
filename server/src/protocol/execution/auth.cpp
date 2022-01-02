@@ -24,11 +24,9 @@ namespace tds::protocol::execution {
     }
 
     void Auth::execute() {
-        AuthToken new_token = m_server_context->authorize_user(*m_username, *m_password);
-        m_client_context->set_new_token(std::move(new_token));
-
         m_response_builder.set_code(ProtocolCode::ok);
         m_response_builder.set_command_name(name);
+        m_client_context->set_new_token(m_server_context->authorize_user(*m_username, *m_password));
     }
 
     void Auth::parse_username(const Field& login_field) {

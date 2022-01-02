@@ -27,9 +27,11 @@ namespace tds::protocol {
         return fs::path{"/"} / std::move(result);
     }
 
-    AuthToken ServerContext::authorize_user(std::string_view username, const std::string& password) {
+    std::shared_ptr<AuthToken> ServerContext::authorize_user(std::string_view username, const std::string& password) {
         std::lock_guard lock{m_mut};
-        if(std::ranges::find(m_authorized_users, username) != m_authorized_users.end()) {
+
+        remove_dead_users();
+        if(has_user_logged_in(username)) {
             throw ProtocolError{ProtocolCode::user_already_logged};
         }
 
@@ -37,16 +39,17 @@ namespace tds::protocol {
             throw ProtocolError{ProtocolCode::invalid_credentials};
         }
 
-        m_authorized_users.emplace_back(username);
-        return AuthToken{std::string{username}, m_user_table.get_perms_of_user(username)};
+        auto new_token = std::make_shared<AuthToken>(std::string{username}, m_user_table.get_perms_of_user(username));
+        m_user_tokens.emplace_back(new_token);
+        return new_token;
     }
 
-    void ServerContext::logout_user(std::string_view username) {
-        std::lock_guard lock{m_mut};
-        if(std::ranges::find(m_authorized_users, username) != m_authorized_users.end()) {
-            std::erase(m_authorized_users, username);
-        } else {
-            throw ProtocolError{ProtocolCode::invalid_credentials};
-        }
+    void ServerContext::remove_dead_users() {
+        std::erase_if(m_user_tokens, [](auto& ptr) { return ptr.expired(); });
+    }
+
+    bool ServerContext::has_user_logged_in(std::string_view username) {
+        return std::ranges::find(m_user_tokens, username, [](auto& ptr) { return ptr.lock()->get_username(); }) !=
+               m_user_tokens.end();
     }
 }

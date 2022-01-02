@@ -26,19 +26,19 @@ namespace tds::protocol {
     }
 
     bool ClientContext::is_authorized() const noexcept {
-        return m_token.has_value();
+        return m_token != nullptr;
     }
 
-    void ClientContext::set_new_token(AuthToken new_token) {
+    void ClientContext::set_new_token(std::shared_ptr<AuthToken> token) {
         if(is_authorized()) {
             throw ProtocolError{ProtocolCode::user_already_logged};
         } else {
-            m_token.emplace(std::move(new_token));
+            m_token = std::move(token);
         }
     }
 
     const AuthToken& ClientContext::get_auth_token() const noexcept {
-        return m_token.value();
+        return *m_token;
     }
 
     void ClientContext::logout() {

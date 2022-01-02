@@ -7,7 +7,7 @@
 #include "tds/user/permissions.hpp"
 
 #include <filesystem>
-#include <optional>
+#include <memory>
 
 namespace tds::protocol {
     class ClientContext {
@@ -23,7 +23,7 @@ namespace tds::protocol {
         void set_mode(ProtocolMode mode);
 
         bool is_authorized() const noexcept;
-        void set_new_token(AuthToken new_token);
+        void set_new_token(std::shared_ptr<AuthToken> token);
         const AuthToken& get_auth_token() const noexcept;
         void logout();
 
@@ -33,7 +33,7 @@ namespace tds::protocol {
     private:
         bool m_alive;
         ProtocolMode m_mode;
-        std::optional<AuthToken> m_token;
+        std::shared_ptr<AuthToken> m_token;
         std::filesystem::path m_current_path;
     };
 }
