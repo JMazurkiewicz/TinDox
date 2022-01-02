@@ -20,6 +20,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 option(TDS_TESTS "Enable tests for TinDox Server.")
 option(TDS_STATIC "Build static library instead of dynamic.")
 
+include(cmake/checks.cmake)
+
 include(FetchContent)
 set(FETCHCONTENT_QUIET OFF)
 
@@ -145,8 +147,11 @@ else()
     add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
 endif()
 
+find_package(Threads REQUIRED)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+
 target_include_directories(tds-dev PUBLIC include)
-target_link_libraries(tds-dev PRIVATE fmt::fmt crypt)
+target_link_libraries(tds-dev PRIVATE Threads::Threads fmt::fmt crypt)
 target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus spdlog::spdlog)
 
 add_executable(tds src/main.cpp)
