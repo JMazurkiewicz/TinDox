@@ -17,7 +17,7 @@
 namespace tds::server {
     class ClientServiceSupervisor {
     public:
-        explicit ClientServiceSupervisor(const protocol::ServerContext& server_context);
+        explicit ClientServiceSupervisor(protocol::ServerContext& server_context);
         ~ClientServiceSupervisor();
 
         ClientServiceSupervisor(const ClientServiceSupervisor&) = delete;

@@ -13,7 +13,7 @@ namespace tds::protocol {
         ResponseBuilder& operator=(const ResponseBuilder&) = delete;
 
         void set_code(ProtocolCode code);
-        void set_command_name(std::string command_name);
+        void set_command_name(std::string_view command_name);
         void add_line(std::string_view line);
 
         [[nodiscard]] Response get_response();

@@ -9,7 +9,7 @@
 #include <ranges>
 
 namespace tds::server {
-    ClientServiceSupervisor::ClientServiceSupervisor(const protocol::ServerContext& server_context)
+    ClientServiceSupervisor::ClientServiceSupervisor(protocol::ServerContext& server_context)
         : m_running{true}
         , m_pipes{linux::make_pipe(true)}
         , m_clients{server_context} {

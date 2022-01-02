@@ -7,8 +7,8 @@ namespace tds::protocol {
         m_code = code;
     }
 
-    void ResponseBuilder::set_command_name(std::string command_name) {
-        m_command_name = std::move(command_name);
+    void ResponseBuilder::set_command_name(std::string_view command_name) {
+        m_command_name = command_name;
     }
 
     void ResponseBuilder::add_line(std::string_view line) {

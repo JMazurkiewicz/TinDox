@@ -1,7 +1,7 @@
 #include "tds/protocol/execution/command_base.hpp"
 
 namespace tds::protocol::execution {
-    void CommandBase::set_server_context(const ServerContext& server_context) {
+    void CommandBase::set_server_context(ServerContext& server_context) {
         m_server_context = &server_context;
     }
 

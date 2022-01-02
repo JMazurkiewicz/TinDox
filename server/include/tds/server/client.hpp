@@ -15,7 +15,7 @@
 namespace tds::server {
     class Client {
     public:
-        explicit Client(ip::TcpSocket socket, const protocol::ServerContext& server_context);
+        explicit Client(ip::TcpSocket socket, protocol::ServerContext& server_context);
         ~Client();
 
         Client(const Client&) = delete;

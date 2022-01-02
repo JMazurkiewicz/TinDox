@@ -11,12 +11,12 @@ namespace tds::protocol::execution {
         CommandBase(const CommandBase&) = delete;
         CommandBase& operator=(const CommandBase&) = delete;
 
-        void set_server_context(const ServerContext& server_context);
+        void set_server_context(ServerContext& server_context);
         void set_client_context(ClientContext& client_context);
         Response get_response();
 
     protected:
-        const ServerContext* m_server_context;
+        ServerContext* m_server_context;
         ClientContext* m_client_context;
 
         ResponseBuilder m_response_builder;

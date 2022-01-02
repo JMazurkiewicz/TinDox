@@ -11,7 +11,7 @@
 #include "tds/server/server_logger.hpp"
 
 namespace tds::server {
-    Client::Client(ip::TcpSocket socket, const protocol::ServerContext& server_context)
+    Client::Client(ip::TcpSocket socket, protocol::ServerContext& server_context)
         : m_socket{std::move(socket)}
         , m_command_executor{server_context, m_context} {
         m_receiver.set_device(m_socket);

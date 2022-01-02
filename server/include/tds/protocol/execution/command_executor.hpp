@@ -7,6 +7,7 @@
 #include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 #include "tds/protocol/server_context.hpp"
+
 #include <type_traits>
 
 #include <fmt/core.h>
@@ -18,7 +19,7 @@ namespace tds::protocol::execution {
         using Base = command::CommandExecutor<Commands...>;
 
     public:
-        CommandExecutor(const ServerContext& server_context, ClientContext& client_context)
+        CommandExecutor(ServerContext& server_context, ClientContext& client_context)
             : m_server_context{server_context}
             , m_client_context{client_context} { }
 
@@ -67,7 +68,7 @@ namespace tds::protocol::execution {
             }
         }
 
-        const ServerContext& m_server_context;
+        ServerContext& m_server_context;
         ClientContext& m_client_context;
     };
 }

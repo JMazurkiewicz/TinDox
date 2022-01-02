@@ -14,10 +14,12 @@ namespace tds::protocol {
 
         unknown = 401,
         not_logged_in = 402,
-        invalid_field = 403,
+        invalid_field_value = 403,
         not_found = 404,
         target_not_found = 405,
         not_enough_perms = 406,
+        user_already_logged = 407,
+        invalid_credentials = 408,
     };
 
     constexpr bool is_info_code(ProtocolCode code) noexcept {

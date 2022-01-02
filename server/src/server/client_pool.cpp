@@ -9,7 +9,7 @@
 #include <fmt/core.h>
 
 namespace tds::server {
-    ClientPool::ClientPool(const protocol::ServerContext& server_context)
+    ClientPool::ClientPool(protocol::ServerContext& server_context)
         : m_server_context{server_context} { }
 
     void ClientPool::add_client(ip::TcpSocket socket) {

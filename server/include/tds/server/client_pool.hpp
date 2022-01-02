@@ -11,7 +11,7 @@
 namespace tds::server {
     class ClientPool {
     public:
-        explicit ClientPool(const protocol::ServerContext& server_context);
+        explicit ClientPool(protocol::ServerContext& server_context);
         ClientPool(const ClientPool&) = delete;
         ClientPool& operator=(const ClientPool&) = delete;
 
@@ -25,7 +25,7 @@ namespace tds::server {
         void close_all();
 
     private:
-        const protocol::ServerContext& m_server_context;
+        protocol::ServerContext& m_server_context;
         std::mutex m_mut;
         std::unordered_map<int, std::unique_ptr<Client>> m_pool;
     };

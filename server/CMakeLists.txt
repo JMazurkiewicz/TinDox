@@ -103,6 +103,7 @@ set(
     src/linux/signal_device.cpp
     src/linux/terminal.cpp
 
+    src/protocol/execution/auth.cpp
     src/protocol/execution/cd.cpp
     src/protocol/execution/command_base.cpp
     src/protocol/execution/ls.cpp

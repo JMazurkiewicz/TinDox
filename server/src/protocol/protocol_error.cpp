@@ -37,14 +37,20 @@ namespace tds::protocol {
                 case not_logged_in:
                     return "not logged in";
 
-                case invalid_field:
-                    return "invalid field in request";
+                case invalid_field_value:
+                    return "invalid field value in request";
 
                 case not_found:
                     return "file not found";
 
                 case target_not_found:
                     return "target directory not found";
+
+                case user_already_logged:
+                    return "user is already logged in";
+
+                case invalid_credentials:
+                    return "invalid credentials (login or password)";
 
                 default:
                     return "unknown code";
