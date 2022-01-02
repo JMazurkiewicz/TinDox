@@ -17,6 +17,6 @@ namespace tds::protocol {
     }
 
     Response ResponseBuilder::get_response() {
-        return Response{fmt::format("{} {}\n{}", static_cast<int>(m_code), m_command_name, m_lines)};
+        return Response{fmt::format("{} {}\n{}\n", static_cast<int>(m_code), m_command_name, m_lines)};
     }
 }

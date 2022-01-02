@@ -79,8 +79,6 @@ namespace tds::server {
 
     void Client::handle_commands(std::span<const char> input) {
         do {
-            server_logger->debug("LOOP, INPUT SIZE: {}", input.size());
-
             try {
                 input = m_interpreter.commit_bytes(input);
                 if(m_interpreter.has_available_request()) {
@@ -92,6 +90,7 @@ namespace tds::server {
                 builder.set_command_name("<interpreter>");
                 builder.add_line(e.what());
                 m_sender.add_response(builder.get_response());
+                m_interpreter.restart();
             }
 
             // TODO very special case -- break if upload start/resume happened

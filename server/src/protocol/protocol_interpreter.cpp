@@ -12,6 +12,12 @@ namespace tds::protocol {
     ProtocolInterpreter::ProtocolInterpreter()
         : m_last_line_complete{true} { }
 
+    void ProtocolInterpreter::restart() {
+        m_lines.clear();
+        m_request.reset();
+        m_last_line_complete = true;
+    }
+
     std::span<const char> ProtocolInterpreter::commit_bytes(std::span<const char> bytes) {
         auto cur = bytes.begin();
         const auto end = bytes.end();
@@ -43,8 +49,10 @@ namespace tds::protocol {
         }
 
         if(m_lines.back().empty()) {
-            m_lines.pop_back();
-            commit_request();
+            if(m_lines.size() > 1) {
+                m_lines.pop_back();
+                commit_request();
+            }
             m_lines.clear();
         }
     }

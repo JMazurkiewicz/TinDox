@@ -120,4 +120,11 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
         REQUIRE(second_fields[0].get_name() == "path");
         REQUIRE(second_fields[0].get_string() == "/home");
     }
+
+    SECTION("Test ignoring empty requests") {
+        ProtocolInterpreter interpreter;
+        const auto unread = interpreter.commit_bytes("\n\n\n\n\n");
+        REQUIRE(unread.empty());
+        REQUIRE(!interpreter.has_available_request());
+    }
 }
