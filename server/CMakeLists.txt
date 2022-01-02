@@ -107,6 +107,7 @@ set(
     src/protocol/execution/cd.cpp
     src/protocol/execution/command_base.cpp
     src/protocol/execution/ls.cpp
+    src/protocol/execution/name.cpp
     src/protocol/execution/pwd.cpp
 
     src/protocol/auth_token.cpp
