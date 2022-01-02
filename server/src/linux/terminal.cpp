@@ -9,7 +9,11 @@ namespace tds::linux {
     void Terminal::set_stdin_echo(bool visibility) {
         termios term;
         if(tcgetattr(STDIN_FILENO, &term) == -1) {
-            throw LinuxError{"tcgetattr(3)"};
+            if(errno == ENOTTY) {
+                return;
+            } else {
+                throw LinuxError{"tcgetattr(3)"};
+            }
         }
 
         if(visibility) {
