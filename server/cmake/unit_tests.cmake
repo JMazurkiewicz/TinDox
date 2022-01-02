@@ -64,4 +64,4 @@ set(
 add_executable(tds-unit-tests ${TDS_UNIT_TESTS_SOURCES})
 target_link_libraries(tds-unit-tests PRIVATE Catch2::Catch2WithMain tds-dev Threads::Threads)
 target_include_directories(tds-unit-tests PRIVATE tests/unit)
-catch_discover_tests(tds-unit-tests)
+catch_discover_tests(tds-unit-tests TEST_PREFIX "UNIT::")

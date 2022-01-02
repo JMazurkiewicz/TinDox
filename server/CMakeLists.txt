@@ -15,6 +15,10 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+option(TDS_TESTS "Enable tests for TinDox Server.")
+option(TDS_STATIC "Build static library instead of dynamic.")
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET OFF)
@@ -35,7 +39,6 @@ else()
     endif()
 endif()
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(fmt 8.0 QUIET)
 if(fmt_FOUND)
     message(STATUS "Found {fmt}: ${fmt_DIR} (found version \"${fmt_VERSION}\")")
@@ -136,7 +139,6 @@ set(
     src/user/user_table.cpp
 )
 
-option(TDS_STATIC "Build static library instead of dynamic.")
 if(TDS_STATIC)
     add_library(tds-dev STATIC ${TDS_DEV_SOURCES})
 else()
@@ -152,18 +154,8 @@ target_link_libraries(tds PUBLIC tds-dev)
 
 include("cmake/install.cmake")
 
-option(TDS_TESTS "Enable tests for TinDox Server.")
-option(TDS_UNIT_TESTS "Run unit tests for TinDox Server.")
-option(TDS_INTEGRATION_TESTS "Run integration tests for TinDox Server.")
-
 if(TDS_TESTS)
     enable_testing()
-
-    if(TDS_UNIT_TESTS)
-        include("cmake/unit_tests.cmake")
-    endif()
-
-    if(TDS_INTEGRATION_TESTS)
-        include("cmake/integration_tests.cmake")
-    endif()
+    include("cmake/unit_tests.cmake")
+    include("cmake/integration_tests.cmake")
 endif()
