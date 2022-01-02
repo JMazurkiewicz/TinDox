@@ -13,9 +13,9 @@
 namespace tds::server {
     Client::Client(ip::TcpSocket socket, protocol::ServerContext& server_context)
         : m_socket{std::move(socket)}
-        , m_command_executor{server_context, m_context} {
-        m_receiver.set_device(m_socket);
-        m_sender.set_device(m_socket);
+        , m_receiver{m_socket}
+        , m_command_executor{server_context, m_context}
+        , m_sender{m_socket} {
         m_context.set_current_path(
             server_context.get_root_path()); // TODO temporaray solution -- should be performed by `auth` command
     }

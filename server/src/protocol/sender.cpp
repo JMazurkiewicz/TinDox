@@ -4,8 +4,8 @@
 #include "tds/protocol/response.hpp"
 
 namespace tds::protocol {
-    Sender::Sender()
-        : m_socket{nullptr}
+    Sender::Sender(ip::TcpSocket& socket)
+        : m_socket{socket}
         , m_errc{}
         , m_sent_byte_count{0} { }
 
@@ -15,10 +15,6 @@ namespace tds::protocol {
 
     bool Sender::has_responses() const noexcept {
         return !m_responses.empty();
-    }
-
-    void Sender::set_device(ip::TcpSocket& socket) {
-        m_socket = &socket;
     }
 
     std::size_t Sender::send() {
@@ -34,7 +30,7 @@ namespace tds::protocol {
         while(!m_responses.empty()) {
             Response& response = m_responses.front();
             const ssize_t count =
-                m_socket->write(response.get_data_pointer(), response.get_remaining_byte_count(), m_errc);
+                m_socket.write(response.get_data_pointer(), response.get_remaining_byte_count(), m_errc);
             if(m_errc != std::errc{} || count <= 0) {
                 break;
             }

@@ -69,8 +69,7 @@ TEST_CASE("tds::protocol::Sender", "[protocol]") {
         "ultricies. Ut fringilla sodales quam, et egestas lacus aliquam a. Donec tempus dignissim dui, vel euismod "
         "ligula facilisis vitae. Phasellus et lorem orci. Nam tincidunt lectus sem, eget dictum ante faucibus mollis. "
         "Duis et elementum diam. Suspendisse ut sed.";
-    Sender sender;
-    sender.set_device(socket);
+    Sender sender{socket};
     sender.add_response(Response{std::string{message}});
     REQUIRE(sender.send() == message.size());
 

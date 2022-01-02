@@ -71,8 +71,7 @@ TEST_CASE("tds::protocol::Receiver", "[protocol]") {
     const ssize_t written = write(client_fd, message.data(), message.size());
     CHECK(written == message.size());
 
-    Receiver receiver;
-    receiver.set_device(socket);
+    Receiver receiver{socket};
     const std::span<const char> result = receiver.receive();
 
     REQUIRE(!result.empty());

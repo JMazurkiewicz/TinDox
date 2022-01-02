@@ -8,18 +8,17 @@
 namespace tds::protocol {
     class Receiver {
     public:
-        Receiver();
+        explicit Receiver(ip::TcpSocket& socket);
         Receiver(const Receiver&) = delete;
         Receiver& operator=(const Receiver&) = delete;
 
-        void set_device(ip::TcpSocket& device);
         std::span<const char> receive();
 
     private:
         void read();
         void check_error();
 
-        ip::TcpSocket* m_socket;
+        ip::TcpSocket& m_socket;
         std::vector<char> m_data;
         std::errc m_errc;
     };
