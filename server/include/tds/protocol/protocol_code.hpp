@@ -12,6 +12,7 @@ namespace tds::protocol {
         bad_field = 302,
         bad_command = 303,
 
+        unknown = 401,
         not_logged_in = 402,
         invalid_field = 403,
         not_found = 404,

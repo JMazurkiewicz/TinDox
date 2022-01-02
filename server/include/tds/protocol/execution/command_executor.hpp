@@ -4,17 +4,20 @@
 #include "tds/command/no_such_command_error.hpp"
 #include "tds/protocol/client_context.hpp"
 #include "tds/protocol/execution/command.hpp"
+#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 #include "tds/protocol/server_context.hpp"
+#include <type_traits>
 
 #include <fmt/core.h>
 
 namespace tds::protocol::execution {
     template<Command... Commands>
     class CommandExecutor : public command::CommandExecutor<Commands...> {
-    public:
+    private:
         using Base = command::CommandExecutor<Commands...>;
 
+    public:
         CommandExecutor(const ServerContext& server_context, ClientContext& client_context)
             : m_server_context{server_context}
             , m_client_context{client_context} { }
@@ -22,10 +25,16 @@ namespace tds::protocol::execution {
         void set_command(std::string_view command_name) {
             try {
                 Base::set_command(command_name);
+                check_authorization();
+                check_permissions();
                 this->visit_command([&](auto& command) { command.set_server_context(m_server_context); });
                 this->visit_command([&](auto& command) { command.set_client_context(m_client_context); });
             } catch(const command::NoSuchCommandError& e) {
                 throw ProtocolError{ProtocolCode::bad_command, fmt::format("No such command '{}'", e.what())};
+            } catch(const ProtocolError&) {
+                throw;
+            } catch(const std::exception& e) {
+                throw ProtocolError{ProtocolCode::unknown, e.what()}; // TODO find better way to do this
             }
         }
 
@@ -38,6 +47,26 @@ namespace tds::protocol::execution {
         }
 
     private:
+        void check_authorization() {
+            this->visit_command([&]<typename T>(T&&) {
+                using U = std::remove_cvref_t<T>;
+                if(U::requires_authorization && !m_client_context.is_authorized()) {
+                    throw ProtocolError{ProtocolCode::not_logged_in};
+                }
+            });
+        }
+
+        void check_permissions() {
+            if(m_client_context.is_authorized()) {
+                this->visit_command([&]<typename T>(T&&) {
+                    using U = std::remove_cvref_t<T>;
+                    if((U::required_perms & m_client_context.get_auth_token().get_perms()) != U::required_perms) {
+                        throw ProtocolError{ProtocolCode::not_enough_perms};
+                    }
+                });
+            }
+        }
+
         const ServerContext& m_server_context;
         ClientContext& m_client_context;
     };

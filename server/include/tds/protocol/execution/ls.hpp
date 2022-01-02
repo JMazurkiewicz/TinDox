@@ -6,6 +6,8 @@ namespace tds::protocol::execution {
     class Ls : public CommandBase {
     public:
         static constexpr std::string_view name = "ls";
+        static constexpr user::Permissions required_perms = user::Permissions::none;
+        static constexpr bool requires_authorization = true;
 
         void parse_fields(std::span<const Field> fields);
         void execute();

@@ -12,7 +12,7 @@ namespace tds::protocol::execution {
         m_response_builder.set_command_name("ls");
 
         for(auto item : fs::directory_iterator{m_client_context->get_current_path()}) {
-            const fs::path relative = m_server_context->get_relative_path_of(item.path());
+            const fs::path relative = item.path().filename();
             m_response_builder.add_line(relative.native());
         }
     }

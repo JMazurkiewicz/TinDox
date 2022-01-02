@@ -6,7 +6,8 @@
 
 namespace tds::user {
     enum class Permissions : std::uint8_t {
-        travel = 1 << 0,
+        none = 0,
+        travel = 1 << 0, // TODO: remove!!
         write = 1 << 1,
         copy = 1 << 2,
         move = 1 << 3,

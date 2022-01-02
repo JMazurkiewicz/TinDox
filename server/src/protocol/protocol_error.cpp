@@ -31,6 +31,9 @@ namespace tds::protocol {
                 case not_enough_perms:
                     return "not enough permissions";
 
+                case unknown:
+                    return "unknown";
+
                 case not_logged_in:
                     return "not logged in";
 
