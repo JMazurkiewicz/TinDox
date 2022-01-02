@@ -1,4 +1,5 @@
 #include "tds/protocol/server_context.hpp"
+
 #include "tds/protocol/auth_token.hpp"
 #include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
