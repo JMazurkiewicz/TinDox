@@ -17,6 +17,8 @@ namespace tds::protocol::execution {
         void execute();
 
     private:
-        std::filesystem::path m_next_path;
+        void parse_path(const Field& path_field);
+
+        std::optional<std::filesystem::path> m_path;
     };
 }
