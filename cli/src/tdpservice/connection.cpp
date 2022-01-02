@@ -96,7 +96,7 @@ bool Connection::receiveAllReadyFromServer(std::string &message) {
         return false;
 
     message.clear();
-    char *buf = new char[BUF_SIZE + 1];
+    char *buf = new char[BUF_MAX_SIZE];
     memset(buf, '\0', sizeof buf);
     int new_events = epoll_wait(epfd_read, events, MAX_EPOLL_EVENTS, 5000);
     if (new_events == -1) {
@@ -113,7 +113,7 @@ bool Connection::receiveAllReadyFromServer(std::string &message) {
         if ((events[i].events & EPOLLIN))
         {
             while (true) {
-                ssize_t read_bytes = read(sock, buf, BUF_SIZE);
+                ssize_t read_bytes = read(sock, buf, BUF_MAX_SIZE - 1);
                 if (read_bytes == -1) {
                     if (errno == EAGAIN || errno == EWOULDBLOCK) {
                         break;

@@ -17,7 +17,8 @@ int main(int argc, char** argv) {
 
     TDPService service;
     service.initConnection(argv[1], stoi(argv[2]));
-    cout << service.response;
+    cout << service.response_first_line;
+    service.logout();
     service.closeConnection();
     return 0;
 }
