@@ -22,8 +22,8 @@ namespace tds::server {
 
     void ClientServiceSupervisor::create_services(const config::ServerConfig& config) {
         for(int _ : std::views::iota(0, config.get_max_thread_count())) {
-            m_jobs.emplace_back([this] {
-                ClientService job{*this};
+            m_jobs.emplace_back([&] {
+                ClientService job{*this, config};
                 job.launch();
             });
         }

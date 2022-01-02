@@ -1,12 +1,14 @@
 #pragma once
 
+#include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/event_type.hpp"
 #include "tds/server/client_service_supervisor.hpp"
+#include "tds/config/server_config.hpp"
 
 namespace tds::server {
     class ClientService {
     public:
-        explicit ClientService(ClientServiceSupervisor& supervisor);
+        explicit ClientService(ClientServiceSupervisor& supervisor, const config::ServerConfig& config);
 
         ClientService(const ClientService&) = delete;
         ClientService& operator=(const ClientService&) = delete;
@@ -18,6 +20,7 @@ namespace tds::server {
         void process_pipe_input();
 
         ClientServiceSupervisor* m_supervisor;
+        linux::EpollBuffer m_epoll_buffer;
         bool m_running;
     };
 }
