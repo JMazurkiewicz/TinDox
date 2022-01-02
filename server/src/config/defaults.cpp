@@ -40,7 +40,7 @@ namespace tds::config::defaults {
         string_builder << "[[users]]\n";
         string_builder << "name = \"admin\"\n";
         string_builder << "passwd = \"" << linux::hash("admin");
-        string_builder << "\"\nperms = \"" << user::Permissions::initial << "\"\n";
+        string_builder << "\"\nperms = \"" << user::Permissions::all << "\"\n";
         return std::move(string_builder.str());
     }
 }

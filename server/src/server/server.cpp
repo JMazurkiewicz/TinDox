@@ -1,8 +1,8 @@
 #include "tds/server/server.hpp"
 
 #include "tds/ip/endpoint_v4.hpp"
+#include "tds/linux/echoless_terminal_guard.hpp"
 #include "tds/linux/epoll_buffer.hpp"
-#include "tds/linux/terminal.hpp"
 #include "tds/server/server_logger.hpp"
 
 #include <csignal>
@@ -26,6 +26,7 @@ namespace tds::server {
     void Server::launch() {
         if(configure()) {
             server_logger->info("Server: starting");
+            linux::EcholessTerminalGuard terminal_guard;
             main_loop();
         }
     }
@@ -36,7 +37,6 @@ namespace tds::server {
             configure_listener();
             configure_main_epoll();
             m_supervisor.create_services(m_config);
-            linux::Terminal::set_stdin_echo(false);
         } catch(const std::system_error& e) {
             server_logger->error("Configuration failed: {} ({})", e.what(), e.code());
             return false;

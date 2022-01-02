@@ -3,7 +3,7 @@
 #include "tds/cli/invalid_command_arguments_error.hpp"
 #include "tds/cli/invalid_command_execution_error.hpp"
 #include "tds/config/limits.hpp"
-#include "tds/linux/terminal.hpp"
+#include "tds/linux/echoless_terminal_guard.hpp"
 #include "tds/user/user_table.hpp"
 
 #include <algorithm>
@@ -58,7 +58,7 @@ namespace tds::cli::user_commands {
     }
 
     void UserAddCommand::read_password() {
-        linux::Terminal::set_stdin_echo(false);
+        linux::EcholessTerminalGuard terminal_guard;
         for(int i = 0; i < config::limits::max_try_count; ++i) {
             if(i == 0) {
                 std::cout << "Enter password: ";
@@ -69,7 +69,6 @@ namespace tds::cli::user_commands {
             std::getline(std::cin, m_password);
             std::cout << '\n';
             if(user::UserTable::is_password_ok(m_password)) {
-                linux::Terminal::set_stdin_echo(true);
                 return;
             }
         }
@@ -79,7 +78,7 @@ namespace tds::cli::user_commands {
 
     void UserAddCommand::read_repeated_password() const {
         std::string repeated_password;
-        linux::Terminal::set_stdin_echo(false);
+        linux::EcholessTerminalGuard terminal_guard;
         for(int i = 0; i < config::limits::max_try_count; ++i) {
             if(i == 0) {
                 std::cout << "Repeat password: ";
@@ -90,7 +89,6 @@ namespace tds::cli::user_commands {
             std::getline(std::cin, repeated_password);
             std::cout << '\n';
             if(repeated_password == m_password) {
-                linux::Terminal::set_stdin_echo(true);
                 return;
             }
         }

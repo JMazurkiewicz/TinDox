@@ -3,8 +3,8 @@
 #include "tds/cli/invalid_command_arguments_error.hpp"
 #include "tds/cli/invalid_command_execution_error.hpp"
 #include "tds/config/limits.hpp"
+#include "tds/linux/echoless_terminal_guard.hpp"
 #include "tds/linux/hash.hpp"
-#include "tds/linux/terminal.hpp"
 #include "tds/user/user_table.hpp"
 
 #include <algorithm>
@@ -43,7 +43,7 @@ namespace tds::cli::user_commands {
     }
 
     void UserPasswdCommand::read_old_password() const {
-        linux::Terminal::set_stdin_echo(false);
+        linux::EcholessTerminalGuard terminal_guard;
         std::string old_password;
         for(int i = 0; i < config::limits::max_try_count; ++i) {
             if(i == 0) {
@@ -55,7 +55,6 @@ namespace tds::cli::user_commands {
             std::getline(std::cin, old_password);
             std::cout << '\n';
             if(get_user_table().verify_password_of_user(m_username, old_password)) {
-                linux::Terminal::set_stdin_echo(true);
                 return;
             }
         }
@@ -64,7 +63,7 @@ namespace tds::cli::user_commands {
     }
 
     void UserPasswdCommand::read_new_password() {
-        linux::Terminal::set_stdin_echo(false);
+        linux::EcholessTerminalGuard terminal_guard;
         for(int i = 0; i < config::limits::max_try_count; ++i) {
             if(i == 0) {
                 std::cout << "Enter new password: ";
@@ -75,7 +74,6 @@ namespace tds::cli::user_commands {
             std::getline(std::cin, m_new_password);
             std::cout << '\n';
             if(user::UserTable::is_password_ok(m_new_password)) {
-                linux::Terminal::set_stdin_echo(true);
                 return;
             }
         }
@@ -84,7 +82,7 @@ namespace tds::cli::user_commands {
     }
 
     void UserPasswdCommand::read_new_password_repeated() const {
-        linux::Terminal::set_stdin_echo(false);
+        linux::EcholessTerminalGuard terminal_guard;
         std::string repeated_password;
         for(int i = 0; i < config::limits::max_try_count; ++i) {
             if(i == 0) {
@@ -96,7 +94,6 @@ namespace tds::cli::user_commands {
             std::getline(std::cin, repeated_password);
             std::cout << '\n';
             if(repeated_password == m_new_password) {
-                linux::Terminal::set_stdin_echo(false);
                 return;
             }
         }

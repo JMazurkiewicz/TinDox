@@ -8,15 +8,16 @@
 #include <system_error>
 
 namespace tds::server {
-    ClientService::ClientService(ClientServiceSupervisor& supervisor)
+    ClientService::ClientService(ClientServiceSupervisor& supervisor, const config::ServerConfig& config)
         : m_supervisor{&supervisor}
+        , m_epoll_buffer{static_cast<std::size_t>(config.get_max_user_count() / config.get_max_thread_count())}
         , m_running{true} { }
 
     void ClientService::launch() {
-        for(linux::EpollBuffer buffer{32}; m_running;) {
-            m_supervisor->wait_for_events(buffer);
+        while(m_running) {
+            m_supervisor->wait_for_events(m_epoll_buffer);
 
-            for(auto [fd, events] : buffer.get_events()) {
+            for(auto [fd, events] : m_epoll_buffer.get_events()) {
                 if(m_supervisor->has_client(fd)) {
                     process_client_input(m_supervisor->get_client(fd), events);
                 } else if(fd == m_supervisor->get_pipe_fd()) {

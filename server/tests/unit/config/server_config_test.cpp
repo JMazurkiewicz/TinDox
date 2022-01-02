@@ -34,7 +34,7 @@ TEST_CASE("tds::config::ServerConfig", "[config]") {
     SECTION("Test setters with bad values") {
         ServerConfig config;
 
-        REQUIRE_THROWS_AS(config.set_max_thread_count(1), std::runtime_error);
+        REQUIRE_THROWS_AS(config.set_max_thread_count(0), std::runtime_error);
         REQUIRE_THROWS_AS(config.set_max_user_count(0), std::runtime_error);
         REQUIRE_THROWS_AS(config.set_backlog(0), std::runtime_error);
         REQUIRE_THROWS_AS(config.set_port(tds::ip::Port::invalid), std::runtime_error);

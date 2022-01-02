@@ -18,9 +18,9 @@ namespace tds::config {
     }
 
     void ServerConfig::set_max_thread_count(int new_max_thread_count) {
-        if(new_max_thread_count <= 1) {
+        if(new_max_thread_count < 1) {
             throw std::runtime_error{
-                fmt::format("Max thread count should be at least 2 (is {})", new_max_thread_count)};
+                fmt::format("Max thread count should be at least 1 (is {})", new_max_thread_count)};
         } else {
             m_max_thread_count = new_max_thread_count;
         }
