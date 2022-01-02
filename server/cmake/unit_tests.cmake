@@ -25,14 +25,14 @@ set(
     TDS_UNIT_TESTS_SOURCES
 
     tests/unit/cli/cli_error_test.cpp
-    tests/unit/cli/command_executor_test.cpp
-    tests/unit/cli/command_test.cpp
     tests/unit/cli/help_command_test.cpp
     tests/unit/cli/init_command_test.cpp
     tests/unit/cli/invalid_command_arguments_error_test.cpp
-    tests/unit/cli/no_such_command_error_test.cpp
     tests/unit/cli/run_command_test.cpp
     tests/unit/cli/user_command_test.cpp
+
+    tests/unit/command/command_executor_test.cpp
+    tests/unit/command/command_test.cpp
 
     tests/unit/config/defaults_test.cpp
     tests/unit/config/server_config_test.cpp
@@ -49,6 +49,14 @@ set(
     tests/unit/linux/linux_error_test.cpp
     tests/unit/linux/pipe_device_test.cpp
     tests/unit/linux/signal_device_test.cpp
+
+    tests/unit/protocol/field_test.cpp
+    tests/unit/protocol/protocol_code_test.cpp
+    tests/unit/protocol/protocol_interpreter_test.cpp
+    tests/unit/protocol/receiver_test.cpp
+    tests/unit/protocol/request_test.cpp
+    tests/unit/protocol/response_test.cpp
+    tests/unit/protocol/sender_test.cpp
 
     tests/unit/user/permissions_test.cpp
 )

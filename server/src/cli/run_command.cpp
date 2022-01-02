@@ -2,9 +2,9 @@
 
 #include "tds/cli/invalid_command_arguments_error.hpp"
 #include "tds/cli/invalid_command_execution_error.hpp"
-#include "tds/cli/no_such_command_error.hpp"
 #include "tds/config/config_reader.hpp"
 #include "tds/server/server.hpp"
+#include "tds/server/server_logger.hpp"
 
 #include <charconv>
 #include <filesystem>
@@ -94,6 +94,11 @@ namespace tds::cli {
     void RunCommand::launch_server() {
         server::Server server{*m_config_directory};
         server.set_config(m_config);
+
+#ifndef NDEBUG
+        server::server_logger->set_level(spdlog::level::debug);
+#endif
+
         server.launch();
     }
 }

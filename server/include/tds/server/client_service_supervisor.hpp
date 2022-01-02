@@ -7,6 +7,7 @@
 #include "tds/linux/event_type.hpp"
 #include "tds/linux/io_device.hpp"
 #include "tds/linux/pipe_device.hpp"
+#include "tds/protocol/server_context.hpp"
 #include "tds/server/client.hpp"
 #include "tds/server/client_pool.hpp"
 
@@ -16,10 +17,7 @@
 namespace tds::server {
     class ClientServiceSupervisor {
     public:
-        static constexpr linux::EventType socket_type =
-            linux::EventType::in | linux::EventType::edge_triggered | linux::EventType::one_shot;
-
-        ClientServiceSupervisor();
+        explicit ClientServiceSupervisor(protocol::ServerContext& server_context);
         ~ClientServiceSupervisor();
 
         ClientServiceSupervisor(const ClientServiceSupervisor&) = delete;

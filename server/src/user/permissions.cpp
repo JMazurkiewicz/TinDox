@@ -8,11 +8,10 @@
 namespace tds::user {
     namespace {
         constexpr inline std::array permission_list = {
-            Permissions::travel, Permissions::write,    Permissions::copy,
-            Permissions::move,   Permissions::download, Permissions::upload,
+            Permissions::write, Permissions::copy, Permissions::move, Permissions::download, Permissions::upload,
         };
 
-        constexpr inline std::string_view permission_symbols = "twcmdu";
+        constexpr inline std::string_view permission_symbols = "wcmdu";
     }
 
     std::string to_string(Permissions perms) {

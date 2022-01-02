@@ -9,9 +9,10 @@
 #include <ranges>
 
 namespace tds::server {
-    ClientServiceSupervisor::ClientServiceSupervisor()
+    ClientServiceSupervisor::ClientServiceSupervisor(protocol::ServerContext& server_context)
         : m_running{true}
-        , m_pipes{linux::make_pipe(true)} {
+        , m_pipes{linux::make_pipe(true)}
+        , m_clients{server_context} {
         m_epoll.add_device(m_pipes.m_read_device);
     }
 
@@ -29,7 +30,8 @@ namespace tds::server {
     }
 
     void ClientServiceSupervisor::accept_connection(ip::TcpSocket connection) {
-        m_epoll.add_device(connection, socket_type);
+        m_epoll.add_device(connection,
+                           linux::EventType::in | linux::EventType::edge_triggered | linux::EventType::one_shot);
         m_clients.add_client(std::move(connection));
     }
 
@@ -58,7 +60,8 @@ namespace tds::server {
         Client& client = m_clients.get_client(fd);
 
         if(client.is_alive()) {
-            m_epoll.rearm_device(device, socket_type);
+            m_epoll.rearm_device(device, linux::EventType::edge_triggered | linux::EventType::one_shot |
+                                             client.get_required_events());
         } else {
             m_clients.close_one(fd);
         }
@@ -66,7 +69,7 @@ namespace tds::server {
 
     void ClientServiceSupervisor::stop() {
         if(m_running) {
-            server_logger->warn("Client supervisor: stop requested");
+            server_logger->warn("ClientServiceSupervisor: stop requested");
 
             const char stop_signal = 'A';
             m_pipes.m_write_device.write(&stop_signal, 1);

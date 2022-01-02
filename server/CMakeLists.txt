@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(
     TinDoxServer
     LANGUAGES CXX
-    VERSION 0.0.2
+    VERSION 0.0.3
     HOMEPAGE_URL https://github.com/JMazurkiewicz/TinDox/server
     DESCRIPTION "TinDox Server"
 )
@@ -80,7 +80,6 @@ set(
     src/cli/help_command.cpp
     src/cli/init_command.cpp
     src/cli/invalid_command_arguments_error.cpp
-    src/cli/no_such_command_error.cpp
     src/cli/run_command.cpp
     src/cli/user_command.cpp
 
@@ -104,12 +103,31 @@ set(
     src/linux/signal_device.cpp
     src/linux/terminal.cpp
 
-    src/server/client_context.cpp
+    src/protocol/execution/auth.cpp
+    src/protocol/execution/cd.cpp
+    src/protocol/execution/command_base.cpp
+    src/protocol/execution/exit.cpp
+    src/protocol/execution/logout.cpp
+    src/protocol/execution/ls.cpp
+    src/protocol/execution/name.cpp
+    src/protocol/execution/pwd.cpp
+
+    src/protocol/auth_token.cpp
+    src/protocol/client_context.cpp
+    src/protocol/field.cpp
+    src/protocol/protocol_error.cpp
+    src/protocol/protocol_interpreter.cpp
+    src/protocol/receiver.cpp
+    src/protocol/request.cpp
+    src/protocol/response_builder.cpp
+    src/protocol/response.cpp
+    src/protocol/sender.cpp
+    src/protocol/server_context.cpp
+
     src/server/client_pool.cpp
     src/server/client_service_supervisor.cpp
     src/server/client_service.cpp
     src/server/client.cpp
-    src/server/server_context.cpp
     src/server/server_logger.cpp
     src/server/server.cpp
 

@@ -6,6 +6,9 @@
 #include <netinet/tcp.h>
 
 namespace tds::ip {
+    TcpSocket::TcpSocket()
+        : IoDevice(-1) { }
+
     TcpSocket::TcpSocket(int fd, EndpointV4 endpoint)
         : IoDevice(fd)
         , m_endpoint{endpoint} {

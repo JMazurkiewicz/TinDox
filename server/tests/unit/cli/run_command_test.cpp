@@ -3,7 +3,6 @@
 #include "tds/cli/command.hpp"
 #include "tds/cli/invalid_command_arguments_error.hpp"
 #include "tds/cli/invalid_command_execution_error.hpp"
-#include "tds/cli/no_such_command_error.hpp"
 #include "tds/cli/run_command.hpp"
 
 #include <array>

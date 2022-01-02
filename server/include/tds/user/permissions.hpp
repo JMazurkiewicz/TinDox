@@ -6,15 +6,15 @@
 
 namespace tds::user {
     enum class Permissions : std::uint8_t {
-        travel = 1 << 0,
+        none = 0,
         write = 1 << 1,
         copy = 1 << 2,
         move = 1 << 3,
         download = 1 << 4,
         upload = 1 << 5,
 
-        initial = travel | download,
-        all = travel | write | copy | move | download | upload,
+        initial = download,
+        all = write | copy | move | download | upload,
     };
 
     constexpr Permissions operator~(Permissions perms) {

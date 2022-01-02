@@ -72,7 +72,7 @@ namespace tds::ip {
         } else {
             auto addr = reinterpret_cast<const sockaddr_in*>(&addrbuf);
             if(addr->sin_family != AF_INET) {
-                std::runtime_error{"Listener: received non-Ipv4 connection"};
+                std::runtime_error{"Listener: received non-IPv4 connection"};
             }
 
             const AddressV4 address{ntohl(addr->sin_addr.s_addr)};
