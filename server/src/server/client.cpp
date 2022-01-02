@@ -30,7 +30,7 @@ namespace tds::server {
     }
 
     linux::EventType Client::get_required_events() const noexcept {
-        linux::EventType events;
+        linux::EventType events = {};
         protocol::ProtocolMode mode = m_context.get_mode();
         if(mode == protocol::ProtocolMode::command || mode == protocol::ProtocolMode::upload) {
             events |= linux::EventType::in;
@@ -79,12 +79,19 @@ namespace tds::server {
 
     void Client::handle_commands(std::span<const char> input) {
         do {
+            server_logger->debug("LOOP, INPUT SIZE: {}", input.size());
+
             try {
                 input = m_interpreter.commit_bytes(input);
                 if(m_interpreter.has_available_request()) {
                     m_request_queue.push(m_interpreter.get_request());
                 }
-            } catch(...) { // TODO CATCH PARSING ERRORS
+            } catch(const protocol::ProtocolError& e) {
+                protocol::ResponseBuilder builder;
+                builder.set_code(e.get_code());
+                builder.set_command_name("<interpreter>");
+                builder.add_line(e.what());
+                m_sender.add_response(builder.get_response());
             }
 
             // TODO very special case -- break if upload start/resume happened
@@ -128,7 +135,7 @@ namespace tds::server {
                 protocol::ResponseBuilder builder;
                 builder.set_code(e.get_code());
                 builder.set_command_name(std::string{request.get_name()});
-                builder.add_line(e.what()); // TODO for sure? -- discuss
+                builder.add_line(e.what());
                 m_sender.add_response(builder.get_response());
             }
 
