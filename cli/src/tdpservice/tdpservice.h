@@ -2,30 +2,28 @@
 #define TINDOX_CONSOLE_CLIENT_TDPSERVICE_H
 
 #include "connection.h"
-
-enum ConError {
-    NONE,
-    E_CON_TO_SERV,
-    E_CLOSE_CON,
-    E_CLOSED_CON,
-};
+#include "responseanalyzer.h"
 
 class TDPService {
 public:
-    TDPService() = default;
+    TDPService() : responseAnalyzer(connectionToServer){}
     ~TDPService() {
         closeConnection();
     }
 
     bool initConnection(const string& serv_ip, int serv_port);
     bool closeConnection();
+    bool logout();
 
-    std::string response = "";
+    string response_first_line;
+    ConnectionError error_code = NONE;
 
-private:
+//private:
     Connection connectionToServer;
-    ConError error_message = NONE;
+    ResponseAnalyzer responseAnalyzer;
 
+    bool sendCommand(string command_name, string field_name1, string field_value1, string field_name2, string field_value2,
+                string field_name3, string field_value3);
 };
 
 

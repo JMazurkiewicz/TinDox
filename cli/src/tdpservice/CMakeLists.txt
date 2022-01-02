@@ -6,6 +6,8 @@ add_library(tdpservice STATIC
         tdpservice.cpp
         connection.h
         connection.cpp
-        )
+        responseanalyzer.cpp
+        responseanalyzer.h
+        connectionerror.h)
 
 target_include_directories(tdpservice PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

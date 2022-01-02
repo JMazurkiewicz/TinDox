@@ -6,7 +6,7 @@
 #include <sys/epoll.h>
 
 #define MAX_EPOLL_EVENTS 64
-#define BUF_SIZE 2048
+#define BUF_MAX_SIZE 2048
 
 using std::string;
 
