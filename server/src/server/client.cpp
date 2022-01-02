@@ -15,10 +15,7 @@ namespace tds::server {
         : m_socket{std::move(socket)}
         , m_receiver{m_socket}
         , m_command_executor{server_context, m_context}
-        , m_sender{m_socket} {
-        m_context.set_current_path(
-            server_context.get_root_path()); // TODO temporaray solution -- should be performed by `auth` command
-    }
+        , m_sender{m_socket} { }
 
     Client::~Client() {
         server_logger->warn("Closed connection with client from {}", m_socket.get_endpoint());

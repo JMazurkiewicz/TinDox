@@ -27,6 +27,7 @@ namespace tds::protocol::execution {
         m_response_builder.set_code(ProtocolCode::ok);
         m_response_builder.set_command_name(name);
         m_client_context->set_new_token(m_server_context->authorize_user(*m_username, *m_password));
+        m_client_context->set_current_path(m_server_context->get_root_path());
     }
 
     void Auth::parse_username(const Field& login_field) {
