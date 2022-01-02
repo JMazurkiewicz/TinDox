@@ -2,12 +2,8 @@
 
 #include "tds/linux/linux_error.hpp"
 
-#ifndef TDS_NO_TERMIOS
-
-// clang-format off
 #include <termios.h>
 #include <unistd.h>
-// clang-format on
 
 namespace tds::linux {
     void Terminal::set_stdin_echo(bool visibility) {
@@ -22,16 +18,8 @@ namespace tds::linux {
             term.c_lflag &= ~ECHO;
         }
 
-        if(tcsetattr(STDIN_FILENO, 0, &term) == -1) {
+        if(tcsetattr(STDIN_FILENO, 0, &term) == -1 && errno != ENOTTY) {
             throw LinuxError{"tcsetattr(3)"};
         }
     }
 }
-
-#else
-
-namespace tds::linux {
-    void Terminal::set_stdin_echo(bool) { }
-}
-
-#endif

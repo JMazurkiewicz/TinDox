@@ -157,7 +157,6 @@ option(TDS_INTEGRATION_TESTS "Run integration tests for TinDox Server.")
 
 if(TDS_TESTS)
     enable_testing()
-    target_compile_definitions(tds-dev PRIVATE TDS_NO_TERMIOS)
 
     if(TDS_UNIT_TESTS)
         include("cmake/unit_tests.cmake")
