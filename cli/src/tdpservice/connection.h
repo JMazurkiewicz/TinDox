@@ -27,16 +27,11 @@ public:
 
     bool receiveAllReadyFromServer(std::string &message);
 
-
-    bool isOpenedConnection() const {
-        return isConnectionOpen;
-    }
-
 private:
 
     void createSocket();
 
-    int sock, epfd;
+    int sock, epfd_read, epfd_write;
     bool isConnectionOpen = false;
     struct sockaddr_in server;
     struct epoll_event events[MAX_EPOLL_EVENTS];

@@ -8,20 +8,29 @@
 
 
 void Connection::createSocket() {
-    sock = socket( AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0 );
+    sock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0 );
     if (sock == -1)
         throw std::system_error(errno, std::generic_category(), "creating socket");
 
-    epfd = epoll_create1(0);
-    if (epfd == -1)
+    epfd_read = epoll_create1(0);
+    epfd_write = epoll_create1(0);
+    if (epfd_read == -1 || epfd_write == -1) {
+        closeConnection();
         throw std::system_error(errno, std::generic_category(), "creating epoll fd");
+    }
 
-    struct epoll_event event{};
-    memset(&event, 0, sizeof(event));
-    event.data.fd = sock;
-    event.events = EPOLLIN | EPOLLOUT;
-    if (epoll_ctl(epfd, EPOLL_CTL_ADD, sock, &event) == -1)
+    struct epoll_event event_read_sock{}, event_write_sock {};
+    memset(&event_read_sock, 0, sizeof(event_read_sock));
+    memset(&event_write_sock, 0, sizeof(event_write_sock));
+    event_read_sock.data.fd = sock;
+    event_write_sock.data.fd = sock;
+    event_read_sock.events = EPOLLIN;
+    event_write_sock.events = EPOLLOUT;
+    if (epoll_ctl(epfd_read, EPOLL_CTL_ADD, sock, &event_read_sock) == -1
+    || epoll_ctl(epfd_write, EPOLL_CTL_ADD, sock, &event_write_sock) == -1) {
+        closeConnection();
         throw std::system_error(errno, std::generic_category(), "epoll - add");
+    }
 }
 
 void Connection::connectToServer(const string& serv_ip, int serv_port) {
@@ -42,9 +51,6 @@ void Connection::connectToServer(const string& serv_ip, int serv_port) {
 void Connection::closeConnection() {
     if(isConnectionOpen) {
 
-        if (epoll_ctl(epfd, EPOLL_CTL_DEL, sock, nullptr) == -1)
-            throw std::system_error(errno, std::generic_category(), "epoll - delete");
-
         if(close(sock) != 0)
             throw std::system_error(errno, std::generic_category(), "closing socket");
 
@@ -58,7 +64,7 @@ bool Connection::sendToServer(std::string &message) {
         unsigned long len = message.size() + 1;
         unsigned long buf_pos = 0;
         while(len) {
-            int new_events = epoll_wait(epfd, events, MAX_EPOLL_EVENTS, -1);
+            int new_events = epoll_wait(epfd_write, events, MAX_EPOLL_EVENTS, -1);
             if (new_events == -1) {
                 closeConnection();
                 throw std::system_error(errno, std::generic_category(), "waiting to send message");
@@ -92,7 +98,7 @@ bool Connection::receiveAllReadyFromServer(std::string &message) {
     message.clear();
     char *buf = new char[BUF_SIZE + 1];
     memset(buf, '\0', sizeof buf);
-    int new_events = epoll_wait(epfd, events, MAX_EPOLL_EVENTS, 5000);
+    int new_events = epoll_wait(epfd_read, events, MAX_EPOLL_EVENTS, 5000);
     if (new_events == -1) {
         closeConnection();
         delete[] buf;
