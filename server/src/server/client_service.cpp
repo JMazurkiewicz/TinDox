@@ -5,8 +5,6 @@
 #include "tds/linux/epoll_buffer.hpp"
 #include "tds/server/server_logger.hpp"
 
-#include <system_error>
-
 namespace tds::server {
     ClientService::ClientService(ClientServiceSupervisor& supervisor, const config::ServerConfig& config)
         : m_supervisor{&supervisor}
@@ -47,7 +45,7 @@ namespace tds::server {
     }
 
     void ClientService::process_pipe_input() {
-        server_logger->warn("ClientService: got stop signal from pipe ({})", m_supervisor->get_pipe_fd());
+        server_logger->warn("ClientService: got stop signal from pipe");
         m_running = false;
     }
 }
