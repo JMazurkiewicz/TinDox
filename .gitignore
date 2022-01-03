@@ -1,11 +1,12 @@
 # Binary files
-.o
-.out
-.obj
-.exe
+*.o
+*.out
+*.obj
+*.exe
+*.class
 
 # Build directories
-/[Bb]uild*/
+/[Bb]uild/
 
 # Visual Studio [Code] files
 .vs*/
