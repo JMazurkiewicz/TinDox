@@ -16,12 +16,19 @@ public:
 
 private:
     Connection connectionToServer;
+    string read_buf;
 
-    ConnectionError getFirstLine(string &command_name);
+    ConnectionError getFirstLine(string::iterator &iter, string &command_name);
 
-    int getErrorCode(int &buf_pos, string &buf);
+    ConnectionError getErrorCode(string::iterator &iter);
 
+    ConnectionError readRestIntoBuf();
 
+    ConnectionError skipToNextCommand(string::iterator &iter);
+
+    ConnectionError checkRestOfFirstLine(string::iterator &iter, string command_name);
+
+    ConnectionError nextReadChar(string::iterator &iter);
 };
 
 
