@@ -131,15 +131,15 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
 
     SECTION("Test two full commands") {
         ProtocolInterpreter interpreter;
-        auto unread = interpreter.commit_bytes("auth\nlogin:admin\npasswd:admin\n\n");
+        auto unread = interpreter.commit_bytes("auth\nlogin:admin\npasswd:admin\n\n"sv);
+        INFO("UNREAD BYTES: \"" << (std::string_view{unread.data(), unread.size()}) << '"');
         REQUIRE(unread.empty());
-        LOG("UNREAD BYTES: \"" << std::string_view{unread.data(), unread.size()} << '"');
         REQUIRE(interpreter.has_available_request());
         Request request = interpreter.get_request();
         REQUIRE(request.get_name() == "auth");
         REQUIRE(request.get_fields().size() == 2);
 
-        unread = interpreter.commit_bytes("exit\n\n");
+        unread = interpreter.commit_bytes("exit\n\n"sv);
         REQUIRE(unread.empty());
         REQUIRE(interpreter.has_available_request());
         request = interpreter.get_request();
