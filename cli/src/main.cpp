@@ -8,19 +8,12 @@
 
 using namespace std;
 
-int main(int argc, char** argv) {
-
-//    if (argc != 3) {
-//        cout << "Required argument number: 3" << endl;
-//        return -1;
-//    }
+int main() {
 
     TDPService service;
     service.initConnection("127.0.0.1", 37666);
-    //service.initConnection(argv[1], stoi(argv[2]));
+    cout << service.auth("admin", "admin");
     cout << service.response_first_line;
-    //service.logout();
     service.closeConnection();
-    cout << service.response_first_line;
     return 0;
 }

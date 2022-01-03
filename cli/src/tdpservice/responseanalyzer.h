@@ -3,26 +3,26 @@
 
 #include "connection.h"
 #include "connectionerror.h"
+#include <memory>
+#include <utility>
 
-enum ServerResponseCode {
-
-};
+using std::shared_ptr;
 
 class ResponseAnalyzer {
 public:
-    ResponseAnalyzer(Connection &connec) :connectionToServer(connec) {}
+    ResponseAnalyzer(shared_ptr<Connection> conn) : connectionToServer(std::move(conn)) {}
 
     ConnectionError readSingleLineResponse(string command_name);
 
 private:
-    Connection connectionToServer;
     string read_buf;
+    shared_ptr<Connection> connectionToServer;
 
     ConnectionError getFirstLine(string::iterator &iter, string &command_name);
 
     ConnectionError getErrorCode(string::iterator &iter);
 
-    ConnectionError readRestIntoBuf();
+    ConnectionError readRestIntoBuf(string::iterator &iter);
 
     ConnectionError skipToNextCommand(string::iterator &iter);
 

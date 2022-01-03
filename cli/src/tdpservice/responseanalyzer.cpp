@@ -20,7 +20,7 @@ ConnectionError ResponseAnalyzer::readSingleLineResponse(string command_name) {
 }
 
 ConnectionError ResponseAnalyzer::getFirstLine(string::iterator &iter, string &command_name) {
-    ConnectionError response_code = readRestIntoBuf();
+    ConnectionError response_code = readRestIntoBuf(iter);
     if(response_code != NONE)
         return response_code;
 
@@ -63,10 +63,12 @@ ConnectionError ResponseAnalyzer::getErrorCode(string::iterator &iter) {
     }
 }
 
-ConnectionError ResponseAnalyzer::readRestIntoBuf() {
+ConnectionError ResponseAnalyzer::readRestIntoBuf(string::iterator &iter) {
     try {
-        if(connectionToServer.receiveAllReadyFromServer(read_buf))
+        if(connectionToServer->receiveAllReadyFromServer(read_buf)) {
+            iter = read_buf.begin();
             return NONE;
+        }
         else
             return E_NOTHING_READ;
     }  catch (const std::system_error& ex) {
@@ -111,9 +113,8 @@ ConnectionError ResponseAnalyzer::checkRestOfFirstLine(string::iterator &iter, s
 ConnectionError ResponseAnalyzer::nextReadChar(string::iterator &iter) {
     ++iter;
     if (iter == read_buf.end()) {
-        if (readRestIntoBuf() != NONE)
+        if (readRestIntoBuf(iter) != NONE)
             return E_RESPONSE;
-        iter = read_buf.begin();
     }
     return NONE;
 }
