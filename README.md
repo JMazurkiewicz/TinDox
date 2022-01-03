@@ -1,8 +1,18 @@
-# Network file system
+# TinDox - simple network filesystem
+
+[![Server build](https://github.com/JMazurkiewicz/TinDox/actions/workflows/server.yaml/badge.svg)](https://github.com/JMazurkiewicz/TinDox/actions/workflows/server.yaml)
+
+## Directories
+
+* `server` - TinDox Server (TDS),
+* `mobile` - TinDox mobile client for Android,
+* `dekstop` - TinDox desktop client for any desktop operating system,
+* `cli` - TinDox command line client for Linux,
+* `docs-pl` - project documentation (in Polish).
 
 ## Team
 
-* Jakub Mazurkiewicz ([@JMazurkiewicz](https://github.com/JMazurkiewicz))
-* Damian Piotrowski ([@dam1508](https://github.com/dam1508))
-* Anna Pyrka ([@annapyrka](https://github.com/annapyrka))
-* Łukasz Reszka ([@LukaszReszka](https://github.com/LukaszReszka))
+* Server - [Jakub Mazurkiewicz](https://github.com/JMazurkiewicz)
+* Mobile client - [Damian Piotrowski](https://github.com/dam1508)
+* Desktop client - [Anna Pyrka](https://github.com/annapyrka)
+* Console client - [Łukasz Reszka](https://github.com/LukaszReszka)
