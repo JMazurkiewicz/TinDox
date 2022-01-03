@@ -1,8 +1,9 @@
 # Global owners
 * @JMazurkiewicz @dam1508 @annapyrka @LukaszReszka
 
-# Workflows
+# Workflows and README
 /.github/workflows/ @JMazurkiewicz
+/README.md @JMazurkiewicz
 
 # Projects
 /server/ @JMazurkiewicz
