@@ -5,7 +5,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
+#include <iostream>
 
 void Connection::createSocket() {
     sock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0 );
@@ -98,7 +98,7 @@ bool Connection::receiveAllReadyFromServer(std::string &message) {
     message.clear();
     char *buf = new char[BUF_MAX_SIZE];
     memset(buf, '\0', sizeof buf);
-    int new_events = epoll_wait(epfd_read, events, MAX_EPOLL_EVENTS, 7000);
+    int new_events = epoll_wait(epfd_read, events, MAX_EPOLL_EVENTS, -1);
     if (new_events == -1) {
         closeConnection();
         delete[] buf;

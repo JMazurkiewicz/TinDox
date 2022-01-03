@@ -112,9 +112,8 @@ ConnectionError ResponseAnalyzer::checkRestOfFirstLine(string::iterator &iter, s
 
 ConnectionError ResponseAnalyzer::nextReadChar(string::iterator &iter) {
     ++iter;
-    if (iter == read_buf.end()) {
-        if (readRestIntoBuf(iter) != NONE)
-            return E_RESPONSE;
-    }
-    return NONE;
+    if (iter == read_buf.end())
+        return E_RESPONSE;
+    else
+        return NONE;
 }
