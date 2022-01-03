@@ -2,6 +2,7 @@
 
 #include "tds/protocol/field_value.hpp"
 #include "tds/protocol/protocol_interpreter.hpp"
+#include "tds/protocol/request.hpp"
 
 #include <algorithm>
 
@@ -126,5 +127,23 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
         const auto unread = interpreter.commit_bytes("\n\n\n\n\n");
         REQUIRE(unread.empty());
         REQUIRE(!interpreter.has_available_request());
+    }
+
+    SECTION("Test two full commands") {
+        ProtocolInterpreter interpreter;
+        auto unread = interpreter.commit_bytes("auth\nlogin:admin\npasswd:admin\n\n"sv);
+        INFO("UNREAD BYTES: \"" << (std::string_view{unread.data(), unread.size()}) << '"');
+        REQUIRE(unread.empty());
+        REQUIRE(interpreter.has_available_request());
+        Request request = interpreter.get_request();
+        REQUIRE(request.get_name() == "auth");
+        REQUIRE(request.get_fields().size() == 2);
+
+        unread = interpreter.commit_bytes("exit\n\n"sv);
+        REQUIRE(unread.empty());
+        REQUIRE(interpreter.has_available_request());
+        request = interpreter.get_request();
+        REQUIRE(request.get_name() == "exit");
+        REQUIRE(request.get_fields().empty());
     }
 }

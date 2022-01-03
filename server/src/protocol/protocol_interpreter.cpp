@@ -8,6 +8,8 @@
 
 #include <fmt/core.h>
 
+#include <spdlog/spdlog.h>
+
 namespace tds::protocol {
     ProtocolInterpreter::ProtocolInterpreter()
         : m_last_line_complete{true} { }
@@ -23,22 +25,27 @@ namespace tds::protocol {
         const auto end = bytes.end();
 
         while(cur != end && !has_available_request()) {
+            spdlog::warn("STEP: CURIDX={} ENDIDX={}", cur - bytes.begin(), end - bytes.begin());
             auto line_end = std::ranges::find(cur, end, line_separator);
             if(line_end != end) {
                 ++line_end;
             }
 
-            commit_line(std::span{cur, line_end});
+            spdlog::warn("COMMITING (({}))", std::string_view(cur, line_end));
+            commit_line({cur, line_end});
             cur = line_end;
         }
 
-        return bytes.last(end - cur);
+        spdlog::warn("FINAL: CURIDX={} ENDIDX={}", cur - bytes.begin(), end - bytes.begin());
+        return {cur, end};
     }
 
     void ProtocolInterpreter::commit_line(std::span<const char> line) {
         if(m_last_line_complete) {
+            spdlog::warn("COMPLETE!!");
             m_lines.emplace_back(line.begin(), line.end());
         } else {
+            spdlog::warn("APPEND!!");
             m_lines.back().append(line.begin(), line.end());
         }
         check_for_protocol_errors();
