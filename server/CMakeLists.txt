@@ -112,12 +112,14 @@ set(
     src/protocol/execution/auth.cpp
     src/protocol/execution/cd.cpp
     src/protocol/execution/command_base.cpp
+    src/protocol/execution/cp.cpp
     src/protocol/execution/exit.cpp
     src/protocol/execution/logout.cpp
     src/protocol/execution/ls.cpp
     src/protocol/execution/mkdir.cpp
     src/protocol/execution/name.cpp
     src/protocol/execution/pwd.cpp
+    src/protocol/execution/transport_command.cpp
 
     src/protocol/auth_token.cpp
     src/protocol/client_context.cpp

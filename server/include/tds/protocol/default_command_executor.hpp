@@ -4,6 +4,7 @@
 #include "tds/protocol/execution/bye.hpp"
 #include "tds/protocol/execution/cd.hpp"
 #include "tds/protocol/execution/command_executor.hpp"
+#include "tds/protocol/execution/cp.hpp"
 #include "tds/protocol/execution/exit.hpp"
 #include "tds/protocol/execution/logout.hpp"
 #include "tds/protocol/execution/ls.hpp"
@@ -13,6 +14,6 @@
 
 namespace tds::protocol {
     using DefaultCommandExecutor =
-        execution::CommandExecutor<execution::Auth, execution::Bye, execution::Cd, execution::Exit, execution::Logout,
-                                   execution::Ls, execution::Mkdir, execution::Name, execution::Pwd>;
+        execution::CommandExecutor<execution::Auth, execution::Bye, execution::Cd, execution::Cp, execution::Exit,
+                                   execution::Logout, execution::Ls, execution::Mkdir, execution::Name, execution::Pwd>;
 }

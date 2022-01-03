@@ -55,6 +55,9 @@ namespace tds::protocol {
                 case file_already_exists:
                     return "file or directory already exists";
 
+                case invalid_file_type:
+                    return "invalid file type";
+
                 default:
                     return "unknown code";
                 }
