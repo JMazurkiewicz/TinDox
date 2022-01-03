@@ -22,7 +22,9 @@ namespace tds::ip {
         }
 
         const int flag = 1;
-        setsockopt(get_fd(), SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(int));
+        if(setsockopt(get_fd(), SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(int)) == -1) {
+            throw linux::LinuxError{"setsockopt(2)"};
+        }
     }
 
     void TcpListener::set_backlog(int new_backlog) {
