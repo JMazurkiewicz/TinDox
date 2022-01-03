@@ -1,5 +1,4 @@
 #include "tds/protocol/execution/transport_command.hpp"
-#include "tds/protocol/execution/path_based_command.hpp"
 
 #include <algorithm>
 
