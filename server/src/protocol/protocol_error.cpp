@@ -52,6 +52,9 @@ namespace tds::protocol {
                 case invalid_credentials:
                     return "invalid credentials (login or password)";
 
+                case file_already_exists:
+                    return "file or directory already exists";
+
                 default:
                     return "unknown code";
                 }

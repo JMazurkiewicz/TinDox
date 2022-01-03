@@ -30,9 +30,6 @@ namespace tds::protocol::execution {
             m_path.emplace(m_client_context->get_current_path());
         }
 
-        m_response_builder.set_code(ProtocolCode::ok);
-        m_response_builder.set_command_name(name);
-
         for(auto&& entry : fs::directory_iterator{*m_path}) {
             std::string line;
             line += '"' + entry.path().filename().native() + '"';

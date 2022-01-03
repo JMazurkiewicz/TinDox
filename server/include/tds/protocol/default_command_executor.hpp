@@ -1,16 +1,18 @@
 #pragma once
 
 #include "tds/protocol/execution/auth.hpp"
+#include "tds/protocol/execution/bye.hpp"
 #include "tds/protocol/execution/cd.hpp"
 #include "tds/protocol/execution/command_executor.hpp"
 #include "tds/protocol/execution/exit.hpp"
 #include "tds/protocol/execution/logout.hpp"
 #include "tds/protocol/execution/ls.hpp"
+#include "tds/protocol/execution/mkdir.hpp"
 #include "tds/protocol/execution/name.hpp"
 #include "tds/protocol/execution/pwd.hpp"
 
 namespace tds::protocol {
     using DefaultCommandExecutor =
-        execution::CommandExecutor<execution::Auth, execution::Cd, execution::Exit, execution::Logout, execution::Ls,
-                                   execution::Name, execution::Pwd>;
+        execution::CommandExecutor<execution::Auth, execution::Bye, execution::Cd, execution::Exit, execution::Logout,
+                                   execution::Ls, execution::Mkdir, execution::Name, execution::Pwd>;
 }

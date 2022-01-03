@@ -30,6 +30,7 @@ namespace tds::protocol::execution {
                 check_permissions();
                 this->visit_command([&](auto& command) { command.set_server_context(m_server_context); });
                 this->visit_command([&](auto& command) { command.set_client_context(m_client_context); });
+                set_command_name();
             } catch(const command::NoSuchCommandError& e) {
                 throw ProtocolError{ProtocolCode::bad_command, fmt::format("No such command '{}'", e.what())};
             } catch(const ProtocolError&) {
@@ -66,6 +67,13 @@ namespace tds::protocol::execution {
                     }
                 });
             }
+        }
+
+        void set_command_name() {
+            this->visit_command([&]<typename T>(T&& command) {
+                using U = std::remove_cvref_t<T>;
+                command.set_command_name(U::name);
+            });
         }
 
         ServerContext& m_server_context;
