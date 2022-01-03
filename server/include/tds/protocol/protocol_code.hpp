@@ -20,6 +20,7 @@ namespace tds::protocol {
         not_enough_perms = 406,
         user_already_logged = 407,
         invalid_credentials = 408,
+        file_already_exists = 409,
     };
 
     constexpr bool is_info_code(ProtocolCode code) noexcept {
