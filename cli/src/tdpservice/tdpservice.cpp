@@ -22,6 +22,7 @@ bool TDPService::closeConnection() {
     if (sendCommand("exit", "", "", "", "", "", ""))
     {
         if((error_code = responseAnalyzer.readSingleLineResponse("exit")) == OK) {
+            response_first_line = std::to_string(error_code) + " exit\n\n";
             try {
                 connectionToServer.closeConnection();
                 return true;
@@ -35,9 +36,10 @@ bool TDPService::closeConnection() {
 
 bool TDPService::logout() {
     if (sendCommand("logout", "", "", "", "", "", "")
-        && (error_code = responseAnalyzer.readSingleLineResponse("logout")) == OK)
+        && (error_code = responseAnalyzer.readSingleLineResponse("logout")) == OK) {
+        response_first_line = std::to_string(error_code) + " logout\n\n";
         return true;
-    else
+    } else
         return false;
 }
 
