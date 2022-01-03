@@ -1,6 +1,7 @@
 #include "tds/protocol/execution/mkdir.hpp"
 
 #include "tds/protocol/protocol_error.hpp"
+
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -19,9 +20,6 @@ namespace tds::protocol::execution {
     }
 
     void Mkdir::execute() {
-        m_response_builder.set_code(ProtocolCode::ok);
-        m_response_builder.set_command_name(name);
-
         const fs::path full_path = m_client_context->get_current_path() / *m_name;
 
         if(fs::exists(full_path)) {

@@ -7,12 +7,14 @@
 namespace tds::protocol::execution {
     class CommandBase {
     public:
-        CommandBase() = default;
+        CommandBase();
         CommandBase(const CommandBase&) = delete;
         CommandBase& operator=(const CommandBase&) = delete;
 
         void set_server_context(ServerContext& server_context);
         void set_client_context(ClientContext& client_context);
+        void set_command_name(std::string_view command_name);
+
         Response get_response();
 
     protected:
