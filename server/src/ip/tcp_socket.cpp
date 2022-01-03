@@ -14,7 +14,7 @@ namespace tds::ip {
         , m_endpoint{endpoint} {
         const int flag = 1;
         if(setsockopt(get_fd(), IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(int)) == -1) {
-            throw linux::LinuxError{"getsockopt(2)"};
+            throw linux::LinuxError{"setsockopt(2)"};
         }
     }
 

@@ -21,6 +21,7 @@ namespace tds::protocol {
         user_already_logged = 407,
         invalid_credentials = 408,
         file_already_exists = 409,
+        invalid_file_type = 410,
     };
 
     constexpr bool is_info_code(ProtocolCode code) noexcept {

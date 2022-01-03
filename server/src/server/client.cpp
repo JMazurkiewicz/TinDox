@@ -128,12 +128,13 @@ namespace tds::server {
             try {
                 m_command_executor.set_command(request.get_name());
                 m_command_executor.parse_fields(request.get_fields());
-                server_logger->debug("Executing '{}' command for {} client", request.get_name(), m_socket.get_endpoint());
+                server_logger->debug("Executing '{}' command for {} client", request.get_name(),
+                                     m_socket.get_endpoint());
                 m_command_executor.execute();
                 m_sender.add_response(m_command_executor.get_response());
             } catch(const protocol::ProtocolError& e) {
-                server_logger->debug("Execution error caused by client from {}: '{}' ({})", m_socket.get_endpoint(), e.what(),
-                                     static_cast<int>(e.get_code()));
+                server_logger->debug("Execution error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
+                                     e.what(), static_cast<int>(e.get_code()));
                 protocol::ResponseBuilder builder;
                 builder.set_code(e.get_code());
                 builder.set_command_name(std::string{request.get_name()});
