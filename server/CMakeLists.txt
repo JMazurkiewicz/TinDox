@@ -117,6 +117,7 @@ set(
     src/protocol/execution/logout.cpp
     src/protocol/execution/ls.cpp
     src/protocol/execution/mkdir.cpp
+    src/protocol/execution/mv.cpp
     src/protocol/execution/name.cpp
     src/protocol/execution/pwd.cpp
     src/protocol/execution/transport_command.cpp

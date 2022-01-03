@@ -9,11 +9,13 @@
 #include "tds/protocol/execution/logout.hpp"
 #include "tds/protocol/execution/ls.hpp"
 #include "tds/protocol/execution/mkdir.hpp"
+#include "tds/protocol/execution/mv.hpp"
 #include "tds/protocol/execution/name.hpp"
 #include "tds/protocol/execution/pwd.hpp"
 
 namespace tds::protocol {
     using DefaultCommandExecutor =
         execution::CommandExecutor<execution::Auth, execution::Bye, execution::Cd, execution::Cp, execution::Exit,
-                                   execution::Logout, execution::Ls, execution::Mkdir, execution::Name, execution::Pwd>;
+                                   execution::Logout, execution::Ls, execution::Mkdir, execution::Mv, execution::Name,
+                                   execution::Pwd>;
 }
