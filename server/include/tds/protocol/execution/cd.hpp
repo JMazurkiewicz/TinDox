@@ -1,24 +1,14 @@
 #pragma once
 
-#include "tds/protocol/execution/command_base.hpp"
-#include "tds/protocol/field.hpp"
-#include "tds/user/permissions.hpp"
-
-#include <span>
+#include "tds/protocol/execution/path_based_command.hpp"
 
 namespace tds::protocol::execution {
-    class Cd : public CommandBase {
+    class Cd : public PathBasedCommand {
     public:
         static constexpr std::string_view name = "cd";
         static constexpr user::Permissions required_perms = user::Permissions::none;
-        static constexpr bool requires_authorization = true;
 
         void parse_fields(std::span<const Field> fields);
         void execute();
-
-    private:
-        void parse_path(const Field& path_field);
-
-        std::optional<std::filesystem::path> m_path;
     };
 }

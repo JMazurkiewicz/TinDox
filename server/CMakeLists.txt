@@ -119,6 +119,7 @@ set(
     src/protocol/execution/mkdir.cpp
     src/protocol/execution/mv.cpp
     src/protocol/execution/name.cpp
+    src/protocol/execution/path_based_command.cpp
     src/protocol/execution/pwd.cpp
     src/protocol/execution/transport_command.cpp
 

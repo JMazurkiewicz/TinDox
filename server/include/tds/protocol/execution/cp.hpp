@@ -7,7 +7,6 @@ namespace tds::protocol::execution {
     public:
         static constexpr std::string_view name = "cp";
         static constexpr user::Permissions required_perms = user::Permissions::copy;
-        static constexpr bool requires_authorization = true;
 
         void execute();
     };

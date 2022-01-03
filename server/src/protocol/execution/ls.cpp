@@ -1,5 +1,7 @@
 #include "tds/protocol/execution/ls.hpp"
 
+#include "tds/protocol/execution/path_based_command.hpp"
+
 #include <chrono>
 
 #include <fmt/chrono.h>
@@ -14,10 +16,9 @@ namespace tds::protocol::execution {
         , m_return_mod{false} { }
 
     void Ls::parse_fields(std::span<const Field> fields) {
+        PathBasedCommand::parse_fields(fields);
         for(auto&& field : fields) {
-            if(field.get_name() == "path") {
-                parse_path(field);
-            } else if(field.get_name() == "size") {
+            if(field.get_name() == "size") {
                 parse_size(field);
             } else if(field.get_name() == "mod") {
                 parse_mod(field);
@@ -26,11 +27,11 @@ namespace tds::protocol::execution {
     }
 
     void Ls::execute() {
-        if(!m_path.has_value()) {
-            m_path.emplace(m_client_context->get_current_path());
+        if(!has_path()) {
+            set_path(m_client_context->get_current_path());
         }
 
-        for(auto&& entry : fs::directory_iterator{*m_path}) {
+        for(auto&& entry : fs::directory_iterator{get_path()}) {
             std::string line;
             line += '"' + entry.path().filename().native() + '"';
 
@@ -61,39 +62,6 @@ namespace tds::protocol::execution {
 
             m_response_builder.add_line(line);
         }
-    }
-
-    void Ls::parse_path(const Field& path_field) {
-        if(m_path.has_value()) {
-            throw ProtocolError{ProtocolCode::bad_field, "path was already set"};
-        }
-
-        const auto path_value = path_field.get_string();
-        if(!path_value.has_value()) {
-            throw ProtocolError{ProtocolCode::invalid_field_value,
-                                "path field has invalid value type (should be string)"};
-        }
-
-        fs::path requested_path = *path_value;
-        fs::path final_path;
-
-        if(requested_path.is_absolute()) {
-            final_path = fs::path{m_server_context->get_root_path()} += requested_path;
-        } else {
-            fs::path suffix = ".//";
-            suffix += fs::path{*path_value}.lexically_normal();
-            final_path = (m_client_context->get_current_path() / suffix).lexically_normal();
-
-            if(!final_path.native().starts_with(m_server_context->get_root_path().native())) {
-                final_path = m_server_context->get_root_path();
-            }
-        }
-
-        if(!fs::exists(final_path)) {
-            throw ProtocolError{ProtocolCode::not_found, fmt::format("directory '{}' does not exist", *path_value)};
-        }
-
-        m_path.emplace(std::move(final_path));
     }
 
     void Ls::parse_size(const Field& size_field) {
