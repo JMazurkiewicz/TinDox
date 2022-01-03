@@ -20,6 +20,9 @@ namespace tds::ip {
         } else {
             set_fd(socket_fd);
         }
+
+        const int flag = 1;
+        setsockopt(get_fd(), SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(int));
     }
 
     void TcpListener::set_backlog(int new_backlog) {
