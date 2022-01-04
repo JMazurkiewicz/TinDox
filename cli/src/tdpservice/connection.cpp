@@ -5,7 +5,6 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <iostream>
 
 void Connection::createSocket() {
     sock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0 );
@@ -61,7 +60,7 @@ void Connection::closeConnection() {
 bool Connection::sendToServer(std::string &message) {
     if(isConnectionOpen) {
         const char *msg = message.c_str();
-        unsigned long len = message.size() + 1;
+        unsigned long len = message.size();
         unsigned long buf_pos = 0;
         while(len) {
             int new_events = epoll_wait(epfd_write, events, MAX_EPOLL_EVENTS, -1);
