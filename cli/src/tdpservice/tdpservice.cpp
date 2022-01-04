@@ -133,7 +133,7 @@ bool TDPService::sendCommand(const string &command_name, const string &field_nam
 	if (!field_name2.empty())
 		last_sent_command += field_name2 + ":" + field_value2 + "\n";
 
-	if (!field_name1.empty())
+	if (!field_name3.empty())
 
 		last_sent_command += field_name3 + ":" + field_value3 + "\n";
 
