@@ -33,7 +33,7 @@ bool TDPService::logout() {
 		return false;
 }
 
-bool TDPService::auth(string login, string passwd) {
+bool TDPService::auth(const string &login, const string &passwd) {
 	if (sendCommand("auth", "login", login, "passwd", passwd, "", "")
 	    && (error_code = responseAnalyzer.readSimpleResponse("auth", received_response, response_body, false)) == OK)
 		return true;
@@ -41,7 +41,7 @@ bool TDPService::auth(string login, string passwd) {
 		return false;
 }
 
-bool TDPService::mkdir(string name) {
+bool TDPService::mkdir(const string &name) {
 	if (sendCommand("mkdir", "name", name, "", "", "", "")
 	    && (error_code = responseAnalyzer.readSimpleResponse("mkdir", received_response, response_body, false)) == OK)
 		return true;
@@ -49,7 +49,7 @@ bool TDPService::mkdir(string name) {
 		return false;
 }
 
-bool TDPService::rm(string name) {
+bool TDPService::rm(const string &name) {
 	if (sendCommand("rm", "name", name, "", "", "", "")
 	    && (error_code = responseAnalyzer.readSimpleResponse("rm", received_response, response_body, false)) == OK)
 		return true;
@@ -57,7 +57,7 @@ bool TDPService::rm(string name) {
 		return false;
 }
 
-bool TDPService::rename(string oname, string nname) {
+bool TDPService::rename(const string &oname, const string &nname) {
 	if (sendCommand("rename", "oname", oname, "nname", nname, "", "")
 	    && (error_code = responseAnalyzer.readSimpleResponse("rename", received_response, response_body, false)) == OK)
 		return true;
@@ -65,7 +65,7 @@ bool TDPService::rename(string oname, string nname) {
 		return false;
 }
 
-bool TDPService::cp(string name, string path) {
+bool TDPService::cp(const string &name, const string &path) {
 	if (sendCommand("cp", "name", name, "path", path, "", "")
 	    && (error_code = responseAnalyzer.readSimpleResponse("cp", received_response, response_body, false)) == OK)
 		return true;
@@ -73,9 +73,42 @@ bool TDPService::cp(string name, string path) {
 		return false;
 }
 
-bool TDPService::mv(string name, string path) {
+bool TDPService::mv(const string &name, const string &path) {
 	if (sendCommand("mv", "name", name, "path", path, "", "")
 	    && (error_code = responseAnalyzer.readSimpleResponse("mv", received_response, response_body, false)) == OK)
+		return true;
+	else
+		return false;
+}
+
+bool TDPService::cd(const string &path) {
+	if (sendCommand("cd", "path", path, "", "", "", "")
+	    && (error_code = responseAnalyzer.readSimpleResponse("cd", received_response, response_body, true)) == OK)
+		return true;
+	else
+		return false;
+}
+
+bool TDPService::ls(const string &path, const string &size, const string &mod) {
+	if (sendCommand("ls", path.empty() ? "" : "path", path,
+	                size.empty() ? "" : "size", size, mod.empty() ? "" : "mod", mod)
+	    && (error_code = responseAnalyzer.readLsResponse(received_response, response_body)) == OK)
+		return true;
+	else
+		return false;
+}
+
+bool TDPService::name() {
+	if (sendCommand("name", "", "", "", "", "", "")
+	    && (error_code = responseAnalyzer.readSimpleResponse("name", received_response, response_body, true)) == OK)
+		return true;
+	else
+		return false;
+}
+
+bool TDPService::pwd() {
+	if (sendCommand("pwd", "", "", "", "", "", "")
+	    && (error_code = responseAnalyzer.readSimpleResponse("pwd", received_response, response_body, true)) == OK)
 		return true;
 	else
 		return false;
@@ -94,14 +127,16 @@ bool TDPService::sendCommand(const string &command_name, const string &field_nam
 
 	last_sent_command.clear();
 	last_sent_command = command_name + "\n";
-	if (!field_name1.empty()) {
+	if (!field_name1.empty())
 		last_sent_command += field_name1 + ":" + field_value1 + "\n";
-		if (!field_name2.empty()) {
-			last_sent_command += field_name2 + ":" + field_value2 + "\n";
-			if (!field_name3.empty())
-				last_sent_command += field_name3 + ":" + field_value3 + "\n";
-		}
-	}
+
+	if (!field_name2.empty())
+		last_sent_command += field_name2 + ":" + field_value2 + "\n";
+
+	if (!field_name1.empty())
+
+		last_sent_command += field_name3 + ":" + field_value3 + "\n";
+
 	last_sent_command += "\n";
 
 	try {

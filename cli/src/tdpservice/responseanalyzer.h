@@ -15,6 +15,8 @@ public:
 	ConnectionError readSimpleResponse(string command_name, string &received_response, string &response_body,
 	                                   bool isSpecificAnswerExpected);
 
+	ConnectionError readLsResponse(string &received_response, string &response_body);
+
 private:
 	string read_buf;
 	shared_ptr<Connection> connectionToServer;
@@ -25,11 +27,13 @@ private:
 
 	ConnectionError readRestIntoBuf(string::iterator &iter);
 
-	ConnectionError checkRestOfResponseHeader(string::iterator &iter, string command_name);
+	ConnectionError checkRestOfResponseHeader(string::iterator &iter, const string &command_name);
 
 	ConnectionError nextReadChar(string::iterator &iter);
 
 	ConnectionError getResponseLine(string::iterator &iter, string &response_body);
+
+	ConnectionError getMultipleLineResponse(string::iterator &iter, string &response_body);
 };
 
 
