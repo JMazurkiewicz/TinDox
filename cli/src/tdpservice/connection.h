@@ -13,28 +13,28 @@ using std::string;
 class Connection {
 public:
 
-    Connection() = default;
+	Connection() = default;
 
-    ~Connection() {
-        closeConnection();
-    }
+	~Connection() {
+		closeConnection();
+	}
 
-    void connectToServer(const string& serv_ip, int serv_port);
+	void connectToServer(const string &serv_ip, int serv_port);
 
-    void closeConnection();
+	void closeConnection();
 
-    bool sendToServer(std::string &message);
+	bool sendToServer(std::string &message);
 
-    bool receiveAllReadyFromServer(std::string &message);
+	bool receiveAllReadyFromServer(std::string &message);
 
 private:
 
-    void createSocket();
+	void createSocket();
 
-    int sock, epfd_read, epfd_write;
-    bool isConnectionOpen = false;
-    struct sockaddr_in server;
-    struct epoll_event events[MAX_EPOLL_EVENTS];
+	int sock, epfd_read, epfd_write;
+	bool isConnectionOpen = false;
+	struct sockaddr_in server;
+	struct epoll_event events[MAX_EPOLL_EVENTS];
 };
 
 
