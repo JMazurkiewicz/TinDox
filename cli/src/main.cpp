@@ -11,9 +11,11 @@ int main() {
 
 	TDPService service;
 	service.initConnection("127.0.0.1", 37666);
-	service.auth("admin", "admi");
+	service.auth("admin", "admin");
 	cout << service.last_sent_command << service.received_response;
-	service.logout();
+	service.pwd();
+	cout << service.last_sent_command << service.received_response;
+	service.ls("", "", "");
 	cout << service.last_sent_command << service.received_response;
 	service.closeConnection();
 	return 0;

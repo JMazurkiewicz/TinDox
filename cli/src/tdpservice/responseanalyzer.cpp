@@ -4,6 +4,7 @@
 ConnectionError ResponseAnalyzer::readSimpleResponse(string command_name, string &received_response,
                                                      string &response_body, bool isSpecificAnswerExpected) {
 	auto iter = read_buf.begin();
+	received_response.clear();
 	ConnectionError response_code = getResponseHeader(iter, command_name);
 	if (response_code != E_RESPONSE && response_code != E_NOTHING_READ && response_code != E_READ_MESSAGE) {
 		if (response_code == OK && !isSpecificAnswerExpected) {
@@ -21,6 +22,22 @@ ConnectionError ResponseAnalyzer::readSimpleResponse(string command_name, string
 				response_code = E_RESPONSE;
 			}
 		}
+	}
+
+	return response_code;
+}
+
+ConnectionError ResponseAnalyzer::readLsResponse(string &received_response, string &response_body) {
+	auto iter = read_buf.begin();
+	string command_name = "ls";
+	received_response.clear();
+	ConnectionError response_code = getResponseHeader(iter, command_name);
+	if (response_code != E_RESPONSE && response_code != E_NOTHING_READ && response_code != E_READ_MESSAGE) {
+		if (getMultipleLineResponse(iter, response_body) == NONE) {
+			received_response = std::to_string(response_code) + " ls\n";
+			received_response += response_body;
+		} else
+			return E_RESPONSE;
 	}
 
 	return response_code;
@@ -70,11 +87,11 @@ ConnectionError ResponseAnalyzer::readRestIntoBuf(string::iterator &iter) {
 	}
 }
 
-ConnectionError ResponseAnalyzer::checkRestOfResponseHeader(string::iterator &iter, string command_name) {
+ConnectionError ResponseAnalyzer::checkRestOfResponseHeader(string::iterator &iter, const string &command_name) {
 
 	const string correct_ending = " " + command_name + "\n";
-	for (int i = 0; i < correct_ending.size(); ++i) {
-		if (*iter != correct_ending[i])
+	for (char i: correct_ending) {
+		if (*iter != i)
 			return E_BAD_COMMAND;
 
 		if (nextReadChar(iter) != NONE)
@@ -113,4 +130,27 @@ ConnectionError ResponseAnalyzer::getResponseLine(string::iterator &iter, string
 		return NONE;
 	} else
 		return E_RESPONSE;
+}
+
+ConnectionError ResponseAnalyzer::getMultipleLineResponse(string::iterator &iter, string &response_body) {
+	response_body.clear();
+
+	if (*iter != '\n') {
+		bool found_new_line_char, found_command_separator = false;
+
+		while (!found_command_separator) {
+			found_new_line_char = false;
+
+			while (!found_new_line_char) {
+				found_new_line_char = (*iter == '\n');
+				response_body += *iter;
+				if (nextReadChar(iter) != NONE)
+					return E_RESPONSE;
+			}
+
+			found_command_separator = (*iter == '\n');
+		}
+	}
+	response_body += "\n";
+	return NONE;
 }
