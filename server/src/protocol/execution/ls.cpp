@@ -4,12 +4,9 @@
 #include "tds/protocol/server_context.hpp"
 
 #include <chrono>
-#include <ranges>
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
-
-namespace fs = std::filesystem;
 
 namespace tds::protocol::execution {
     Ls::Ls()
@@ -32,11 +29,11 @@ namespace tds::protocol::execution {
             set_path(m_client_context->get_current_path());
         }
 
-        auto directory =
-            std::ranges::subrange{fs::directory_iterator{get_path()}, fs::directory_iterator{}} |
-            std::views::filter([&](const fs::path& path) { return !m_server_context->is_forbidden(path); });
+        for(auto&& entry : std::filesystem::directory_iterator{get_path()}) {
+            if(m_server_context->is_forbidden(entry.path())) {
+                continue;
+            }
 
-        for(auto&& entry : directory) {
             std::string line;
             line += '"' + entry.path().filename().native() + '"';
 
