@@ -15,7 +15,8 @@ namespace tds::server {
         : m_socket{std::move(socket)}
         , m_receiver{m_socket}
         , m_command_executor{server_context, m_context}
-        , m_sender{m_socket} { }
+        , m_sender{m_socket}
+        , m_download_manager{m_socket} { }
 
     Client::~Client() {
         server_logger->warn("Closed connection with client from {}", m_socket.get_endpoint());
@@ -49,7 +50,11 @@ namespace tds::server {
             if((events & linux::EventType::in) != linux::EventType{}) {
                 handle_input();
             }
-            process();
+
+            if(m_context.get_mode() == protocol::ProtocolMode::command) {
+                process_commands();
+            }
+
             if((events & linux::EventType::out) != linux::EventType{}) {
                 handle_output();
             }
@@ -93,7 +98,7 @@ namespace tds::server {
                 m_interpreter.restart();
             }
 
-            // TODO very special case -- break if upload start/resume happened
+            // TODO very special case -- break if back is 'uls', process all commands and eventually start upload
         } while(!input.empty());
 
         if(!input.empty()) {
@@ -103,22 +108,6 @@ namespace tds::server {
 
     void Client::handle_upload(std::span<const char> input) {
         // TODO upload file with UploadManager!
-    }
-
-    void Client::process() {
-        switch(m_context.get_mode()) {
-        case protocol::ProtocolMode::command:
-            process_commands();
-            break;
-
-        case protocol::ProtocolMode::download:
-            process_download();
-            break;
-
-        case protocol::ProtocolMode::upload:
-            // TODO process upload??
-            break;
-        }
     }
 
     void Client::process_commands() {
@@ -131,7 +120,12 @@ namespace tds::server {
                 server_logger->debug("Executing '{}' command for {} client", request.get_name(),
                                      m_socket.get_endpoint());
                 m_command_executor.execute();
-                m_sender.add_response(m_command_executor.get_response());
+
+                if(m_context.get_mode() == protocol::ProtocolMode::download) {
+                    m_download_manager.start_download(m_context.get_download_token());
+                } else {
+                    m_sender.add_response(m_command_executor.get_response());
+                }
             } catch(const protocol::ProtocolError& e) {
                 server_logger->debug("Execution error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
                                      e.what(), static_cast<int>(e.get_code()));
@@ -146,12 +140,31 @@ namespace tds::server {
         }
     }
 
-    void Client::process_download() {
-        // TODO handle download with download manager
+    void Client::handle_output() {
+        switch(m_context.get_mode()) {
+        case protocol::ProtocolMode::command:
+            handle_executor_output();
+            break;
+
+        case protocol::ProtocolMode::download:
+            handle_download_manager_output();
+            break;
+
+        case protocol::ProtocolMode::upload:
+            break;
+        }
     }
 
-    void Client::handle_output() {
+    void Client::handle_executor_output() {
         const std::size_t sent_byte_count = m_sender.send();
-        server_logger->debug("Sent {} bytes to {} client", sent_byte_count, m_socket.get_endpoint());
+        server_logger->debug("Sender sent {} bytes to {} client", sent_byte_count, m_socket.get_endpoint());
+    }
+
+    void Client::handle_download_manager_output() {
+        const std::size_t sent_byte_count = m_download_manager.send();
+        server_logger->debug("DownloadManager sent {} bytes to {} client", sent_byte_count, m_socket.get_endpoint());
+        if(m_download_manager.has_finished()) {
+            m_context.set_mode(protocol::ProtocolMode::command);
+        }
     }
 }

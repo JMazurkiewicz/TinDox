@@ -102,17 +102,21 @@ set(
     src/linux/echoless_terminal_guard.cpp
     src/linux/epoll_buffer.cpp
     src/linux/epoll_device.cpp
+    src/linux/file_device.cpp
     src/linux/hash.cpp
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
     src/linux/pipe_device.cpp
     src/linux/signal_device.cpp
     src/linux/terminal.cpp
+    src/linux/transfer_bytes.cpp
 
     src/protocol/execution/auth.cpp
     src/protocol/execution/cd.cpp
     src/protocol/execution/command_base.cpp
     src/protocol/execution/cp.cpp
+    src/protocol/execution/dl.cpp
+    src/protocol/execution/dls.cpp
     src/protocol/execution/exit.cpp
     src/protocol/execution/logout.cpp
     src/protocol/execution/ls.cpp
@@ -120,11 +124,14 @@ set(
     src/protocol/execution/mv.cpp
     src/protocol/execution/name.cpp
     src/protocol/execution/path_based_command.cpp
+    src/protocol/execution/perms.cpp
     src/protocol/execution/pwd.cpp
     src/protocol/execution/transport_command.cpp
 
     src/protocol/auth_token.cpp
     src/protocol/client_context.cpp
+    src/protocol/download_manager.cpp
+    src/protocol/download_token.cpp
     src/protocol/field.cpp
     src/protocol/protocol_error.cpp
     src/protocol/protocol_interpreter.cpp
