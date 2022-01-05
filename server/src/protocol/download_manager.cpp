@@ -3,13 +3,7 @@
 #include "tds/linux/linux_error.hpp"
 #include "tds/linux/transfer_bytes.hpp"
 
-#include <stdexcept>
-
 #include <fcntl.h>
-#include <fmt/core.h>
-#include <fmt/ostream.h>
-
-namespace fs = std::filesystem;
 
 namespace tds::protocol {
     DownloadManager::DownloadManager(ip::TcpSocket& socket)
@@ -17,8 +11,9 @@ namespace tds::protocol {
 
     void DownloadManager::start_download(std::shared_ptr<DownloadToken> token) {
         m_token = std::move(token);
-        open_file();
-        init_state();
+        m_file.open(m_token->get_file_path(), O_RDONLY);
+        m_offset = m_token->get_file_offset();
+        m_file_size = std::filesystem::file_size(m_token->get_file_path());
     }
 
     ssize_t DownloadManager::send() {
@@ -38,15 +33,5 @@ namespace tds::protocol {
 
     bool DownloadManager::has_finished() {
         return m_token == nullptr;
-    }
-
-    void DownloadManager::open_file() {
-        const fs::path& path = m_token->get_file_path();
-        m_file.open(path.c_str(), O_RDONLY);
-    }
-
-    void DownloadManager::init_state() {
-        m_offset = m_token->get_file_offset();
-        m_file_size = fs::file_size(m_token->get_file_path());
     }
 }

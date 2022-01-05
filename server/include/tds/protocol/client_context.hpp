@@ -9,7 +9,6 @@
 
 #include <filesystem>
 #include <memory>
-#include <optional>
 
 namespace tds::protocol {
     class ClientContext {

@@ -19,9 +19,6 @@ namespace tds::protocol {
         bool has_finished();
 
     private:
-        void open_file();
-        void init_state();
-
         ip::TcpSocket& m_socket;
         std::shared_ptr<DownloadToken> m_token;
         linux::FileDevice m_file;
