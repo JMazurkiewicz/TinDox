@@ -30,11 +30,11 @@ namespace tds::protocol {
 
     ssize_t DownloadManager::send() {
         const off64_t old_offset = m_offset;
-        const int result = sendfile(m_socket.get_fd(), fileno(m_file), &m_offset, m_file_size - m_offset);
+        const int result = sendfile64(m_socket.get_fd(), fileno(m_file), &m_offset, m_file_size - m_offset);
 
         if(result == -1 && errno != EAGAIN) {
             throw linux::LinuxError{"sendfile64(2)"};
-        } else {
+        } else if(m_file_size - m_offset == 0) {
             close_file();
             m_token.reset();
         }
