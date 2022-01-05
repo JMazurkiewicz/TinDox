@@ -25,6 +25,7 @@ namespace tds::protocol {
 
         bool is_authorized() const noexcept;
         void set_auth_token(std::shared_ptr<AuthToken> token);
+        int get_auth_try_count() const noexcept;
         const AuthToken& get_auth_token() const noexcept;
         void logout();
 
@@ -37,7 +38,8 @@ namespace tds::protocol {
         [[nodiscard]] std::shared_ptr<DownloadToken> get_download_token();
 
     private:
-        bool m_alive;
+        bool m_alive : 1;
+        int m_auth_try_count;
         ProtocolMode m_mode;
         std::shared_ptr<AuthToken> m_auth_token;
         std::shared_ptr<DownloadToken> m_download_token;
