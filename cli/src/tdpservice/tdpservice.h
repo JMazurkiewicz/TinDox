@@ -32,6 +32,8 @@ public:
 
 	bool cd(const string &path);
 
+	bool tree(const string &path);
+
 	bool ls(const string &path, const string &size, const string &mod);
 
 	bool name();

@@ -15,7 +15,7 @@ public:
 	ConnectionError readSimpleResponse(string command_name, string &received_response, string &response_body,
 	                                   bool isSpecificAnswerExpected);
 
-	ConnectionError readLsResponse(string &received_response, string &response_body);
+	ConnectionError readMultilineResponse(string &received_response, string &response_body, string command_name);
 
 private:
 	string read_buf;
