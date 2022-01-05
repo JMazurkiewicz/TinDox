@@ -11,7 +11,15 @@ namespace fs = std::filesystem;
 namespace tds::protocol::execution {
     void Cp::execute() {
         std::error_code errc;
-        fs::copy_file(m_client_context->get_current_path() / get_name(), get_path() / get_name(), errc);
+        const fs::path old_path = m_client_context->get_current_path() / get_name();
+        fs::path new_path = get_path() / get_name();
+
+        for(int copy_number = 1; fs::exists(new_path); ++copy_number) {
+            const fs::path new_name = fmt::format("{} (copy {})", get_name().native(), copy_number);
+            new_path = get_path() / new_name;
+        }
+
+        fs::copy_file(old_path, new_path, errc);
 
         if(const int code = errc.value(); code == EEXIST) {
             throw ProtocolError{ProtocolCode::file_already_exists};
