@@ -4,33 +4,46 @@ Author: Jakub Mazurkiewicz
 
 License: MIT (see [`LICENSE`](https://github.com/JMazurkiewicz/TinDox/blob/main/LICENSE) for details)
 
-## How to get
+## How to install
 
-### Get some dependencies
+### Easy way: use `dpkg`
+
+Go to [release page](https://github.com/JMazurkiewicz/TinDox/releases) and download latest `TinDoxServer.deb`. Then go to your download folder and do these steps:
+
+```sh
+sudo dpkg -i TinDoxServer.deb
+dpkg -s TinDoxServer
+```
+
+### Hard way: build it yourself
+
+#### Get some dependencies
 
 This step is not required - CMake will take care of dependencies anyway.
 
-```bash
+```sh
 sudo apt-get libfmt-dev libspdlog-dev
 ```
 
-### Build and install
+#### Build and install
 
-```bash
+```sh
+git clone https://github.com/JMazurkiewicz/TinDox.git
+cd server
 cmake -B build
 cmake --build build
 sudo cmake --install build
 ```
 
-### Run tests
+## How to run tests
 
-```bash
-cmake -B build -DTDS_TESTS=ON [-DTDS_{TYPE}_TESTS=ON...]
+```sh
+cmake -B build -DTDS_TESTS=ON -R "TYPE::*"
 cmake --build build
 ctest --test-dir build
 ```
 
-The `{TYPE}` must be at least one of:
+The `TYPE` must be one of:
 
 * `UNIT`
 * `INTEGRATION`

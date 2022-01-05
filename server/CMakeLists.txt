@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(
     TinDoxServer
     LANGUAGES CXX
-    VERSION 0.0.3
+    VERSION 0.0.4
     HOMEPAGE_URL https://github.com/JMazurkiewicz/TinDox/server
     DESCRIPTION "TinDox Server"
 )
@@ -12,8 +12,6 @@ if(NOT UNIX OR APPLE)
     message(FATAL_ERROR "This project is only supported by Linux OS.")
 endif()
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -156,15 +154,11 @@ set(
     src/user/user_table.cpp
 )
 
-if(TDS_STATIC)
-    add_library(tds-dev STATIC ${TDS_DEV_SOURCES})
-else()
-    add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
-endif()
-
-find_package(Threads REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
+add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
+target_compile_features(tds-dev PUBLIC cxx_std_20)
 target_include_directories(tds-dev PUBLIC include)
 target_link_libraries(tds-dev PRIVATE Threads::Threads fmt::fmt crypt)
 target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus spdlog::spdlog)
