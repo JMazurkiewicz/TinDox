@@ -8,6 +8,7 @@ namespace fs = std::filesystem;
 namespace tds::protocol {
     ClientContext::ClientContext()
         : m_alive{true}
+        , m_auth_try_count{0}
         , m_mode{ProtocolMode::command} { }
 
     bool ClientContext::is_alive() const noexcept {
@@ -31,11 +32,18 @@ namespace tds::protocol {
     }
 
     void ClientContext::set_auth_token(std::shared_ptr<AuthToken> token) {
-        if(is_authorized()) {
+        if(token == nullptr) {
+            ++m_auth_try_count;
+        } else if(is_authorized()) {
             throw ProtocolError{ProtocolCode::user_already_logged};
         } else {
             m_auth_token = std::move(token);
+            m_auth_try_count = 0;
         }
+    }
+
+    int ClientContext::get_auth_try_count() const noexcept{
+        return m_auth_try_count;
     }
 
     const AuthToken& ClientContext::get_auth_token() const noexcept {

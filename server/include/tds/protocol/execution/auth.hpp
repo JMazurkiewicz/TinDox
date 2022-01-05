@@ -7,6 +7,7 @@
 namespace tds::protocol::execution {
     class Auth : public CommandBase {
     public:
+        static constexpr int max_try_count = 3;
         static constexpr std::string_view name = "auth";
         static constexpr user::Permissions required_perms = user::Permissions::none;
         static constexpr bool requires_authorization = false;
