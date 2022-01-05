@@ -113,6 +113,8 @@ set(
     src/protocol/execution/cd.cpp
     src/protocol/execution/command_base.cpp
     src/protocol/execution/cp.cpp
+    src/protocol/execution/dl.cpp
+    src/protocol/execution/dls.cpp
     src/protocol/execution/exit.cpp
     src/protocol/execution/logout.cpp
     src/protocol/execution/ls.cpp
@@ -125,6 +127,8 @@ set(
 
     src/protocol/auth_token.cpp
     src/protocol/client_context.cpp
+    src/protocol/download_manager.cpp
+    src/protocol/download_token.cpp
     src/protocol/field.cpp
     src/protocol/protocol_error.cpp
     src/protocol/protocol_interpreter.cpp

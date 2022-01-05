@@ -58,6 +58,9 @@ namespace tds::protocol {
                 case invalid_file_type:
                     return "invalid file type";
 
+                case dls_without_dl:
+                    return "download start requested without dl command";
+
                 default:
                     return "unknown code";
                 }

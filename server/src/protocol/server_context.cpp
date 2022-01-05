@@ -29,7 +29,6 @@ namespace tds::protocol {
 
     std::shared_ptr<AuthToken> ServerContext::authorize_user(std::string_view username, const std::string& password) {
         std::lock_guard lock{m_mut};
-
         remove_dead_users();
         if(has_user_logged_in(username)) {
             throw ProtocolError{ProtocolCode::user_already_logged};
@@ -40,16 +39,31 @@ namespace tds::protocol {
         }
 
         auto new_token = std::make_shared<AuthToken>(std::string{username}, m_user_table.get_perms_of_user(username));
-        m_user_tokens.emplace_back(new_token);
+        m_auth_tokens.emplace_back(new_token);
         return new_token;
     }
 
+    void ServerContext::register_download_token(std::weak_ptr<DownloadToken> download_token) {
+        std::lock_guard lock{m_mut};
+        remove_dead_download_tokens();
+
+        if(!fs::exists(download_token.lock()->get_file_path())) {
+            throw ProtocolError{ProtocolCode::not_found};
+        } else {
+            m_download_tokens.emplace_back(std::move(download_token));
+        }
+    }
+
     void ServerContext::remove_dead_users() {
-        std::erase_if(m_user_tokens, [](auto& ptr) { return ptr.expired(); });
+        std::erase_if(m_auth_tokens, [](auto& ptr) { return ptr.expired(); });
     }
 
     bool ServerContext::has_user_logged_in(std::string_view username) {
-        return std::ranges::find(m_user_tokens, username, [](auto& ptr) { return ptr.lock()->get_username(); }) !=
-               m_user_tokens.end();
+        return std::ranges::find(m_auth_tokens, username, [](auto& ptr) { return ptr.lock()->get_username(); }) !=
+               m_auth_tokens.end();
+    }
+
+    void ServerContext::remove_dead_download_tokens() {
+        std::erase_if(m_download_tokens, [](auto& ptr) { return ptr.expired(); });
     }
 }

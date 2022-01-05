@@ -24,7 +24,7 @@ namespace tds::protocol::execution {
     }
 
     void Auth::execute() {
-        m_client_context->set_new_token(m_server_context->authorize_user(*m_username, *m_password));
+        m_client_context->set_auth_token(m_server_context->authorize_user(*m_username, *m_password));
         m_client_context->set_current_path(m_server_context->get_root_path());
     }
 

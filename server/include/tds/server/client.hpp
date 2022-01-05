@@ -4,6 +4,7 @@
 #include "tds/linux/event_type.hpp"
 #include "tds/protocol/client_context.hpp"
 #include "tds/protocol/default_command_executor.hpp"
+#include "tds/protocol/download_manager.hpp"
 #include "tds/protocol/protocol_interpreter.hpp"
 #include "tds/protocol/receiver.hpp"
 #include "tds/protocol/request.hpp"
@@ -32,11 +33,11 @@ namespace tds::server {
         void handle_commands(std::span<const char> input);
         void handle_upload(std::span<const char> input);
 
-        void process();
         void process_commands();
-        void process_download();
 
         void handle_output();
+        void handle_executor_output();
+        void handle_download_manager_output();
 
         ip::TcpSocket m_socket;
         protocol::ClientContext m_context;
@@ -46,5 +47,7 @@ namespace tds::server {
         protocol::ProtocolInterpreter m_interpreter;
         protocol::DefaultCommandExecutor m_command_executor;
         protocol::Sender m_sender;
+
+        protocol::DownloadManager m_download_manager;
     };
 }
