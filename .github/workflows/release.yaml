@@ -34,7 +34,6 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          build/TinDoxServer.deb
-          build/TinDoxServer.deb.sha256
+          server/build/TinDoxServer.deb*
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
