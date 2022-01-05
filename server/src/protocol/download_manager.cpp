@@ -1,26 +1,19 @@
 #include "tds/protocol/download_manager.hpp"
 
 #include "tds/linux/linux_error.hpp"
+#include "tds/linux/transfer_bytes.hpp"
 
 #include <stdexcept>
 
+#include <fcntl.h>
 #include <fmt/core.h>
 #include <fmt/ostream.h>
-#include <sys/types.h>
-#include <unistd.h>
 
 namespace fs = std::filesystem;
 
 namespace tds::protocol {
     DownloadManager::DownloadManager(ip::TcpSocket& socket)
-        : m_socket{socket}
-        , m_file{nullptr} { }
-
-    DownloadManager::~DownloadManager() {
-        if(m_file != nullptr) {
-            std::fclose(m_file);
-        }
-    }
+        : m_socket{socket} { }
 
     void DownloadManager::start_download(std::shared_ptr<DownloadToken> token) {
         m_token = std::move(token);
@@ -30,12 +23,13 @@ namespace tds::protocol {
 
     ssize_t DownloadManager::send() {
         const off64_t old_offset = m_offset;
-        const int result = sendfile64(m_socket.get_fd(), fileno(m_file), &m_offset, m_file_size - m_offset);
+        std::errc code = {};
+        const int count = linux::transfer_bytes(m_file, m_socket, m_offset, m_file_size - m_offset, code);
 
-        if(result == -1 && errno != EAGAIN) {
-            throw linux::LinuxError{"sendfile64(2)"};
+        if(count == -1 && code != std::errc::resource_unavailable_try_again) {
+            throw linux::LinuxError{static_cast<int>(code), "DownloadManager::send"};
         } else if(m_file_size - m_offset == 0) {
-            close_file();
+            m_file.close();
             m_token.reset();
         }
 
@@ -48,21 +42,11 @@ namespace tds::protocol {
 
     void DownloadManager::open_file() {
         const fs::path& path = m_token->get_file_path();
-        m_file = std::fopen(path.c_str(), "rb");
-        if(m_file == nullptr) {
-            throw std::runtime_error{fmt::format("DownloadManager: failed to open '{}' file", path)};
-        }
+        m_file.open(path.c_str(), O_RDONLY);
     }
 
     void DownloadManager::init_state() {
         m_offset = m_token->get_file_offset();
         m_file_size = fs::file_size(m_token->get_file_path());
-    }
-
-    void DownloadManager::close_file() {
-        if(m_file != nullptr) {
-            std::fclose(m_file);
-            m_file = nullptr;
-        }
     }
 }

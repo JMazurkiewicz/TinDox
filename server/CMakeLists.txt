@@ -102,12 +102,14 @@ set(
     src/linux/echoless_terminal_guard.cpp
     src/linux/epoll_buffer.cpp
     src/linux/epoll_device.cpp
+    src/linux/file_device.cpp
     src/linux/hash.cpp
     src/linux/io_device.cpp
     src/linux/linux_error.cpp
     src/linux/pipe_device.cpp
     src/linux/signal_device.cpp
     src/linux/terminal.cpp
+    src/linux/transfer_bytes.cpp
 
     src/protocol/execution/auth.cpp
     src/protocol/execution/cd.cpp
