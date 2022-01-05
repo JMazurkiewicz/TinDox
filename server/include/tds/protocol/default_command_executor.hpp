@@ -15,6 +15,7 @@
 #include "tds/protocol/execution/name.hpp"
 #include "tds/protocol/execution/perms.hpp"
 #include "tds/protocol/execution/pwd.hpp"
+#include "tds/protocol/execution/rename.hpp"
 #include "tds/protocol/execution/rm.hpp"
 #include "tds/protocol/execution/tree.hpp"
 
@@ -22,6 +23,6 @@ namespace tds::protocol {
     using DefaultCommandExecutor =
         execution::CommandExecutor<execution::Auth, execution::Bye, execution::Cd, execution::Cp, execution::Dl,
                                    execution::Dls, execution::Exit, execution::Logout, execution::Ls, execution::Mkdir,
-                                   execution::Mv, execution::Name, execution::Perms, execution::Pwd, execution::Rm,
-                                   execution::Tree>;
+                                   execution::Mv, execution::Name, execution::Perms, execution::Pwd, execution::Rename,
+                                   execution::Rm, execution::Tree>;
 }
