@@ -1,2 +1,3 @@
-# Don't include documentation in code statistics.
-docs-pl/** -linguist-detectable
+# Ensure GitHub detects all header files as C++ files
+*.h     linguist-language=C++
+*.hpp   linguist-language=C++
