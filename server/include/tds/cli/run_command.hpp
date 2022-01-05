@@ -10,6 +10,7 @@ namespace tds::cli {
     public:
         static constexpr std::string_view name = "run";
 
+        RunCommand();
         void parse_arguments(std::span<const std::string_view> args);
         void execute();
 
@@ -24,6 +25,7 @@ namespace tds::cli {
 
         std::optional<std::uint16_t> m_port;
         std::optional<std::filesystem::path> m_config_directory;
+        bool m_debug_mode : 1;
 
         config::ServerConfig m_config;
     };
