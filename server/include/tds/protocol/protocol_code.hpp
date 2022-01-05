@@ -16,7 +16,6 @@ namespace tds::protocol {
         not_logged_in = 402,
         invalid_field_value = 403,
         not_found = 404,
-        target_not_found = 405,
         not_enough_perms = 406,
         user_already_logged = 407,
         invalid_credentials = 408,

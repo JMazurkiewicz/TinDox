@@ -20,6 +20,8 @@ namespace tds::protocol {
         std::shared_ptr<AuthToken> authorize_user(std::string_view username, const std::string& password);
         void register_download_token(std::weak_ptr<DownloadToken> download_token);
 
+        bool is_forbidden(const std::filesystem::path& path) const;
+
     private:
         void remove_dead_users();
         bool has_user_logged_in(std::string_view username);
@@ -28,6 +30,7 @@ namespace tds::protocol {
 
         std::mutex m_mut;
         const std::filesystem::path m_root;
+        const std::filesystem::path m_config_directory;
         user::UserTable m_user_table;
 
         std::vector<std::weak_ptr<AuthToken>> m_auth_tokens;

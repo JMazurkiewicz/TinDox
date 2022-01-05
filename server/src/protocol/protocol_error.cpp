@@ -43,9 +43,6 @@ namespace tds::protocol {
                 case not_found:
                     return "file not found";
 
-                case target_not_found:
-                    return "target directory not found";
-
                 case user_already_logged:
                     return "user is already logged in";
 

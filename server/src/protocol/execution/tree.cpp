@@ -15,10 +15,15 @@ namespace tds::protocol::execution {
         }
 
         for(fs::recursive_directory_iterator it{get_path()}; it != fs::recursive_directory_iterator{}; ++it) {
+            if(m_server_context->is_forbidden(it->path())) {
+                it.disable_recursion_pending();
+                continue;
+            }
+
             std::string line(it.depth(), ' ');
             line += '"' + it->path().filename().native() + '"';
 
-            if(fs::is_directory(it->path()) && fs::is_empty(it->path())) {
+            if(it->is_directory() && fs::is_empty(it->path())) {
                 line += " E";
             }
 

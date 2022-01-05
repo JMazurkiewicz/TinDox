@@ -11,8 +11,9 @@ namespace fs = std::filesystem;
 
 namespace tds::protocol {
     ServerContext::ServerContext(fs::path root)
-        : m_root{std::move(root)} {
-        m_user_table.open(m_root / ".tds/users");
+        : m_root{std::move(root)}
+        , m_config_directory{m_root / ".tds"} {
+        m_user_table.open(m_config_directory / "users");
     }
 
     const fs::path& ServerContext::get_root_path() const noexcept {
@@ -51,6 +52,15 @@ namespace tds::protocol {
             throw ProtocolError{ProtocolCode::not_found};
         } else {
             m_download_tokens.emplace_back(std::move(download_token));
+        }
+    }
+
+    bool ServerContext::is_forbidden(const std::filesystem::path& path) const {
+        if(!path.is_absolute()) {
+            throw ProtocolError{ProtocolCode::unknown,
+                                "Server context requires absolute paths. Please send this to server developer."};
+        } else {
+            return path.native().starts_with(m_config_directory.native());
         }
     }
 
