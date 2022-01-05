@@ -40,7 +40,6 @@ namespace tds::protocol {
         bool m_alive;
         ProtocolMode m_mode;
         std::shared_ptr<AuthToken> m_auth_token;
-        std::filesystem::path m_current_path;
         std::shared_ptr<DownloadToken> m_download_token;
     };
 }

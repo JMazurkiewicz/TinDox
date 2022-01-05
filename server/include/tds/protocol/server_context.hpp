@@ -21,12 +21,16 @@ namespace tds::protocol {
         void register_download_token(std::weak_ptr<DownloadToken> download_token);
 
         bool is_forbidden(const std::filesystem::path& path) const;
+        bool is_locked(const std::filesystem::path& path);
 
     private:
-        void remove_dead_users();
         bool has_user_logged_in(std::string_view username);
 
+        void remove_dead_users();
         void remove_dead_download_tokens();
+
+        bool is_locked_by_user(const std::filesystem::path& path);
+        bool is_locked_by_download(const std::filesystem::path& path);
 
         std::mutex m_mut;
         const std::filesystem::path m_root;

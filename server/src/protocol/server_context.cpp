@@ -64,8 +64,9 @@ namespace tds::protocol {
         }
     }
 
-    void ServerContext::remove_dead_users() {
-        std::erase_if(m_auth_tokens, [](auto& ptr) { return ptr.expired(); });
+    bool ServerContext::is_locked(const std::filesystem::path& path) {
+        std::lock_guard lock{m_mut};
+        return is_locked_by_user(path) || is_locked_by_download(path);
     }
 
     bool ServerContext::has_user_logged_in(std::string_view username) {
@@ -73,7 +74,24 @@ namespace tds::protocol {
                m_auth_tokens.end();
     }
 
+    void ServerContext::remove_dead_users() {
+        std::erase_if(m_auth_tokens, [](auto& ptr) { return ptr.expired(); });
+    }
+
     void ServerContext::remove_dead_download_tokens() {
         std::erase_if(m_download_tokens, [](auto& ptr) { return ptr.expired(); });
+    }
+
+    bool ServerContext::is_locked_by_user(const fs::path& path) {
+        remove_dead_users();
+        return std::ranges::find_if(m_auth_tokens, [&](auto& ptr) {
+                   return ptr.lock()->get_current_path().native().starts_with(path.native());
+               }) != m_auth_tokens.end();
+    }
+
+    bool ServerContext::is_locked_by_download(const fs::path& path) {
+        remove_dead_download_tokens();
+        return std::ranges::find(m_download_tokens, path, [](auto& ptr) { return ptr.lock()->get_file_path(); }) !=
+               m_download_tokens.end();
     }
 }

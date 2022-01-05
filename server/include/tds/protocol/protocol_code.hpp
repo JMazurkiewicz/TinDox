@@ -22,6 +22,7 @@ namespace tds::protocol {
         file_already_exists = 409,
         invalid_file_type = 410,
         dls_without_dl = 411,
+        in_use = 412,
     };
 
     constexpr bool is_info_code(ProtocolCode code) noexcept {
