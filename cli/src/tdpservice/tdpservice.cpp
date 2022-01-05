@@ -92,11 +92,21 @@ bool TDPService::cd(const string &path) {
 bool TDPService::ls(const string &path, const string &size, const string &mod) {
 	if (sendCommand("ls", path.empty() ? "" : "path", path,
 	                size.empty() ? "" : "size", size, mod.empty() ? "" : "mod", mod)
-	    && (error_code = responseAnalyzer.readLsResponse(received_response, response_body)) == OK)
+	    && (error_code = responseAnalyzer.readMultilineResponse(received_response, response_body, "ls")) == OK)
 		return true;
 	else
 		return false;
 }
+
+bool TDPService::tree(const string &path) {
+	if (sendCommand("tree", path.empty() ? "" : "path", path,
+	                "", "", "", "")
+	    && (error_code = responseAnalyzer.readMultilineResponse(received_response, response_body, "tree")) == OK)
+		return true;
+	else
+		return false;
+}
+
 
 bool TDPService::name() {
 	if (sendCommand("name", "", "", "", "", "", "")

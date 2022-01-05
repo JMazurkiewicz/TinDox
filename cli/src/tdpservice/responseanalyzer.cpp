@@ -27,14 +27,14 @@ ConnectionError ResponseAnalyzer::readSimpleResponse(string command_name, string
 	return response_code;
 }
 
-ConnectionError ResponseAnalyzer::readLsResponse(string &received_response, string &response_body) {
+ConnectionError
+ResponseAnalyzer::readMultilineResponse(string &received_response, string &response_body, string command_name) {
 	auto iter = read_buf.begin();
-	string command_name = "ls";
 	received_response.clear();
 	ConnectionError response_code = getResponseHeader(iter, command_name);
 	if (response_code != E_RESPONSE && response_code != E_NOTHING_READ && response_code != E_READ_MESSAGE) {
 		if (getMultipleLineResponse(iter, response_body) == NONE) {
-			received_response = std::to_string(response_code) + " ls\n";
+			received_response = std::to_string(response_code) + " " + command_name + "\n";
 			received_response += response_body;
 		} else
 			return E_RESPONSE;
