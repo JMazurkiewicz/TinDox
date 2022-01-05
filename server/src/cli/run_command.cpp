@@ -22,6 +22,9 @@ namespace tds::cli {
         inline constexpr const char* config_directory_argument_tip = "tds run --dir <path to instance>";
     }
 
+    RunCommand::RunCommand()
+        : m_debug_mode{false} { }
+
     void RunCommand::parse_arguments(std::span<const std::string_view> args) {
         const auto args_end = args.end();
 
@@ -39,6 +42,8 @@ namespace tds::cli {
                 } else {
                     parse_config_directory_path(*it);
                 }
+            } else if(*it == "--debug") {
+                m_debug_mode = true;
             } else {
                 throw InvalidCommandArgumentsError{std::string{*it}, "tds run"};
             }
@@ -95,9 +100,9 @@ namespace tds::cli {
         server::Server server{*m_config_directory};
         server.set_config(m_config);
 
-#ifndef NDEBUG
-        server::server_logger->set_level(spdlog::level::debug);
-#endif
+        if(m_debug_mode) {
+            server::server_logger->set_level(spdlog::level::debug);
+        }
 
         server.launch();
     }
