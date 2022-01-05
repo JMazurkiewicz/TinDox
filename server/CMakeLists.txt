@@ -126,7 +126,10 @@ set(
     src/protocol/execution/path_based_command.cpp
     src/protocol/execution/perms.cpp
     src/protocol/execution/pwd.cpp
+    src/protocol/execution/rename.cpp
+    src/protocol/execution/rm.cpp
     src/protocol/execution/transport_command.cpp
+    src/protocol/execution/tree.cpp
 
     src/protocol/auth_token.cpp
     src/protocol/client_context.cpp

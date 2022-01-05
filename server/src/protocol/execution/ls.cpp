@@ -1,14 +1,12 @@
 #include "tds/protocol/execution/ls.hpp"
 
 #include "tds/protocol/execution/path_based_command.hpp"
+#include "tds/protocol/server_context.hpp"
 
 #include <chrono>
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
-
-namespace chrono = std::chrono;
-namespace fs = std::filesystem;
 
 namespace tds::protocol::execution {
     Ls::Ls()
@@ -31,7 +29,11 @@ namespace tds::protocol::execution {
             set_path(m_client_context->get_current_path());
         }
 
-        for(auto&& entry : fs::directory_iterator{get_path()}) {
+        for(auto&& entry : std::filesystem::directory_iterator{get_path()}) {
+            if(m_server_context->is_forbidden(entry.path())) {
+                continue;
+            }
+
             std::string line;
             line += '"' + entry.path().filename().native() + '"';
 
@@ -50,7 +52,7 @@ namespace tds::protocol::execution {
             if(m_return_mod) {
                 std::error_code errc;
                 const std::time_t lwt =
-                    chrono::system_clock::to_time_t(chrono::file_clock::to_sys(entry.last_write_time(errc)));
+                    std::chrono::system_clock::to_time_t(std::chrono::file_clock::to_sys(entry.last_write_time(errc)));
 
                 line += ' ';
                 if(errc.value() == 0) {

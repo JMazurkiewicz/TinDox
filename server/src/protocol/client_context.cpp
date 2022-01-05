@@ -47,11 +47,11 @@ namespace tds::protocol {
     }
 
     const fs::path& ClientContext::get_current_path() {
-        return m_current_path;
+        return get_auth_token().get_current_path();
     }
 
     void ClientContext::set_current_path(fs::path path) {
-        m_current_path = std::move(path);
+        m_auth_token->set_current_path(std::move(path));
     }
 
     bool ClientContext::has_download_token() const noexcept {

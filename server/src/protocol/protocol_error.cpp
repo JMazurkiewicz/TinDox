@@ -43,9 +43,6 @@ namespace tds::protocol {
                 case not_found:
                     return "file not found";
 
-                case target_not_found:
-                    return "target directory not found";
-
                 case user_already_logged:
                     return "user is already logged in";
 
@@ -60,6 +57,9 @@ namespace tds::protocol {
 
                 case dls_without_dl:
                     return "download start requested without dl command";
+
+                case in_use:
+                    return "file or directory is used by another user";
 
                 default:
                     return "unknown code";
