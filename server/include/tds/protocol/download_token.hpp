@@ -9,7 +9,7 @@
 namespace tds::protocol {
     class DownloadToken : public PathLock {
     public:
-        DownloadToken(std::filesystem::path file);
+        explicit DownloadToken(std::filesystem::path file);
 
         const std::filesystem::path& get_file_path() const noexcept;
         std::uintmax_t get_file_offset() const noexcept;

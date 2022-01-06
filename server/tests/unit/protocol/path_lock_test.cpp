@@ -26,30 +26,28 @@ TEST_CASE("tds::protocol::PathLock", "[protocol]") {
     }
 
     SECTION("Test 'set_locked_path'") {
-        const fs::path subpath = path / "subpath";
+        const fs::path subpath = path / "outer/inner";
         PathLock lock{path};
 
         lock.set_locked_path(subpath);
         REQUIRE(lock.get_locked_path() == subpath);
         REQUIRE(lock.has_locked_path(subpath));
-        REQUIRE(lock.has_locked_path(subpath / "hello.txt"));
+        REQUIRE(lock.has_locked_path(subpath / "outer"));
     }
 
     SECTION("Test path lock checking") {
         PathLock lock{path};
         REQUIRE(lock.has_locked_path(path));
-        REQUIRE(lock.has_locked_path(path / "subdirectory"));
-        REQUIRE(!lock.has_locked_path("/home"));
-        REQUIRE(!lock.has_locked_path("/home/td/client"));
+        REQUIRE(lock.has_locked_path(path / ".."));
+        REQUIRE(lock.has_locked_path("/"));
         REQUIRE_THROWS_AS(lock.has_locked_path("../relative_path"), std::runtime_error);
     }
 
     SECTION("Test 'make_path_lock'") {
         auto lock_ptr = make_path_lock(path);
         REQUIRE(lock_ptr->has_locked_path(path));
-        REQUIRE(lock_ptr->has_locked_path(path / "subdirectory"));
-        REQUIRE(!lock_ptr->has_locked_path("/home"));
-        REQUIRE(!lock_ptr->has_locked_path("/home/td/client"));
+        REQUIRE(lock_ptr->has_locked_path(path / ".."));
+        REQUIRE(lock_ptr->has_locked_path("/"));
         REQUIRE_THROWS_AS(lock_ptr->has_locked_path("../relative_path"), std::runtime_error);
     }
 }
