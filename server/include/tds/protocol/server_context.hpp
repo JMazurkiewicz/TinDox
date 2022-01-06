@@ -33,7 +33,6 @@ namespace tds::protocol {
         void remove_expired_path_locks();
         void remove_dead_download_tokens();
 
-        bool is_locked_by_user(const std::filesystem::path& path);
         bool is_locked_by_download(const std::filesystem::path& path);
 
         const std::filesystem::path m_root;

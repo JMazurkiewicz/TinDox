@@ -84,7 +84,7 @@ namespace tds::protocol {
     bool ServerContext::is_path_locked(const std::filesystem::path& path) {
         std::lock_guard lock{m_locks_mutex};
         remove_expired_path_locks();
-        const bool old_cond = is_locked_by_user(path) || is_locked_by_download(path);
+        const bool old_cond = is_locked_by_download(path);
         return old_cond || std::ranges::find_if(m_path_locks, [&](auto& ptr) {
                                return ptr.lock()->has_locked_path(path);
                            }) != m_path_locks.end();
@@ -105,13 +105,6 @@ namespace tds::protocol {
 
     void ServerContext::remove_dead_download_tokens() {
         std::erase_if(m_download_tokens, [](auto& ptr) { return ptr.expired(); });
-    }
-
-    bool ServerContext::is_locked_by_user(const fs::path& path) {
-        remove_dead_users();
-        return std::ranges::find_if(m_auth_tokens, [&](auto& ptr) {
-                   return ptr.lock()->get_current_path().native().starts_with(path.native());
-               }) != m_auth_tokens.end();
     }
 
     bool ServerContext::is_locked_by_download(const fs::path& path) {
