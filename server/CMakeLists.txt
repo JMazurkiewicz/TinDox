@@ -143,6 +143,7 @@ set(
     src/protocol/response.cpp
     src/protocol/sender.cpp
     src/protocol/server_context.cpp
+    src/protocol/upload_token.cpp
 
     src/server/client_pool.cpp
     src/server/client_service_supervisor.cpp
