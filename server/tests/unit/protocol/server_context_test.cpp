@@ -15,7 +15,7 @@ TEST_CASE("tds::protocol::ServerContext", "[protocol]") {
     fs::create_directory(root);
     {
         tds::cli::InitCommand init;
-        init.parse_arguments(std::array{"--dir"sv, std::string_view{root.native()}});
+        init.parse_arguments(std::array{std::string_view{root.native()}});
         init.execute();
     }
     ServerContext context{root};
