@@ -12,12 +12,14 @@ using namespace std::string_view_literals;
 
 TEST_CASE("tds::protocol::ServerContext", "[protocol]") {
     const fs::path root = "/tmp/tds_server_context_test";
-    fs::create_directory(root);
-    {
+
+    SECTION("Create tds instance") {
+        fs::create_directory(root);
         tds::cli::InitCommand init;
         init.parse_arguments(std::array{std::string_view{root.native()}});
         init.execute();
     }
+
     ServerContext context{root};
 
     SECTION("Test constructor") {
@@ -25,7 +27,7 @@ TEST_CASE("tds::protocol::ServerContext", "[protocol]") {
     }
 
     SECTION("Test 'get_relative_path_to") {
-        REQUIRE(context.get_relative_path_to(root / "test") == "test");
+        REQUIRE(context.get_relative_path_to(root / "test") == "/test");
         REQUIRE(context.get_relative_path_to(root) == "/");
     }
 
