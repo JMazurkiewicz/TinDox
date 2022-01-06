@@ -5,6 +5,7 @@
 #include "tds/protocol/server_context.hpp"
 
 #include <filesystem>
+#include <fstream>
 
 using namespace tds::protocol;
 namespace fs = std::filesystem;
@@ -15,6 +16,10 @@ TEST_CASE("tds::protocol::ServerContext", "[protocol]") {
 
     SECTION("Create tds instance") {
         fs::create_directory(root);
+        fs::create_directory(root / "subpath");
+        std::ofstream{root / "hello.txt"} << "Hello!";
+        std::ofstream{root / "subpath/hello.txt"} << "Hello 2!";
+
         tds::cli::InitCommand init;
         init.parse_arguments(std::array{std::string_view{root.native()}});
         init.execute();
