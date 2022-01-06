@@ -24,9 +24,8 @@ namespace tds::protocol::execution {
     }
 
     void Dl::execute() {
-        auto token = std::make_shared<DownloadToken>(m_client_context->get_current_path() / *m_name);
-        m_server_context->register_download_token(token);
-        m_client_context->set_download_token(std::move(token));
+        m_client_context->set_download_token(
+            m_server_context->download_file(m_client_context->get_current_path() / *m_name));
     }
 
     void Dl::parse_name(const Field& name_field) {
