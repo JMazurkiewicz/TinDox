@@ -22,6 +22,10 @@ namespace tds::protocol {
         return m_path;
     }
 
+    void PathLock::set_locked_path(const std::filesystem::path& new_path) {
+        m_path = std::move(new_path);
+    }
+
     std::shared_ptr<PathLock> make_path_lock(std::filesystem::path path) {
         return std::make_shared<PathLock>(std::move(path));
     }

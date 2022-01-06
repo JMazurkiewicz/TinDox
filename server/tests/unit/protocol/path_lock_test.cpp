@@ -6,9 +6,10 @@
 #include <type_traits>
 
 using namespace tds::protocol;
+namespace fs = std::filesystem;
 
 TEST_CASE("tds::protocol::PathLock", "[protocol]") {
-    const std::string path = "/home/td/server";
+    const fs::path path = "/home/td/server";
 
     SECTION("Test construction") {
         PathLock lock{path};
@@ -24,10 +25,20 @@ TEST_CASE("tds::protocol::PathLock", "[protocol]") {
         REQUIRE(!std::is_copy_assignable_v<PathLock>);
     }
 
+    SECTION("Test 'set_locked_path'") {
+        const fs::path subpath = path / "subpath";
+        PathLock lock{path};
+
+        lock.set_locked_path(subpath);
+        REQUIRE(lock.get_locked_path() == subpath);
+        REQUIRE(lock.has_locked_path(subpath));
+        REQUIRE(lock.has_locked_path(subpath / "hello.txt"));
+    }
+
     SECTION("Test path lock checking") {
         PathLock lock{path};
         REQUIRE(lock.has_locked_path(path));
-        REQUIRE(lock.has_locked_path(path + "/subdirectory"));
+        REQUIRE(lock.has_locked_path(path / "subdirectory"));
         REQUIRE(!lock.has_locked_path("/home"));
         REQUIRE(!lock.has_locked_path("/home/td/client"));
         REQUIRE_THROWS_AS(lock.has_locked_path("../relative_path"), std::runtime_error);
@@ -36,7 +47,7 @@ TEST_CASE("tds::protocol::PathLock", "[protocol]") {
     SECTION("Test 'make_path_lock'") {
         auto lock_ptr = make_path_lock(path);
         REQUIRE(lock_ptr->has_locked_path(path));
-        REQUIRE(lock_ptr->has_locked_path(path + "/subdirectory"));
+        REQUIRE(lock_ptr->has_locked_path(path / "subdirectory"));
         REQUIRE(!lock_ptr->has_locked_path("/home"));
         REQUIRE(!lock_ptr->has_locked_path("/home/td/client"));
         REQUIRE_THROWS_AS(lock_ptr->has_locked_path("../relative_path"), std::runtime_error);

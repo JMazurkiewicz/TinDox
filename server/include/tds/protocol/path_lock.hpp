@@ -12,6 +12,7 @@ namespace tds::protocol {
 
         bool has_locked_path(const std::filesystem::path& path);
         const std::filesystem::path& get_locked_path() const noexcept;
+        void set_locked_path(const std::filesystem::path& new_path);
 
     private:
         std::filesystem::path m_path;
