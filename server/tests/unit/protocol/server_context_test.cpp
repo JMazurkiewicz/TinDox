@@ -5,7 +5,6 @@
 #include "tds/protocol/server_context.hpp"
 
 #include <filesystem>
-#include <fstream>
 
 using namespace tds::protocol;
 namespace fs = std::filesystem;
@@ -16,9 +15,8 @@ TEST_CASE("tds::protocol::ServerContext", "[protocol]") {
 
     SECTION("Create tds instance") {
         fs::create_directory(root);
-        fs::create_directory(root / "subpath");
-        std::ofstream{root / "hello.txt"} << "Hello!";
-        std::ofstream{root / "subpath/hello.txt"} << "Hello 2!";
+        fs::create_directory(root / "outer");
+        fs::create_directory(root / "outer/inner");
 
         tds::cli::InitCommand init;
         init.parse_arguments(std::array{std::string_view{root.native()}});
@@ -48,15 +46,17 @@ TEST_CASE("tds::protocol::ServerContext", "[protocol]") {
     }
 
     SECTION("Test 'lock_path' and 'is_path_locked'") {
-        auto lock = context.lock_path(root / "subpath");
-        REQUIRE(context.is_path_locked(root / "subpath"));
-        REQUIRE(context.is_path_locked(root / "subpath/hello.txt"));
-        REQUIRE(!context.is_path_locked(root / "hello.txt"));
+        const fs::path inner = root / "outer/inner";
+
+        auto lock = context.lock_path(inner);
+        REQUIRE(context.is_path_locked(inner));
+        REQUIRE(context.is_path_locked(root / "outer"));
+        REQUIRE(context.is_path_locked(root));
 
         lock.reset();
-        REQUIRE(!context.is_path_locked(root / "subpath"));
-        REQUIRE(!context.is_path_locked(root / "subpath/hello.txt"));
-        REQUIRE(!context.is_path_locked(root / "hello.txt"));
+        REQUIRE(!context.is_path_locked(inner));
+        REQUIRE(!context.is_path_locked(root / "outer"));
+        REQUIRE(!context.is_path_locked(root));
     }
 
     SECTION("Test 'is_path_forbidden'") {
