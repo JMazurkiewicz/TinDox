@@ -48,6 +48,7 @@ set(
     tests/unit/linux/signal_device_test.cpp
 
     tests/unit/protocol/field_test.cpp
+    tests/unit/protocol/path_lock_test.cpp
     tests/unit/protocol/protocol_code_test.cpp
     tests/unit/protocol/protocol_interpreter_test.cpp
     tests/unit/protocol/receiver_test.cpp

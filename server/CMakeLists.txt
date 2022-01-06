@@ -134,6 +134,7 @@ set(
     src/protocol/download_manager.cpp
     src/protocol/download_token.cpp
     src/protocol/field.cpp
+    src/protocol/path_lock.cpp
     src/protocol/protocol_error.cpp
     src/protocol/protocol_interpreter.cpp
     src/protocol/receiver.cpp
