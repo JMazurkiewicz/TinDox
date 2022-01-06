@@ -6,8 +6,8 @@ namespace tds::protocol {
     DownloadToken::DownloadToken(std::filesystem::path file)
         : PathLock(std::move(file))
         , m_offset{0} {
-        if(!std::filesystem::is_regular_file(file)) {
-            throw ProtocolError{ProtocolCode::invalid_file_type, "DownloadToken: got invalid file path"};
+        if(!std::filesystem::is_regular_file(get_file_path())) {
+            throw ProtocolError{ProtocolCode::invalid_file_type, "invalid file (should be regular one)"};
         }
     }
 
