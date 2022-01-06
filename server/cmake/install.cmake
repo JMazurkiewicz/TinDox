@@ -20,4 +20,3 @@ set(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <mazkuba3@gmail.com>")
 set(CPACK_GENERATOR DEB)
 
 include(CPack)
-
