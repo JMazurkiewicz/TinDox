@@ -14,7 +14,7 @@ namespace tds::protocol {
         if(!path.is_absolute()) {
             throw std::runtime_error{"PathLock::has_locked_path: path must be absolute"};
         } else {
-            return path.native().starts_with(m_path.native());
+            return m_path.native().starts_with(path.native());
         }
     }
 
