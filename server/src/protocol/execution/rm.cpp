@@ -26,7 +26,7 @@ namespace tds::protocol::execution {
         const fs::path full_path = m_client_context->get_current_path() / *m_name;
         if(!fs::exists(full_path)) {
             throw ProtocolError{ProtocolCode::not_found};
-        } else if(m_server_context->is_locked(full_path)) {
+        } else if(m_server_context->is_path_locked(full_path)) {
             throw ProtocolError{ProtocolCode::in_use};
         } else {
             const std::uintmax_t count = fs::remove_all(full_path);

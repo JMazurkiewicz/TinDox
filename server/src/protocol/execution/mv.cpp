@@ -8,7 +8,7 @@ namespace fs = std::filesystem;
 namespace tds::protocol::execution {
     void Mv::execute() {
         const fs::path old_path = m_client_context->get_current_path() / get_name();
-        if(m_server_context->is_locked(old_path)) {
+        if(m_server_context->is_path_locked(old_path)) {
             throw ProtocolError{ProtocolCode::in_use};
         }
 
@@ -26,7 +26,7 @@ namespace tds::protocol::execution {
         } else if(code != 0) {
             throw ProtocolError{ProtocolCode::unknown,
                                 fmt::format("unknown filesystem error: failed to move {} to {} ({})", get_name(),
-                                            m_server_context->get_relative_path_of(get_path()), errc)};
+                                            m_server_context->get_relative_path_to(get_path()), errc)};
         }
     }
 }
