@@ -11,7 +11,8 @@ namespace tds::config {
         : m_max_thread_count{defaults::get_default_max_thread_count()}
         , m_max_user_count{defaults::get_default_max_user_count()}
         , m_backlog{defaults::get_default_backlog()}
-        , m_port{defaults::get_default_port()} { }
+        , m_port{defaults::get_default_port()}
+        , m_upload_max_size{defaults::get_default_upload_max_size()} { }
 
     int ServerConfig::get_max_thread_count() const noexcept {
         return m_max_thread_count;
@@ -60,5 +61,13 @@ namespace tds::config {
         } else {
             m_port = new_port;
         }
+    }
+
+    std::uintmax_t ServerConfig::get_upload_max_size() const noexcept {
+        return m_upload_max_size;
+    }
+
+    void ServerConfig::set_upload_max_size(std::uintmax_t new_upload_max_size) {
+        m_upload_max_size = new_upload_max_size;
     }
 }

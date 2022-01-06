@@ -42,7 +42,7 @@ namespace tds::protocol {
         }
     }
 
-    int ClientContext::get_auth_try_count() const noexcept{
+    int ClientContext::get_auth_try_count() const noexcept {
         return m_auth_try_count;
     }
 

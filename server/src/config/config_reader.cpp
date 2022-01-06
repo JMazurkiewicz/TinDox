@@ -43,6 +43,8 @@ namespace tds::config {
             } else {
                 m_config.set_port(ip::Port(value));
             }
+        } else if(name == "upload_max_size") {
+            m_config.set_upload_max_size(value);
         } else {
             throw std::runtime_error{fmt::format("ConfigReader: {} is not valid integer field", name)};
         }
