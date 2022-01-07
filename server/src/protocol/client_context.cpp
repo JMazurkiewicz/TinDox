@@ -85,4 +85,12 @@ namespace tds::protocol {
     std::shared_ptr<DownloadToken> ClientContext::get_download_token() {
         return std::move(m_download_token);
     }
+
+    void ClientContext::set_upload_token(std::shared_ptr<UploadToken> token) {
+        m_upload_token = std::move(token);
+    }
+
+    std::shared_ptr<UploadToken> ClientContext::get_upload_token() {
+        return std::move(m_upload_token);
+    }
 }

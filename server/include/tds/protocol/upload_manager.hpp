@@ -15,11 +15,14 @@ namespace tds::protocol {
         ~UploadManager();
 
         void start_upload(std::shared_ptr<UploadToken> token);
-        void append(std::span<const char> bytes);
+        void commit_bytes(std::span<const char> bytes);
         bool has_finished();
 
     private:
+        std::filesystem::path get_partial_file_name() const;
         std::ios_base::openmode get_openmode() const noexcept;
+
+        void create_backup();
 
         const std::filesystem::path m_temporary_path;
         std::shared_ptr<UploadToken> m_token;

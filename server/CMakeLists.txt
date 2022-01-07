@@ -128,6 +128,7 @@ set(
     src/protocol/execution/rm.cpp
     src/protocol/execution/transport_command.cpp
     src/protocol/execution/tree.cpp
+    src/protocol/execution/ul.cpp
 
     src/protocol/auth_token.cpp
     src/protocol/client_context.cpp
@@ -143,6 +144,7 @@ set(
     src/protocol/response.cpp
     src/protocol/sender.cpp
     src/protocol/server_context.cpp
+    src/protocol/upload_manager.cpp
     src/protocol/upload_token.cpp
 
     src/server/client_pool.cpp

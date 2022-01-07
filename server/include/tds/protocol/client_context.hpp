@@ -5,6 +5,7 @@
 #include "tds/protocol/protocol_interpreter.hpp"
 #include "tds/protocol/protocol_mode.hpp"
 #include "tds/protocol/server_context.hpp"
+#include "tds/protocol/upload_token.hpp"
 #include "tds/user/permissions.hpp"
 
 #include <filesystem>
@@ -38,6 +39,9 @@ namespace tds::protocol {
         void set_downloaded_file_offset(std::uintmax_t offset);
         [[nodiscard]] std::shared_ptr<DownloadToken> get_download_token();
 
+        void set_upload_token(std::shared_ptr<UploadToken> token);
+        [[nodiscard]] std::shared_ptr<UploadToken> get_upload_token();
+
     private:
         bool m_alive : 1;
         int m_auth_try_count : 7;
@@ -45,5 +49,6 @@ namespace tds::protocol {
         std::shared_ptr<AuthToken> m_auth_token;
         std::shared_ptr<PathLock> m_current_path_lock;
         std::shared_ptr<DownloadToken> m_download_token;
+        std::shared_ptr<UploadToken> m_upload_token;
     };
 }
