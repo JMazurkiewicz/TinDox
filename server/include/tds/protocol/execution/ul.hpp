@@ -17,7 +17,7 @@ namespace tds::protocol::execution {
         void parse_size(const Field& size_field);
         void parse_retry(const Field& retry_field);
 
-        // void retry();
+        void retry();
 
         std::optional<std::filesystem::path> m_name;
         std::optional<std::uintmax_t> m_size;

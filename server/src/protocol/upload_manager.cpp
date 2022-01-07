@@ -4,19 +4,21 @@
 
 namespace tds::protocol {
     UploadManager::UploadManager(const ServerContext& server_context)
-        : m_temporary_path{server_context.get_config_directory_path()} { }
+        : m_server_context{server_context} { }
 
     UploadManager::~UploadManager() {
-        create_backup();
+        if(!has_finished()) {
+            create_backup();
+        }
     }
 
     void UploadManager::start_upload(std::shared_ptr<UploadToken> token) {
         m_token = std::move(token);
-        m_file.open(get_partial_file_name(), get_openmode());
+        m_file.open(m_server_context.get_partial_file_path(m_token->get_temporary_filename_stem()), get_openmode());
     }
 
-    std::filesystem::path UploadManager::get_partial_file_name() const {
-        return ""; // TODO USERNAME.partial
+    bool UploadManager::has_finished() const noexcept {
+        return m_token == nullptr;
     }
 
     std::ios_base::openmode UploadManager::get_openmode() const noexcept {
@@ -28,7 +30,7 @@ namespace tds::protocol {
     }
 
     void UploadManager::create_backup() {
-        std::ofstream backup{m_temporary_path / /*USERNAME.upload*/ ""};
+        std::ofstream backup{m_server_context.get_backup_file_path(m_token->get_temporary_filename_stem())};
         backup << "destination = " << m_token->get_destination_path();
         backup << "\nsize = " << m_token->get_file_size();
         backup << "\nname = " << m_token->get_file_name();

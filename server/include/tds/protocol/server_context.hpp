@@ -26,6 +26,9 @@ namespace tds::protocol {
         [[nodiscard]] bool is_path_forbidden(const std::filesystem::path& path) const;
         [[nodiscard]] bool is_path_locked(const std::filesystem::path& path);
 
+        [[nodiscard]] std::string get_partial_file_path(const std::filesystem::path& filename_stem) const;
+        [[nodiscard]] std::string get_backup_file_path(const std::filesystem::path& filename_stem) const;
+
     private:
         bool is_user_authorized(std::string_view username);
         void check_path(const std::filesystem::path& path);

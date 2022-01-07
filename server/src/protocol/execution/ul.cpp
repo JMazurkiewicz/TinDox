@@ -4,6 +4,8 @@
 
 #include <algorithm>
 
+#include <toml++/toml.h>
+
 namespace fs = std::filesystem;
 
 namespace tds::protocol::execution {
@@ -25,7 +27,11 @@ namespace tds::protocol::execution {
         }
     }
 
-    void Ul::execute() { }
+    void Ul::execute() {
+        if(m_retry) {
+            retry();
+        }
+    }
 
     void Ul::parse_name(const Field& name_field) {
         if(m_name.has_value()) {
@@ -62,5 +68,10 @@ namespace tds::protocol::execution {
             throw ProtocolError{ProtocolCode::invalid_field_value,
                                 "retry field has invalid value type (should be boolean)"};
         }
+    }
+
+    void Ul::retry() {
+        const auto table =
+            toml::parse_file(m_server_context->get_backup_file_path(m_client_context->get_auth_token().get_username()));
     }
 }

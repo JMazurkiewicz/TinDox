@@ -87,6 +87,14 @@ namespace tds::protocol {
                m_path_locks.end();
     }
 
+    std::string ServerContext::get_partial_file_path(const fs::path& filename_stem) const {
+        return get_config_directory_path() / (filename_stem.native() + ".partial");
+    }
+
+    std::string ServerContext::get_backup_file_path(const fs::path& filename_stem) const {
+        return get_config_directory_path() / (filename_stem.native() + ".upload");
+    }
+
     bool ServerContext::is_user_authorized(std::string_view username) {
         return std::ranges::find(m_auth_tokens, username, [](auto& ptr) { return ptr.lock()->get_username(); }) !=
                m_auth_tokens.end();
