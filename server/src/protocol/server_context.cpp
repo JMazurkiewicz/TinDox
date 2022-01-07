@@ -7,7 +7,7 @@
 #include "tds/protocol/protocol_error.hpp"
 
 #include <algorithm>
-#include <mutex>
+#include <filesystem>
 #include <stdexcept>
 
 namespace fs = std::filesystem;
@@ -68,6 +68,21 @@ namespace tds::protocol {
         auto download_lock = make_download_token(path);
         m_path_locks.emplace_back(download_lock);
         return download_lock;
+    }
+
+    std::shared_ptr<UploadToken> ServerContext::upload_file(const std::filesystem::path& path, std::uintmax_t size) {
+        std::lock_guard loc{m_locks_mutex};
+        remove_expired_path_locks();
+
+        if(fs::exists(path)) {
+            throw ProtocolError{ProtocolCode::file_already_exists};
+        } else if(!fs::exists(path.parent_path())) {
+            throw ProtocolError{ProtocolCode::not_found};
+        }
+
+        auto upload_lock = make_upload_token(path, size);
+        m_path_locks.emplace_back(upload_lock);
+        return upload_lock;
     }
 
     bool ServerContext::is_path_forbidden(const std::filesystem::path& path) const {

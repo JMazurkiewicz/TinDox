@@ -16,6 +16,7 @@ namespace tds::protocol {
         not_logged_in = 402,
         invalid_field_value = 403,
         not_found = 404,
+        invalid_upload_data = 405, // TODO error message + docs
         not_enough_perms = 406,
         user_already_logged = 407,
         invalid_credentials = 408,
@@ -23,6 +24,7 @@ namespace tds::protocol {
         invalid_file_type = 410,
         dls_without_dl = 411,
         in_use = 412,
+        no_upload_to_resume = 413, // TODO error message + docs
     };
 
     constexpr bool is_info_code(ProtocolCode code) noexcept {

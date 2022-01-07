@@ -3,6 +3,7 @@
 #include "tds/protocol/auth_token.hpp"
 #include "tds/protocol/download_token.hpp"
 #include "tds/protocol/path_lock.hpp"
+#include "tds/protocol/upload_token.hpp"
 #include "tds/user/user_table.hpp"
 
 #include <filesystem>
@@ -22,6 +23,7 @@ namespace tds::protocol {
         [[nodiscard]] std::shared_ptr<AuthToken> authorize_user(std::string_view username, const std::string& password);
         [[nodiscard]] std::shared_ptr<PathLock> lock_path(const std::filesystem::path& path);
         [[nodiscard]] std::shared_ptr<DownloadToken> download_file(const std::filesystem::path& path);
+        [[nodiscard]] std::shared_ptr<UploadToken> upload_file(const std::filesystem::path& path, std::uintmax_t size);
 
         [[nodiscard]] bool is_path_forbidden(const std::filesystem::path& path) const;
         [[nodiscard]] bool is_path_locked(const std::filesystem::path& path);

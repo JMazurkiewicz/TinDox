@@ -17,6 +17,11 @@ namespace tds::protocol {
         m_file.open(m_server_context.get_partial_file_path(m_token->get_temporary_filename_stem()), get_openmode());
     }
 
+    std::span<const char> commit_bytes(std::span<const char> bytes) {
+        // TODO
+        return bytes;
+    }
+
     bool UploadManager::has_finished() const noexcept {
         return m_token == nullptr;
     }
@@ -31,9 +36,8 @@ namespace tds::protocol {
 
     void UploadManager::create_backup() {
         std::ofstream backup{m_server_context.get_backup_file_path(m_token->get_temporary_filename_stem())};
-        backup << "destination = " << m_token->get_destination_path();
+        backup << "name = " << m_token->get_file_name();
         backup << "\nsize = " << m_token->get_file_size();
-        backup << "\nname = " << m_token->get_file_name();
         backup << "\noffset = " << m_token->get_file_offset() << '\n';
     }
 }

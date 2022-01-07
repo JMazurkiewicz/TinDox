@@ -61,6 +61,9 @@ namespace tds::protocol {
                 case in_use:
                     return "file or directory is used by another user";
 
+                case no_upload_to_resume:
+                    return "upload cannot be resumed";
+
                 default:
                     return "unknown code";
                 }

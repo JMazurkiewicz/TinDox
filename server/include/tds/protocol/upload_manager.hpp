@@ -15,7 +15,7 @@ namespace tds::protocol {
         ~UploadManager();
 
         void start_upload(std::shared_ptr<UploadToken> token);
-        void commit_bytes(std::span<const char> bytes);
+        std::span<const char> commit_bytes(std::span<const char> bytes);
         bool has_finished() const noexcept;
 
     private:

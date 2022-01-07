@@ -1,5 +1,6 @@
 #include "tds/protocol/execution/ul.hpp"
 
+#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 
 #include <algorithm>
@@ -28,9 +29,7 @@ namespace tds::protocol::execution {
     }
 
     void Ul::execute() {
-        if(m_retry) {
-            retry();
-        }
+        m_client_context->set_upload_token(m_retry ? retry_upload() : start_new_upload());
     }
 
     void Ul::parse_name(const Field& name_field) {
@@ -70,8 +69,34 @@ namespace tds::protocol::execution {
         }
     }
 
-    void Ul::retry() {
-        const auto table =
-            toml::parse_file(m_server_context->get_backup_file_path(m_client_context->get_auth_token().get_username()));
+    std::shared_ptr<UploadToken> Ul::start_new_upload() {
+        auto token = m_server_context->upload_file(*m_name, *m_size);
+        token->set_temporary_filename_stem(m_client_context->get_auth_token().get_username());
+        return token;
+    }
+
+    std::shared_ptr<UploadToken> Ul::retry_upload() {
+        const fs::path backup_path =
+            m_server_context->get_backup_file_path(m_client_context->get_auth_token().get_username());
+        toml::table table;
+
+        try {
+            table = toml::parse_file(backup_path.native());
+        } catch(const toml::parse_error&) {
+            throw ProtocolError{ProtocolCode::no_upload_to_resume};
+        }
+
+        auto name = table["name"].as_string();
+        auto size = table["size"].as_integer();
+        auto offset = table["offset"].as_integer();
+        fs::remove(backup_path);
+
+        if(!name || !size || !offset) {
+            throw ProtocolError{ProtocolCode::no_upload_to_resume};
+        } else {
+            auto token = m_server_context->upload_file(name->get(), size->get());
+            token->set_file_offset(offset->get());
+            return token;
+        }
     }
 }

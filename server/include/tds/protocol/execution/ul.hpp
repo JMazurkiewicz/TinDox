@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tds/protocol/execution/command_base.hpp"
+#include "tds/protocol/upload_token.hpp"
 
 namespace tds::protocol::execution {
     class Ul : public CommandBase {
@@ -17,7 +18,8 @@ namespace tds::protocol::execution {
         void parse_size(const Field& size_field);
         void parse_retry(const Field& retry_field);
 
-        void retry();
+        std::shared_ptr<UploadToken> start_new_upload();
+        std::shared_ptr<UploadToken> retry_upload();
 
         std::optional<std::filesystem::path> m_name;
         std::optional<std::uintmax_t> m_size;
