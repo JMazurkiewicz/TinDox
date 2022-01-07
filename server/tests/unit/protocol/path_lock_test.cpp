@@ -32,13 +32,12 @@ TEST_CASE("tds::protocol::PathLock", "[protocol]") {
         lock.set_locked_path(subpath);
         REQUIRE(lock.get_locked_path() == subpath);
         REQUIRE(lock.has_locked_path(subpath));
-        REQUIRE(lock.has_locked_path(subpath / "outer"));
+        REQUIRE(lock.has_locked_path(path / "outer"));
     }
 
     SECTION("Test path lock checking") {
         PathLock lock{path};
         REQUIRE(lock.has_locked_path(path));
-        REQUIRE(lock.has_locked_path(path / ".."));
         REQUIRE(lock.has_locked_path("/"));
         REQUIRE_THROWS_AS(lock.has_locked_path("../relative_path"), std::runtime_error);
     }
@@ -46,7 +45,6 @@ TEST_CASE("tds::protocol::PathLock", "[protocol]") {
     SECTION("Test 'make_path_lock'") {
         auto lock_ptr = make_path_lock(path);
         REQUIRE(lock_ptr->has_locked_path(path));
-        REQUIRE(lock_ptr->has_locked_path(path / ".."));
         REQUIRE(lock_ptr->has_locked_path("/"));
         REQUIRE_THROWS_AS(lock_ptr->has_locked_path("../relative_path"), std::runtime_error);
     }
