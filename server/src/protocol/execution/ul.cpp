@@ -2,6 +2,7 @@
 
 #include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
+#include "tds/protocol/protocol_mode.hpp"
 
 #include <algorithm>
 
@@ -30,6 +31,7 @@ namespace tds::protocol::execution {
 
     void Ul::execute() {
         m_client_context->set_upload_token(m_retry ? retry_upload() : start_new_upload());
+        m_client_context->set_mode(ProtocolMode::upload);
     }
 
     void Ul::parse_name(const Field& name_field) {
@@ -70,7 +72,8 @@ namespace tds::protocol::execution {
     }
 
     std::shared_ptr<UploadToken> Ul::start_new_upload() {
-        auto token = m_server_context->upload_file(*m_name, *m_size);
+        const fs::path full_path = m_server_context->get_root_path() / *m_name;
+        auto token = m_server_context->upload_file(full_path, *m_size);
         token->set_temporary_filename_stem(m_client_context->get_auth_token().get_username());
         return token;
     }
@@ -95,7 +98,7 @@ namespace tds::protocol::execution {
             throw ProtocolError{ProtocolCode::no_upload_to_resume};
         } else {
             auto token = m_server_context->upload_file(name->get(), size->get());
-            token->set_file_offset(offset->get());
+            token->add_file_offset(offset->get());
             return token;
         }
     }

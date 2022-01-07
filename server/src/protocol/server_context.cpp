@@ -10,6 +10,9 @@
 #include <filesystem>
 #include <stdexcept>
 
+#include <fmt/ostream.h> // TODO REMOVE
+#include <spdlog/spdlog.h> // TODO REMOVE
+
 namespace fs = std::filesystem;
 
 namespace tds::protocol {
@@ -74,6 +77,7 @@ namespace tds::protocol {
         std::lock_guard loc{m_locks_mutex};
         remove_expired_path_locks();
 
+        spdlog::warn("PATH {}, PARENT: {}", path, path.parent_path());
         if(fs::exists(path)) {
             throw ProtocolError{ProtocolCode::file_already_exists};
         } else if(!fs::exists(path.parent_path())) {

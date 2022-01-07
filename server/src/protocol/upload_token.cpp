@@ -38,8 +38,8 @@ namespace tds::protocol {
         m_temporary_filename_stem = std::move(temporary_filename_stem);
     }
 
-    void UploadToken::set_file_offset(std::uintmax_t offset) noexcept {
-        m_offset = offset;
+    void UploadToken::add_file_offset(std::uintmax_t offset_change) noexcept {
+        m_offset += offset_change;
     }
 
     std::shared_ptr<UploadToken> make_upload_token(const fs::path& file, std::uintmax_t file_size) {

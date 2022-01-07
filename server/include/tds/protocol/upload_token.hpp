@@ -16,7 +16,7 @@ namespace tds::protocol {
         [[nodiscard]] std::uintmax_t get_file_offset() const noexcept;
 
         void set_temporary_filename_stem(std::filesystem::path temporary_filename_stem);
-        void set_file_offset(std::uintmax_t offset) noexcept;
+        void add_file_offset(std::uintmax_t offset_change) noexcept;
 
     private:
         const std::filesystem::path m_destination_path;

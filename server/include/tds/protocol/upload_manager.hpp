@@ -20,10 +20,14 @@ namespace tds::protocol {
 
     private:
         std::ios_base::openmode get_openmode() const noexcept;
+        std::size_t get_remaining_bytes() const noexcept;
+        void finish();
         void create_backup();
 
         const ServerContext& m_server_context;
         std::shared_ptr<UploadToken> m_token;
+        std::filesystem::path m_partial_file_name;
+        std::filesystem::path m_backup_file_name;
         std::ofstream m_file;
     };
 }
