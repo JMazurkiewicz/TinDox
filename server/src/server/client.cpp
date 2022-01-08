@@ -102,6 +102,7 @@ namespace tds::server {
     void Client::handle_upload(std::span<const char>& input) {
         input = m_upload_manager.commit_bytes(input);
         if(m_upload_manager.has_finished()) {
+            server_logger->debug("Finished upload for {} client", m_socket.get_endpoint());
             m_context.set_mode(protocol::ProtocolMode::command);
         }
     }
@@ -167,6 +168,7 @@ namespace tds::server {
         const std::size_t sent_byte_count = m_download_manager.send();
         server_logger->debug("DownloadManager sent {} bytes to {} client", sent_byte_count, m_socket.get_endpoint());
         if(m_download_manager.has_finished()) {
+            server_logger->debug("Finished download for {} client", m_socket.get_endpoint());
             m_context.set_mode(protocol::ProtocolMode::command);
         }
     }

@@ -30,12 +30,11 @@ namespace tds::protocol {
         m_file.write(bytes.data(), byte_count);
         m_token->add_file_offset(byte_count);
 
-        if(byte_count == 0) {
+        if(m_token->get_file_offset() == m_token->get_file_size()) {
             finish();
-            return {};
-        } else {
-            return bytes.last(bytes.size() - byte_count);
         }
+
+        return bytes.last(bytes.size() - byte_count);
     }
 
     bool UploadManager::has_finished() const noexcept {
@@ -62,7 +61,7 @@ namespace tds::protocol {
 
     void UploadManager::create_backup() {
         std::ofstream backup{m_backup_file_name};
-        backup << "name = " << m_token->get_file_name();
+        backup << "path = " << m_token->get_file_path();
         backup << "\nsize = " << m_token->get_file_size();
         backup << "\noffset = " << m_token->get_file_offset() << '\n';
     }

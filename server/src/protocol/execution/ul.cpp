@@ -30,7 +30,11 @@ namespace tds::protocol::execution {
     }
 
     void Ul::execute() {
-        m_client_context->set_upload_token(m_retry ? retry_upload() : start_new_upload());
+        auto upload_token = m_retry ? retry_upload() : start_new_upload();
+        upload_token->set_temporary_filename_stem(m_client_context->get_auth_token().get_username());
+        m_response_builder.add_line(std::to_string(upload_token->get_file_offset()));
+
+        m_client_context->set_upload_token(std::move(upload_token));
         m_client_context->set_mode(ProtocolMode::upload);
     }
 
@@ -72,9 +76,8 @@ namespace tds::protocol::execution {
     }
 
     std::shared_ptr<UploadToken> Ul::start_new_upload() {
-        const fs::path full_path = m_server_context->get_root_path() / *m_name;
+        const fs::path full_path = m_client_context->get_current_path() / *m_name;
         auto token = m_server_context->upload_file(full_path, *m_size);
-        token->set_temporary_filename_stem(m_client_context->get_auth_token().get_username());
         return token;
     }
 
@@ -89,15 +92,15 @@ namespace tds::protocol::execution {
             throw ProtocolError{ProtocolCode::no_upload_to_resume};
         }
 
-        auto name = table["name"].as_string();
+        auto path = table["path"].as_string();
         auto size = table["size"].as_integer();
         auto offset = table["offset"].as_integer();
         fs::remove(backup_path);
 
-        if(!name || !size || !offset) {
+        if(!path || !size || !offset) {
             throw ProtocolError{ProtocolCode::no_upload_to_resume};
         } else {
-            auto token = m_server_context->upload_file(name->get(), size->get());
+            auto token = m_server_context->upload_file(path->get(), size->get());
             token->add_file_offset(offset->get());
             return token;
         }

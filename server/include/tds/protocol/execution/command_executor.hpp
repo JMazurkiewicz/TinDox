@@ -36,7 +36,7 @@ namespace tds::protocol::execution {
             } catch(const ProtocolError&) {
                 throw;
             } catch(const std::exception& e) {
-                throw ProtocolError{ProtocolCode::unknown, e.what()}; // TODO find better way to do this
+                throw ProtocolError{ProtocolCode::unknown, e.what()};
             }
         }
 
