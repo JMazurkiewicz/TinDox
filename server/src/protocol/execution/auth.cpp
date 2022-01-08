@@ -26,7 +26,7 @@ namespace tds::protocol::execution {
     void Auth::execute() {
         try {
             m_client_context->set_auth_token(m_server_context->authorize_user(*m_username, *m_password));
-            m_client_context->set_current_path(m_server_context->get_root_path());
+            m_client_context->set_path_lock(m_server_context->lock_path(m_server_context->get_root_path()));
         } catch(const ProtocolError& e) {
             if(e.get_code() == ProtocolCode::invalid_credentials) {
                 m_client_context->set_auth_token(nullptr);

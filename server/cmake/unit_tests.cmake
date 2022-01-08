@@ -48,12 +48,14 @@ set(
     tests/unit/linux/signal_device_test.cpp
 
     tests/unit/protocol/field_test.cpp
+    tests/unit/protocol/path_lock_test.cpp
     tests/unit/protocol/protocol_code_test.cpp
     tests/unit/protocol/protocol_interpreter_test.cpp
     tests/unit/protocol/receiver_test.cpp
     tests/unit/protocol/request_test.cpp
     tests/unit/protocol/response_test.cpp
     tests/unit/protocol/sender_test.cpp
+    tests/unit/protocol/server_context_test.cpp
 
     tests/unit/user/permissions_test.cpp
 )

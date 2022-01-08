@@ -42,7 +42,7 @@ namespace tds::protocol {
         }
     }
 
-    int ClientContext::get_auth_try_count() const noexcept{
+    int ClientContext::get_auth_try_count() const noexcept {
         return m_auth_try_count;
     }
 
@@ -54,12 +54,16 @@ namespace tds::protocol {
         m_auth_token.reset();
     }
 
+    void ClientContext::set_path_lock(std::shared_ptr<PathLock> lock) {
+        m_current_path_lock = lock;
+    }
+
     const fs::path& ClientContext::get_current_path() {
-        return get_auth_token().get_current_path();
+        return m_current_path_lock->get_locked_path();
     }
 
     void ClientContext::set_current_path(fs::path path) {
-        m_auth_token->set_current_path(std::move(path));
+        m_current_path_lock->set_locked_path(std::move(path));
     }
 
     bool ClientContext::has_download_token() const noexcept {
@@ -80,5 +84,13 @@ namespace tds::protocol {
 
     std::shared_ptr<DownloadToken> ClientContext::get_download_token() {
         return std::move(m_download_token);
+    }
+
+    void ClientContext::set_upload_token(std::shared_ptr<UploadToken> token) {
+        m_upload_token = std::move(token);
+    }
+
+    std::shared_ptr<UploadToken> ClientContext::get_upload_token() {
+        return std::move(m_upload_token);
     }
 }

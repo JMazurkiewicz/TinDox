@@ -43,6 +43,9 @@ namespace tds::protocol {
                 case not_found:
                     return "file not found";
 
+                case no_upload_to_resume:
+                    return "no upload to resume";
+
                 case user_already_logged:
                     return "user is already logged in";
 
@@ -60,6 +63,12 @@ namespace tds::protocol {
 
                 case in_use:
                     return "file or directory is used by another user";
+
+                case wrong_upload_path:
+                    return "wrong upload path";
+
+                case not_a_directory:
+                    return "not a directory";
 
                 default:
                     return "unknown code";

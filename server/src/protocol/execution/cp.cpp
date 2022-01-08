@@ -28,7 +28,7 @@ namespace tds::protocol::execution {
         } else if(code != 0) {
             throw ProtocolError{ProtocolCode::unknown,
                                 fmt::format("unknown filesystem error: failed to copy {} to {} ({})", get_name(),
-                                            m_server_context->get_relative_path_of(get_path()), errc)};
+                                            m_server_context->get_relative_path_to(get_path()), errc)};
         }
     }
 }

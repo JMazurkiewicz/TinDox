@@ -2,6 +2,8 @@
 
 #include "tds/protocol/auth_token.hpp"
 #include "tds/protocol/download_token.hpp"
+#include "tds/protocol/path_lock.hpp"
+#include "tds/protocol/upload_token.hpp"
 #include "tds/user/user_table.hpp"
 
 #include <filesystem>
@@ -14,30 +16,36 @@ namespace tds::protocol {
         ServerContext(const ServerContext&) = delete;
         ServerContext& operator=(const ServerContext&) = delete;
 
-        const std::filesystem::path& get_root_path() const noexcept;
-        [[nodiscard]] std::filesystem::path get_relative_path_of(const std::filesystem::path& subpath) const;
+        [[nodiscard]] const std::filesystem::path& get_root_path() const noexcept;
+        [[nodiscard]] const std::filesystem::path& get_config_directory_path() const noexcept;
+        [[nodiscard]] std::filesystem::path get_relative_path_to(const std::filesystem::path& subpath) const;
 
-        std::shared_ptr<AuthToken> authorize_user(std::string_view username, const std::string& password);
-        void register_download_token(std::weak_ptr<DownloadToken> download_token);
+        [[nodiscard]] std::shared_ptr<AuthToken> authorize_user(std::string_view username, const std::string& password);
+        [[nodiscard]] std::shared_ptr<PathLock> lock_path(const std::filesystem::path& path);
+        [[nodiscard]] std::shared_ptr<DownloadToken> download_file(const std::filesystem::path& path);
+        [[nodiscard]] std::shared_ptr<UploadToken> upload_file(const std::filesystem::path& path, std::uintmax_t size);
 
-        bool is_forbidden(const std::filesystem::path& path) const;
-        bool is_locked(const std::filesystem::path& path);
+        [[nodiscard]] bool is_path_forbidden(const std::filesystem::path& path) const;
+        [[nodiscard]] bool is_path_locked(const std::filesystem::path& path);
+
+        [[nodiscard]] std::string get_partial_file_path(const std::filesystem::path& filename_stem) const;
+        [[nodiscard]] std::string get_backup_file_path(const std::filesystem::path& filename_stem) const;
 
     private:
-        bool has_user_logged_in(std::string_view username);
+        bool is_user_authorized(std::string_view username);
+        void check_path(const std::filesystem::path& path);
 
-        void remove_dead_users();
-        void remove_dead_download_tokens();
+        void remove_expired_auth_tokens();
+        void remove_expired_path_locks();
 
-        bool is_locked_by_user(const std::filesystem::path& path);
-        bool is_locked_by_download(const std::filesystem::path& path);
-
-        std::mutex m_mut;
         const std::filesystem::path m_root;
         const std::filesystem::path m_config_directory;
-        user::UserTable m_user_table;
 
+        std::mutex m_auth_mutex;
+        user::UserTable m_user_table;
         std::vector<std::weak_ptr<AuthToken>> m_auth_tokens;
-        std::vector<std::weak_ptr<DownloadToken>> m_download_tokens;
+
+        std::mutex m_locks_mutex;
+        std::vector<std::weak_ptr<PathLock>> m_path_locks;
     };
 }

@@ -16,6 +16,7 @@ namespace tds::protocol {
         not_logged_in = 402,
         invalid_field_value = 403,
         not_found = 404,
+        no_upload_to_resume = 405,
         not_enough_perms = 406,
         user_already_logged = 407,
         invalid_credentials = 408,
@@ -23,19 +24,9 @@ namespace tds::protocol {
         invalid_file_type = 410,
         dls_without_dl = 411,
         in_use = 412,
+        wrong_upload_path = 413,
+        not_a_directory = 414,
     };
-
-    constexpr bool is_info_code(ProtocolCode code) noexcept {
-        return static_cast<int>(code) / 100 == 1;
-    }
-
-    constexpr bool is_frame_error_code(ProtocolCode code) noexcept {
-        return static_cast<int>(code) / 300 == 3;
-    }
-
-    constexpr bool is_error_code(ProtocolCode code) noexcept {
-        return static_cast<int>(code) / 100 == 4;
-    }
 }
 
 namespace std {

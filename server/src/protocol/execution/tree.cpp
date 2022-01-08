@@ -15,7 +15,7 @@ namespace tds::protocol::execution {
         }
 
         for(fs::recursive_directory_iterator it{get_path()}; it != fs::recursive_directory_iterator{}; ++it) {
-            if(m_server_context->is_forbidden(it->path())) {
+            if(m_server_context->is_path_forbidden(it->path())) {
                 it.disable_recursion_pending();
                 continue;
             }

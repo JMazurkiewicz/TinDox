@@ -29,7 +29,7 @@ namespace tds::protocol::execution {
 
     void Rename::execute() {
         const fs::path old_path = m_client_context->get_current_path() / *m_oname;
-        if(m_server_context->is_locked(old_path)) {
+        if(m_server_context->is_path_locked(old_path)) {
             throw ProtocolError{ProtocolCode::in_use};
         }
 

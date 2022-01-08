@@ -1,12 +1,15 @@
 #include "tds/cli/help_command.hpp"
 
 #include "tds/cli/invalid_command_arguments_error.hpp"
+#include "tds/config.hpp"
 
 #include <iostream>
 
 namespace tds::cli {
     namespace {
         inline constexpr std::string_view help_message = {
+            "TinDox Server " TDS_VERSION_STRING "\n"
+            "\n"
             "usage: tds <command> [args]\n"
             "\n"
             "These are TinDoxServer commands:\n"

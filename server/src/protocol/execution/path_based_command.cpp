@@ -53,8 +53,10 @@ namespace tds::protocol::execution {
             }
         }
 
-        if(m_server_context->is_forbidden(final_path) || !fs::exists(final_path)) {
+        if(m_server_context->is_path_forbidden(final_path) || !fs::exists(final_path)) {
             throw ProtocolError{ProtocolCode::not_found, fmt::format("directory '{}' does not exist", *path_value)};
+        } else if(!fs::is_directory(final_path)) {
+            throw ProtocolError{ProtocolCode::not_a_directory, fmt::format("{} is not a directory", *path_value)};
         }
 
         set_path(std::move(final_path));

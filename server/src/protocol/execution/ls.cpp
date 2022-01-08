@@ -30,7 +30,7 @@ namespace tds::protocol::execution {
         }
 
         for(auto&& entry : std::filesystem::directory_iterator{get_path()}) {
-            if(m_server_context->is_forbidden(entry.path())) {
+            if(m_server_context->is_path_forbidden(entry.path())) {
                 continue;
             }
 
