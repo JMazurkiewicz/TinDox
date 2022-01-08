@@ -38,7 +38,7 @@ namespace tds::server {
         } else if(mode == protocol::ProtocolMode::command || mode == protocol::ProtocolMode::upload) {
             return linux::EventType::in;
         } else {
-            __builtin_unreachable(); // should never happend
+            __builtin_unreachable(); // should never happen
         }
     }
 
@@ -86,7 +86,7 @@ namespace tds::server {
                 } else if(mode == protocol::ProtocolMode::upload) {
                     m_pending_request_queue.push(m_interpreter.get_request());
                 } else {
-                    __builtin_unreachable(); // should never happend
+                    __builtin_unreachable(); // should never happen
                 }
             }
         } catch(const protocol::ProtocolError& e) {
