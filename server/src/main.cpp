@@ -5,6 +5,7 @@
 #include "tds/cli/invalid_command_execution_error.hpp"
 #include "tds/cli/run_command.hpp"
 #include "tds/cli/user_command.hpp"
+#include "tds/cli/version_command.hpp"
 #include "tds/command/no_such_command_error.hpp"
 
 #include <array>
@@ -37,7 +38,7 @@ int main(int argc, char** argv) {
             const std::vector<std::string_view> argument_vector(argv + 2, argv + argc);
 
             using namespace tds::cli;
-            using Executor = CommandExecutor<HelpCommand, InitCommand, RunCommand, UserCommand>;
+            using Executor = CommandExecutor<HelpCommand, InitCommand, RunCommand, UserCommand, VersionCommand>;
 
             Executor executor;
             executor.set_command(argv[1]);

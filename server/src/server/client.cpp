@@ -91,7 +91,7 @@ namespace tds::server {
             }
         } catch(const protocol::ProtocolError& e) {
             server_logger->warn("Interpreter error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
-                                 e.what(), static_cast<int>(e.get_code()));
+                                e.what(), static_cast<int>(e.get_code()));
             protocol::ResponseBuilder builder;
             builder.set_code(e.get_code());
             builder.set_command_name("<interpreter>");
@@ -126,20 +126,20 @@ namespace tds::server {
             if(m_context.get_mode() == protocol::ProtocolMode::download) {
                 auto download_token = m_context.get_download_token();
                 server_logger->info("Started download of {} for {} client", download_token->get_file_path(),
-                                     m_socket.get_endpoint());
+                                    m_socket.get_endpoint());
                 m_download_manager.start_download(std::move(download_token));
             } else {
                 m_sender.add_response(m_command_executor.get_response());
                 if(m_context.get_mode() == protocol::ProtocolMode::upload) {
                     auto upload_token = m_context.get_upload_token();
                     server_logger->info("Started upload of {} for {} client", upload_token->get_file_path(),
-                                         m_socket.get_endpoint());
+                                        m_socket.get_endpoint());
                     m_upload_manager.start_upload(std::move(upload_token));
                 }
             }
         } catch(const protocol::ProtocolError& e) {
             server_logger->warn("Execution error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
-                                 e.what(), static_cast<int>(e.get_code()));
+                                e.what(), static_cast<int>(e.get_code()));
             protocol::ResponseBuilder builder;
             builder.set_code(e.get_code());
             builder.set_command_name(std::string{request.get_name()});

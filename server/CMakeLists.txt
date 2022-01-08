@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(
     TinDoxServer
     LANGUAGES CXX
-    VERSION 0.0.4
+    VERSION 0.0.5
     HOMEPAGE_URL https://github.com/JMazurkiewicz/TinDox/server
     DESCRIPTION "TinDox Server"
 )
@@ -85,6 +85,7 @@ set(
     src/cli/invalid_command_arguments_error.cpp
     src/cli/run_command.cpp
     src/cli/user_command.cpp
+    src/cli/version_command.cpp
 
     src/config/config_reader.cpp
     src/config/defaults.cpp
@@ -161,9 +162,12 @@ set(
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+configure_file(cmake/config.hpp.in include/tds/config.hpp)
+
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
 target_compile_features(tds-dev PUBLIC cxx_std_20)
 target_include_directories(tds-dev PUBLIC include)
+target_include_directories(tds-dev PRIVATE ${PROJECT_BINARY_DIR}/include)
 target_link_libraries(tds-dev PRIVATE Threads::Threads fmt::fmt crypt)
 target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus spdlog::spdlog)
 
