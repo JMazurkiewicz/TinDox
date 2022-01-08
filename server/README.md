@@ -8,7 +8,7 @@ License: MIT (see [`LICENSE`](https://github.com/JMazurkiewicz/TinDox/blob/main/
 
 ### Easy way: use `dpkg`
 
-Go to [release page](https://github.com/JMazurkiewicz/TinDox/releases) and download latest `TinDoxServer.deb`. Then go to your `Downloads` directory and do these steps:
+Go to [releases page](https://github.com/JMazurkiewicz/TinDox/releases) and download latest `TinDoxServer.deb`. Then go to your `Downloads` directory and run this script:
 
 ```sh
 sudo dpkg -i TinDoxServer.deb
