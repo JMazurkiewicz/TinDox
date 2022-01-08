@@ -90,6 +90,8 @@ namespace tds::server {
                 }
             }
         } catch(const protocol::ProtocolError& e) {
+            server_logger->warn("Interpreter error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
+                                 e.what(), static_cast<int>(e.get_code()));
             protocol::ResponseBuilder builder;
             builder.set_code(e.get_code());
             builder.set_command_name("<interpreter>");
@@ -102,7 +104,7 @@ namespace tds::server {
     void Client::handle_upload(std::span<const char>& input) {
         input = m_upload_manager.commit_bytes(input);
         if(m_upload_manager.has_finished()) {
-            server_logger->debug("Finished upload for {} client", m_socket.get_endpoint());
+            server_logger->info("Finished upload for {} client", m_socket.get_endpoint());
             m_context.set_mode(protocol::ProtocolMode::command);
         }
     }
@@ -118,25 +120,25 @@ namespace tds::server {
         try {
             m_command_executor.set_command(request.get_name());
             m_command_executor.parse_fields(request.get_fields());
-            server_logger->debug("Executing '{}' command for {} client", request.get_name(), m_socket.get_endpoint());
+            server_logger->info("Executing '{}' command for {} client", request.get_name(), m_socket.get_endpoint());
             m_command_executor.execute();
 
             if(m_context.get_mode() == protocol::ProtocolMode::download) {
                 auto download_token = m_context.get_download_token();
-                server_logger->debug("Started download of {} for {} client", download_token->get_file_path(),
+                server_logger->info("Started download of {} for {} client", download_token->get_file_path(),
                                      m_socket.get_endpoint());
                 m_download_manager.start_download(std::move(download_token));
             } else {
                 m_sender.add_response(m_command_executor.get_response());
                 if(m_context.get_mode() == protocol::ProtocolMode::upload) {
                     auto upload_token = m_context.get_upload_token();
-                    server_logger->debug("Started upload of {} for {} client", upload_token->get_file_path(),
+                    server_logger->info("Started upload of {} for {} client", upload_token->get_file_path(),
                                          m_socket.get_endpoint());
                     m_upload_manager.start_upload(std::move(upload_token));
                 }
             }
         } catch(const protocol::ProtocolError& e) {
-            server_logger->debug("Execution error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
+            server_logger->warn("Execution error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
                                  e.what(), static_cast<int>(e.get_code()));
             protocol::ResponseBuilder builder;
             builder.set_code(e.get_code());
@@ -168,7 +170,7 @@ namespace tds::server {
         const std::size_t sent_byte_count = m_download_manager.send();
         server_logger->debug("DownloadManager sent {} bytes to {} client", sent_byte_count, m_socket.get_endpoint());
         if(m_download_manager.has_finished()) {
-            server_logger->debug("Finished download for {} client", m_socket.get_endpoint());
+            server_logger->info("Finished download for {} client", m_socket.get_endpoint());
             m_context.set_mode(protocol::ProtocolMode::command);
         }
     }
