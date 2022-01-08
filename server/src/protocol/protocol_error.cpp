@@ -67,6 +67,9 @@ namespace tds::protocol {
                 case wrong_upload_path:
                     return "wrong upload path";
 
+                case not_a_directory:
+                    return "not a directory";
+
                 default:
                     return "unknown code";
                 }

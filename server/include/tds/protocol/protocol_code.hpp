@@ -25,6 +25,7 @@ namespace tds::protocol {
         dls_without_dl = 411,
         in_use = 412,
         wrong_upload_path = 413,
+        not_a_directory = 414,
     };
 }
 
