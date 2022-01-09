@@ -97,13 +97,10 @@ namespace tds::cli {
     }
 
     void RunCommand::launch_server() {
-        server::Server server{*m_config_directory};
-        server.set_config(m_config);
-
+        server::Server server{*m_config_directory, m_config};
         if(m_debug_mode) {
             server::server_logger->set_level(spdlog::level::debug);
         }
-
         server.launch();
     }
 }

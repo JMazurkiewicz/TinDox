@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tds/config/server_config.hpp"
 #include "tds/protocol/auth_token.hpp"
 #include "tds/protocol/download_token.hpp"
 #include "tds/protocol/path_lock.hpp"
@@ -12,7 +13,7 @@
 namespace tds::protocol {
     class ServerContext {
     public:
-        explicit ServerContext(std::filesystem::path root);
+        explicit ServerContext(std::filesystem::path root, const config::ServerConfig& server_config);
         ServerContext(const ServerContext&) = delete;
         ServerContext& operator=(const ServerContext&) = delete;
 
@@ -44,6 +45,7 @@ namespace tds::protocol {
         std::mutex m_auth_mutex;
         user::UserTable m_user_table;
         std::vector<std::weak_ptr<AuthToken>> m_auth_tokens;
+        const std::uintmax_t m_upload_max_size;
 
         std::mutex m_locks_mutex;
         std::vector<std::weak_ptr<PathLock>> m_path_locks;

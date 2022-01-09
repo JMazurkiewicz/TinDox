@@ -10,17 +10,14 @@
 #include <stdexcept>
 
 namespace tds::server {
-    Server::Server(std::filesystem::path root)
-        : m_context{std::move(root)}
+    Server::Server(std::filesystem::path root, const config::ServerConfig& config)
+        : m_config{config}
+        , m_context{std::move(root), m_config}
         , m_running{true}
         , m_supervisor{m_context} { }
 
     Server::~Server() {
         stop();
-    }
-
-    void Server::set_config(const config::ServerConfig& config) {
-        m_config = config;
     }
 
     void Server::launch() {

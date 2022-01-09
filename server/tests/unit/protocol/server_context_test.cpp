@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "tds/cli/init_command.hpp"
+#include "tds/config/server_config.hpp"
 #include "tds/protocol/protocol_error.hpp"
 #include "tds/protocol/server_context.hpp"
 
@@ -23,7 +24,8 @@ TEST_CASE("tds::protocol::ServerContext", "[protocol]") {
         init.execute();
     }
 
-    ServerContext context{root};
+    tds::config::ServerConfig config;
+    ServerContext context{root, config};
 
     SECTION("Test constructor") {
         REQUIRE(context.get_root_path() == root);

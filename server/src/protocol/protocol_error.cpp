@@ -70,6 +70,9 @@ namespace tds::protocol {
                 case not_a_directory:
                     return "not a directory";
 
+                case too_large_file:
+                    return "too large file";
+
                 default:
                     return "unknown code";
                 }
