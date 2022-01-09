@@ -58,10 +58,13 @@ namespace tds::protocol {
     }
 
     void ProtocolInterpreter::check_for_protocol_errors() {
-        const bool too_long_line = (m_lines.back().size() > max_line_length);
-        const bool too_many_lines = (m_lines.size() > max_line_count);
+        const auto line_length = m_lines.back().size();
+        const auto line_count = m_lines.size();
+
+        const bool too_long_line = (line_length > max_line_length);
+        const bool too_many_lines = (line_count > max_line_count);
         if(too_long_line || too_many_lines) {
-            m_last_line_complete = true;
+            restart();
         }
 
         if(too_long_line) {

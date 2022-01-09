@@ -159,6 +159,10 @@ namespace tds::server {
     }
 
     void Client::handle_output() {
+        if(m_sender.has_responses()) {
+            handle_executor_output();
+        }
+
         switch(m_context.get_mode()) {
         case protocol::ProtocolMode::command:
         case protocol::ProtocolMode::upload:
