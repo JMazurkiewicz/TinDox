@@ -1,5 +1,6 @@
 #include "tds/server/client_service_supervisor.hpp"
 
+#include "tds/ip/endpoint_v4.hpp"
 #include "tds/linux/event_type.hpp"
 #include "tds/linux/pipe_device.hpp"
 #include "tds/server/client_service.hpp"
@@ -7,6 +8,7 @@
 
 #include <algorithm>
 #include <ranges>
+#include <system_error>
 
 namespace tds::server {
     ClientServiceSupervisor::ClientServiceSupervisor(protocol::ServerContext& server_context)
@@ -30,9 +32,18 @@ namespace tds::server {
     }
 
     void ClientServiceSupervisor::accept_connection(ip::TcpSocket connection) {
-        m_clients.spawn_client(std::move(connection));
-        m_epoll.add_device(connection,
-                           linux::EventType::in | linux::EventType::edge_triggered | linux::EventType::one_shot);
+        const int socket_fd = connection.get_fd();
+        const ip::EndpointV4 endpoint = connection.get_endpoint();
+
+        try {
+            m_epoll.add_device(connection,
+                               linux::EventType::in | linux::EventType::edge_triggered | linux::EventType::one_shot);
+            m_clients.spawn_client(std::move(connection));
+        } catch(const std::system_error& e) {
+            server_logger->error("ClientServiceSupervisor: failed to add connection from {} (fd = {}): {} ({})",
+                                 endpoint, socket_fd, e.what(), e.code());
+            m_clients.close_one(socket_fd);
+        }
     }
 
     std::size_t ClientServiceSupervisor::get_client_count() {
