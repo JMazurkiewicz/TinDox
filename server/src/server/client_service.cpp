@@ -5,20 +5,34 @@
 #include "tds/linux/epoll_buffer.hpp"
 #include "tds/server/server_logger.hpp"
 
+#include <system_error>
+
 namespace tds::server {
     ClientService::ClientService(ClientServiceSupervisor& supervisor, const config::ServerConfig& config)
-        : m_supervisor{&supervisor}
+        : m_supervisor{supervisor}
         , m_epoll_buffer{static_cast<std::size_t>(config.get_max_user_count() / config.get_max_thread_count())}
         , m_running{true} { }
 
     void ClientService::launch() {
+        try {
+            main_loop();
+        } catch(const std::system_error& e) {
+            server_logger->error("ClientService caught system error: {} ({})", e.what(), e.code());
+        } catch(const std::exception& e) {
+            server_logger->error("ClientService caught fatal error: {}", e.what());
+        } catch(...) {
+            server_logger->error("ClientService: unknown fatal error");
+        }
+    }
+
+    void ClientService::main_loop() {
         while(m_running) {
-            m_supervisor->wait_for_events(m_epoll_buffer);
+            m_supervisor.wait_for_events(m_epoll_buffer);
 
             for(auto [fd, events] : m_epoll_buffer.get_events()) {
-                if(m_supervisor->has_client(fd)) {
-                    process_client_input(m_supervisor->get_client(fd), events);
-                } else if(fd == m_supervisor->get_pipe_fd()) {
+                if(m_supervisor.has_client(fd)) {
+                    process_client_input(m_supervisor.get_client(fd), events);
+                } else if(fd == m_supervisor.get_pipe_fd()) {
                     process_pipe_input();
                 } else {
                     server_logger->warn("ClientService: unknown device spotted ({})", fd);
@@ -41,7 +55,7 @@ namespace tds::server {
             server_logger->error("ClientService: unknown fatal error caused by client from {}", endpoint);
         }
 
-        m_supervisor->rearm_device(client.get_socket());
+        m_supervisor.rearm_device(client.get_socket());
     }
 
     void ClientService::process_pipe_input() {

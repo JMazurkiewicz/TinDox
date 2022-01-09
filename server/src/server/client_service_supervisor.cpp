@@ -30,9 +30,9 @@ namespace tds::server {
     }
 
     void ClientServiceSupervisor::accept_connection(ip::TcpSocket connection) {
+        m_clients.spawn_client(std::move(connection));
         m_epoll.add_device(connection,
                            linux::EventType::in | linux::EventType::edge_triggered | linux::EventType::one_shot);
-        m_clients.add_client(std::move(connection));
     }
 
     std::size_t ClientServiceSupervisor::get_client_count() {

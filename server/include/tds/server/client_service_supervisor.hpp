@@ -37,7 +37,7 @@ namespace tds::server {
         void stop();
 
     private:
-        bool m_running;
+        bool m_running : 1;
         linux::EpollDevice m_epoll;
         linux::PipeDevices m_pipes;
         ClientPool m_clients;

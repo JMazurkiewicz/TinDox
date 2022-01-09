@@ -16,11 +16,12 @@ namespace tds::server {
         void launch();
 
     private:
+        void main_loop();
         void process_client_input(Client& client, linux::EventType events);
         void process_pipe_input();
 
-        ClientServiceSupervisor* m_supervisor;
+        ClientServiceSupervisor& m_supervisor;
         linux::EpollBuffer m_epoll_buffer;
-        bool m_running;
+        bool m_running : 1;
     };
 }

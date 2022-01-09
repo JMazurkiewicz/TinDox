@@ -12,13 +12,13 @@ namespace tds::server {
     ClientPool::ClientPool(protocol::ServerContext& server_context)
         : m_server_context{server_context} { }
 
-    void ClientPool::add_client(ip::TcpSocket socket) {
+    void ClientPool::spawn_client(ip::TcpSocket socket) {
         std::lock_guard lock{m_mut};
         const int socket_fd = socket.get_fd();
         auto [_, inserted] = m_pool.insert({socket_fd, std::make_unique<Client>(std::move(socket), m_server_context)});
         if(!inserted) {
             throw std::runtime_error{
-                fmt::format("ClientPool failed to accept new connection (fd = {})", socket.get_fd())};
+                fmt::format("ClientPool: failed to accept new connection (fd = {})", socket.get_fd())};
         }
     }
 
@@ -37,7 +37,7 @@ namespace tds::server {
         if(auto it = m_pool.find(fd); it != m_pool.end()) {
             return *it->second;
         } else {
-            throw std::runtime_error{fmt::format("Could not find client with fd {}", fd)};
+            throw std::runtime_error{fmt::format("ClientPool: could not find client with fd {}", fd)};
         }
     }
 
@@ -46,7 +46,7 @@ namespace tds::server {
         if(auto it = m_pool.find(fd); it != m_pool.end()) {
             m_pool.erase(it);
         } else {
-            throw std::runtime_error{fmt::format("Could not close connection with client (fd = {})", fd)};
+            throw std::runtime_error{fmt::format("ClientPool: could not close connection with client (fd = {})", fd)};
         }
     }
 

@@ -2,7 +2,7 @@
 modules="cli;cli/user_commands;command;config;ip;linux;protocol;protocol/execution;server;user"
 for name in ${modules//;/ }
 do
-    echo "Formatting $name"
+    echo "Formatting $name module"
     clang-format -i include/tds/$name/*.hpp 2>/dev/null
     clang-format -i src/$name/*.cpp 2>/dev/null
     clang-format -i tests/unit/$name/*.cpp 2>/dev/null
