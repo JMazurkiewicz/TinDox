@@ -5,12 +5,15 @@
 #include "tds/linux/epoll_buffer.hpp"
 #include "tds/server/server_logger.hpp"
 
+#include <algorithm>
 #include <system_error>
 
 namespace tds::server {
     ClientService::ClientService(ClientServiceSupervisor& supervisor, const config::ServerConfig& config)
         : m_supervisor{supervisor}
-        , m_epoll_buffer{static_cast<std::size_t>(config.get_max_user_count() / config.get_max_thread_count())}
+        , m_epoll_buffer{std::ranges::max(static_cast<std::size_t>(config.get_max_user_count() /
+                                                                   config.get_max_thread_count()),
+                                          std::size_t{1})}
         , m_running{true} { }
 
     void ClientService::launch() {
