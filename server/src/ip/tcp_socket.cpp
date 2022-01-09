@@ -4,6 +4,7 @@
 
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <unistd.h>
 
 namespace tds::ip {
     TcpSocket::TcpSocket()

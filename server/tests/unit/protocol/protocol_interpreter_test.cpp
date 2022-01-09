@@ -170,11 +170,9 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
 
     SECTION("Test three bad requests") {
         ProtocolInterpreter interpreter;
-        std::span<const char> input = {
-            "ls\nls\nls\n\n"
-            "pwd\npwd:pwd\nllllll\n\n"
-            "aaa\nndssd\nfdfd\n;;;;;;;\n\n"sv
-        };
+        std::span<const char> input = {"ls\nls\nls\n\n"
+                                       "pwd\npwd:pwd\nllllll\n\n"
+                                       "aaa\nndssd\nfdfd\n;;;;;;;\n\n"sv};
 
         int loop_counter = 0;
 
