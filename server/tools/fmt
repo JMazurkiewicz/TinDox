@@ -3,9 +3,9 @@ modules="cli;cli/user_commands;command;config;ip;linux;protocol;protocol/executi
 for name in ${modules//;/ }
 do
     echo "Formatting $name"
-    clang-format -i include/tds/$name/*.hpp
-    clang-format -i src/$name/*.cpp
-    clang-format -i tests/unit/$name/*.cpp
+    clang-format -i include/tds/$name/*.hpp 2>/dev/null
+    clang-format -i src/$name/*.cpp 2>/dev/null
+    clang-format -i tests/unit/$name/*.cpp 2>/dev/null
 done
 
 clang-format -i src/main.cpp

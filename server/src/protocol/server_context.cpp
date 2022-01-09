@@ -13,9 +13,10 @@
 namespace fs = std::filesystem;
 
 namespace tds::protocol {
-    ServerContext::ServerContext(fs::path root)
+    ServerContext::ServerContext(fs::path root, const config::ServerConfig& server_config)
         : m_root{std::move(root)}
-        , m_config_directory{m_root / ".tds"} {
+        , m_config_directory{m_root / ".tds"}
+        , m_upload_max_size{server_config.get_upload_max_size()} {
         m_user_table.open(get_config_directory_path() / "users");
     }
 
@@ -80,6 +81,8 @@ namespace tds::protocol {
             throw ProtocolError{ProtocolCode::file_already_exists};
         } else if(!fs::exists(path.parent_path())) {
             throw ProtocolError{ProtocolCode::not_found};
+        } else if(size > m_upload_max_size) {
+            throw ProtocolError{ProtocolCode::too_large_file};
         }
 
         for(auto&& lock : m_path_locks) {

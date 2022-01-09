@@ -16,13 +16,12 @@
 namespace tds::server {
     class Server {
     public:
-        explicit Server(std::filesystem::path root);
+        explicit Server(std::filesystem::path root, const config::ServerConfig& config);
         ~Server();
 
         Server(const Server&) = delete;
         Server& operator=(const Server&) = delete;
 
-        void set_config(const config::ServerConfig& config);
         void launch();
 
     private:
@@ -37,8 +36,8 @@ namespace tds::server {
         void main_loop();
         void stop();
 
+        const config::ServerConfig& m_config;
         protocol::ServerContext m_context;
-        config::ServerConfig m_config;
         bool m_running;
 
         linux::SignalDevice m_signal_device;

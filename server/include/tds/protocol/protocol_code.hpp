@@ -26,6 +26,7 @@ namespace tds::protocol {
         in_use = 412,
         wrong_upload_path = 413,
         not_a_directory = 414,
+        too_large_file = 415,
     };
 }
 
