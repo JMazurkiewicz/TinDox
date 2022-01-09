@@ -18,21 +18,17 @@ namespace tds::protocol {
         m_last_line_complete = true;
     }
 
-    std::span<const char> ProtocolInterpreter::commit_bytes(std::span<const char> bytes) {
-        auto cur = bytes.begin();
-        const auto end = bytes.end();
-
-        while(cur != end && !has_available_request()) {
-            auto line_end = std::ranges::find(cur, end, line_separator);
-            if(line_end != end) {
+    void ProtocolInterpreter::commit_bytes(std::span<const char>& bytes) {
+        while(!bytes.empty() && !has_available_request()) {
+            auto line_end = std::ranges::find(bytes, line_separator);
+            if(line_end != bytes.end()) {
                 ++line_end;
             }
 
-            commit_line({cur, line_end});
-            cur = line_end;
+            const std::span<const char> line{bytes.begin(), line_end};
+            bytes = {line_end, bytes.end()};
+            commit_line(line);
         }
-
-        return {cur, end};
     }
 
     void ProtocolInterpreter::commit_line(std::span<const char> line) {
@@ -95,7 +91,7 @@ namespace tds::protocol {
 
     Request ProtocolInterpreter::get_request() {
         Request final_request = std::move(m_request).value();
-        m_request.reset();
+        restart();
         return final_request;
     }
 }

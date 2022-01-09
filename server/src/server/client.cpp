@@ -94,7 +94,7 @@ namespace tds::server {
 
     void Client::handle_request(std::span<const char>& input) {
         try {
-            input = m_interpreter.commit_bytes(input);
+            m_interpreter.commit_bytes(input);
             if(m_interpreter.has_available_request()) {
                 execute_command(m_interpreter.get_request());
             }
@@ -161,17 +161,8 @@ namespace tds::server {
     void Client::handle_output() {
         if(m_sender.has_responses()) {
             handle_executor_output();
-        }
-
-        switch(m_context.get_mode()) {
-        case protocol::ProtocolMode::command:
-        case protocol::ProtocolMode::upload:
-            handle_executor_output();
-            break;
-
-        case protocol::ProtocolMode::download:
+        } else if(m_context.get_mode() == protocol::ProtocolMode::download) {
             handle_download_manager_output();
-            break;
         }
     }
 

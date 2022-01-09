@@ -19,7 +19,7 @@ namespace tds::protocol {
         ProtocolInterpreter& operator=(const ProtocolInterpreter&) = delete;
 
         void restart();
-        [[nodiscard]] std::span<const char> commit_bytes(std::span<const char> bytes);
+        void commit_bytes(std::span<const char>& bytes);
 
         [[nodiscard]] bool has_available_request() const noexcept;
         [[nodiscard]] Request get_request();
