@@ -72,7 +72,7 @@ namespace tds::protocol {
 
                 case too_large_file:
                     return "too large file";
-
+                    
                 default:
                     return "unknown code";
                 }
