@@ -12,7 +12,7 @@
 #include "tds/protocol/server_context.hpp"
 #include "tds/protocol/upload_manager.hpp"
 
-#include <queue>
+#include <vector>
 
 namespace tds::server {
     class Client {
@@ -30,12 +30,15 @@ namespace tds::server {
         void handle(linux::EventType events);
 
     private:
-        void handle_input();
-        void handle_request_input(std::span<const char>& input);
+        void handle_pending_input();
+        void handle_current_input();
+        void handle_input(std::span<const char>& input);
+        void handle_request(std::span<const char>& input);
         void handle_upload(std::span<const char>& input);
 
-        void execute_pending_commands();
         void execute_command(const protocol::Request& request);
+        void start_download();
+        void start_upload();
 
         void handle_output();
         void handle_executor_output();
@@ -45,7 +48,7 @@ namespace tds::server {
         protocol::ClientContext m_context;
 
         protocol::Receiver m_receiver;
-        std::queue<protocol::Request> m_pending_request_queue;
+        std::vector<char> m_pending_input;
         protocol::ProtocolInterpreter m_interpreter;
         protocol::DefaultCommandExecutor m_command_executor;
         protocol::Sender m_sender;

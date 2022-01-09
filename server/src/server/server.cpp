@@ -77,7 +77,7 @@ namespace tds::server {
         const ip::EndpointV4 endpoint = connection.get_endpoint();
 
         try {
-            server_logger->info("New connection from {} (fd = {})", endpoint, connection.get_fd());
+            server_logger->info("New connection from {}", endpoint, connection.get_fd());
 
             if(m_supervisor.get_client_count() < m_config.get_max_user_count()) {
                 m_supervisor.accept_connection(std::move(connection));
@@ -93,7 +93,7 @@ namespace tds::server {
     }
 
     void Server::main_loop() {
-        for(linux::EpollBuffer buffer{4}; m_running;) {
+        for(linux::EpollBuffer buffer{16}; m_running;) {
             m_epoll.wait_for_events(buffer);
 
             for(auto [fd, events] : buffer.get_events()) {

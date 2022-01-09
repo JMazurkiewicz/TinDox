@@ -38,7 +38,7 @@ namespace tds::server {
 
         const config::ServerConfig& m_config;
         protocol::ServerContext m_context;
-        bool m_running;
+        bool m_running : 1;
 
         linux::SignalDevice m_signal_device;
         ip::TcpListener m_tcp_listener;

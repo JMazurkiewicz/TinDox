@@ -22,13 +22,15 @@ namespace tds::protocol {
         const int count = linux::transfer_bytes(m_file, m_socket, m_offset, m_file_size - m_offset, code);
 
         if(count == -1 && code != std::errc::resource_unavailable_try_again) {
-            throw linux::LinuxError{static_cast<int>(code), "DownloadManager::send"};
+            throw linux::LinuxError{static_cast<int>(code), "DownloadManager::send(2)"};
+        } else if(m_offset == old_offset) {
+            throw linux::LinuxError{ENOTCONN, "DownloadManager::send(2)"};
         } else if(m_file_size - m_offset == 0) {
             m_file.close();
             m_token.reset();
         }
 
-        return m_offset - old_offset;
+        return count;
     }
 
     bool DownloadManager::has_finished() {

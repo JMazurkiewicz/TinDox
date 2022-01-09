@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "tds/protocol/field_value.hpp"
+#include "tds/protocol/protocol_error.hpp"
 #include "tds/protocol/protocol_interpreter.hpp"
 #include "tds/protocol/request.hpp"
 
@@ -13,17 +14,20 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
     SECTION("Regular request with extra input at the end") {
         ProtocolInterpreter interpreter;
 
-        auto unread = interpreter.commit_bytes("auth\nlogin: ad"sv);
+        std::span<const char> input = "auth\nlogin: ad"sv;
+        interpreter.commit_bytes(input);
         REQUIRE(!interpreter.has_available_request());
-        REQUIRE(unread.empty());
+        REQUIRE(input.empty());
 
-        unread = interpreter.commit_bytes("min\npasswd: admin"sv);
+        input = "min\npasswd: admin"sv;
+        interpreter.commit_bytes(input);
         REQUIRE(!interpreter.has_available_request());
-        REQUIRE(unread.empty());
+        REQUIRE(input.empty());
 
-        unread = interpreter.commit_bytes("\n\npwd"sv);
+        input = "\n\npwd"sv;
+        interpreter.commit_bytes(input);
         REQUIRE(interpreter.has_available_request());
-        REQUIRE(std::ranges::equal(unread, "pwd"sv));
+        REQUIRE(std::ranges::equal(input, "pwd"sv));
 
         const Request request = interpreter.get_request();
         REQUIRE(request.get_name() == "auth");
@@ -41,13 +45,15 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
     SECTION("Special case where newline is first character of input") {
         ProtocolInterpreter interpreter;
 
-        auto unread = interpreter.commit_bytes("auth"sv);
+        std::span<const char> input = "auth"sv;
+        interpreter.commit_bytes(input);
         REQUIRE(!interpreter.has_available_request());
-        REQUIRE(unread.empty());
+        REQUIRE(input.empty());
 
-        unread = interpreter.commit_bytes("\nlogin: admin\npasswd: admin\n\n"sv);
+        input = "\nlogin: admin\npasswd: admin\n\n"sv;
+        interpreter.commit_bytes(input);
         REQUIRE(interpreter.has_available_request());
-        REQUIRE(unread.empty());
+        REQUIRE(input.empty());
 
         const Request request = interpreter.get_request();
         REQUIRE(request.get_name() == "auth");
@@ -65,21 +71,25 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
     SECTION("Every part of input end with newline character") {
         ProtocolInterpreter interpreter;
 
-        auto unread = interpreter.commit_bytes("auth\n"sv);
+        std::span<const char> input = "auth\n"sv;
+        interpreter.commit_bytes(input);
         REQUIRE(!interpreter.has_available_request());
-        REQUIRE(unread.empty());
+        REQUIRE(input.empty());
 
-        unread = interpreter.commit_bytes("login: admin\n"sv);
+        input = "login: admin\n"sv;
+        interpreter.commit_bytes(input);
         REQUIRE(!interpreter.has_available_request());
-        REQUIRE(unread.empty());
+        REQUIRE(input.empty());
 
-        unread = interpreter.commit_bytes("passwd: admin\n"sv);
+        input = "passwd: admin\n"sv;
+        interpreter.commit_bytes(input);
         REQUIRE(!interpreter.has_available_request());
-        REQUIRE(unread.empty());
+        REQUIRE(input.empty());
 
-        unread = interpreter.commit_bytes("\n"sv);
+        input = "\n"sv;
+        interpreter.commit_bytes(input);
         REQUIRE(interpreter.has_available_request());
-        REQUIRE(unread.empty());
+        REQUIRE(input.empty());
 
         const Request request = interpreter.get_request();
         REQUIRE(request.get_name() == "auth");
@@ -97,8 +107,9 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
     SECTION("Two commands") {
         ProtocolInterpreter interpreter;
 
-        auto unread = interpreter.commit_bytes("ls\npath: /\n\n"sv);
-        REQUIRE(unread.empty());
+        std::span<const char> input = "ls\npath: /\n\n"sv;
+        interpreter.commit_bytes(input);
+        REQUIRE(input.empty());
         REQUIRE(interpreter.has_available_request());
 
         const Request first_request = interpreter.get_request();
@@ -109,8 +120,9 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
         REQUIRE(first_fields[0].get_name() == "path");
         REQUIRE(first_fields[0].get_string() == "/");
 
-        unread = interpreter.commit_bytes("cd\npath: /home\n\n"sv);
-        REQUIRE(unread.empty());
+        input = "cd\npath: /home\n\n"sv;
+        interpreter.commit_bytes(input);
+        REQUIRE(input.empty());
         REQUIRE(interpreter.has_available_request());
 
         const Request second_request = interpreter.get_request();
@@ -124,26 +136,51 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
 
     SECTION("Test ignoring empty requests") {
         ProtocolInterpreter interpreter;
-        const auto unread = interpreter.commit_bytes("\n\n\n\n\n");
-        REQUIRE(unread.empty());
+        std::span<const char> input = "\n\n\n\n\n";
+        interpreter.commit_bytes(input);
+        REQUIRE(input.empty());
         REQUIRE(!interpreter.has_available_request());
     }
 
     SECTION("Test two full commands") {
         ProtocolInterpreter interpreter;
-        auto unread = interpreter.commit_bytes("auth\nlogin:admin\npasswd:admin\n\n"sv);
-        INFO("UNREAD BYTES: \"" << (std::string_view{unread.data(), unread.size()}) << '"');
-        REQUIRE(unread.empty());
+        std::span<const char> input = "auth\nlogin:admin\npasswd:admin\n\n"sv;
+        interpreter.commit_bytes(input);
+        REQUIRE(input.empty());
         REQUIRE(interpreter.has_available_request());
         Request request = interpreter.get_request();
         REQUIRE(request.get_name() == "auth");
         REQUIRE(request.get_fields().size() == 2);
 
-        unread = interpreter.commit_bytes("exit\n\n"sv);
-        REQUIRE(unread.empty());
+        input = "exit\n\n"sv;
+        interpreter.commit_bytes(input);
+        REQUIRE(input.empty());
         REQUIRE(interpreter.has_available_request());
         request = interpreter.get_request();
         REQUIRE(request.get_name() == "exit");
         REQUIRE(request.get_fields().empty());
+    }
+
+    SECTION("Test bad requests") {
+        ProtocolInterpreter interpreter;
+        std::span<const char> input = "ls\nls\n\n"sv;
+        REQUIRE_THROWS_AS(interpreter.commit_bytes(input), ProtocolError);
+        REQUIRE(input.empty());
+    }
+
+    SECTION("Test three bad requests") {
+        ProtocolInterpreter interpreter;
+        std::span<const char> input = {"ls\nls\nls\n\n"
+                                       "pwd\npwd:pwd\nllllll\n\n"
+                                       "aaa\nndssd\nfdfd\n;;;;;;;\n\n"sv};
+
+        int loop_counter = 0;
+
+        do {
+            REQUIRE_THROWS_AS(interpreter.commit_bytes(input), ProtocolError);
+            ++loop_counter;
+        } while(!input.empty());
+
+        REQUIRE(loop_counter == 3);
     }
 }

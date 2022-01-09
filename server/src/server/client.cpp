@@ -33,7 +33,8 @@ namespace tds::server {
 
     linux::EventType Client::get_required_events() const noexcept {
         const protocol::ProtocolMode mode = m_context.get_mode();
-        if(m_sender.has_responses() || mode == protocol::ProtocolMode::download) {
+        if((!m_pending_input.empty() && mode == protocol::ProtocolMode::command) || m_sender.has_responses() ||
+           mode == protocol::ProtocolMode::download) {
             return linux::EventType::out;
         } else if(mode == protocol::ProtocolMode::command || mode == protocol::ProtocolMode::upload) {
             return linux::EventType::in;
@@ -44,9 +45,10 @@ namespace tds::server {
 
     void Client::handle(linux::EventType events) {
         try {
-            execute_pending_commands();
-            if((events & linux::EventType::in) != linux::EventType{}) {
-                handle_input();
+            if(!m_pending_input.empty()) {
+                handle_pending_input();
+            } else if((events & linux::EventType::in) != linux::EventType{}) {
+                handle_current_input();
             }
 
             if((events & linux::EventType::out) != linux::EventType{}) {
@@ -58,15 +60,29 @@ namespace tds::server {
         }
     }
 
-    void Client::handle_input() {
+    void Client::handle_pending_input() {
+        std::span<const char> input = m_pending_input;
+        server_logger->debug("Handling {} pending bytes from {} client", input.size(), m_socket.get_endpoint());
+        handle_input(input);
+        m_pending_input.assign(input.begin(), input.end());
+    }
+
+    void Client::handle_current_input() {
         std::span<const char> input = m_receiver.receive();
         server_logger->debug("Received {} bytes from {} client", input.size(), m_socket.get_endpoint());
+        handle_input(input);
+    }
 
+    void Client::handle_input(std::span<const char>& input) {
         do {
             switch(m_context.get_mode()) {
             case protocol::ProtocolMode::command:
-            case protocol::ProtocolMode::download: // command executor could have changed mode to download
-                handle_request_input(input);
+                handle_request(input);
+                break;
+
+            case protocol::ProtocolMode::download:
+                m_pending_input.assign(input.begin(), input.end());
+                input = {};
                 break;
 
             case protocol::ProtocolMode::upload:
@@ -76,18 +92,11 @@ namespace tds::server {
         } while(!input.empty());
     }
 
-    void Client::handle_request_input(std::span<const char>& input) {
+    void Client::handle_request(std::span<const char>& input) {
         try {
-            input = m_interpreter.commit_bytes(input);
+            m_interpreter.commit_bytes(input);
             if(m_interpreter.has_available_request()) {
-                const auto mode = m_context.get_mode();
-                if(mode == protocol::ProtocolMode::command) {
-                    execute_command(m_interpreter.get_request());
-                } else if(mode == protocol::ProtocolMode::upload) {
-                    m_pending_request_queue.push(m_interpreter.get_request());
-                } else {
-                    __builtin_unreachable(); // should never happen
-                }
+                execute_command(m_interpreter.get_request());
             }
         } catch(const protocol::ProtocolError& e) {
             server_logger->warn("Interpreter error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
@@ -109,13 +118,6 @@ namespace tds::server {
         }
     }
 
-    void Client::execute_pending_commands() {
-        while(!m_pending_request_queue.empty()) {
-            execute_command(m_pending_request_queue.front());
-            m_pending_request_queue.pop();
-        }
-    }
-
     void Client::execute_command(const protocol::Request& request) {
         try {
             m_command_executor.set_command(request.get_name());
@@ -124,17 +126,11 @@ namespace tds::server {
             m_command_executor.execute();
 
             if(m_context.get_mode() == protocol::ProtocolMode::download) {
-                auto download_token = m_context.get_download_token();
-                server_logger->info("Started download of {} for {} client", download_token->get_file_path(),
-                                    m_socket.get_endpoint());
-                m_download_manager.start_download(std::move(download_token));
+                start_download();
             } else {
                 m_sender.add_response(m_command_executor.get_response());
                 if(m_context.get_mode() == protocol::ProtocolMode::upload) {
-                    auto upload_token = m_context.get_upload_token();
-                    server_logger->info("Started upload of {} for {} client", upload_token->get_file_path(),
-                                        m_socket.get_endpoint());
-                    m_upload_manager.start_upload(std::move(upload_token));
+                    start_upload();
                 }
             }
         } catch(const protocol::ProtocolError& e) {
@@ -148,16 +144,25 @@ namespace tds::server {
         }
     }
 
-    void Client::handle_output() {
-        switch(m_context.get_mode()) {
-        case protocol::ProtocolMode::command:
-        case protocol::ProtocolMode::upload:
-            handle_executor_output();
-            break;
+    void Client::start_download() {
+        auto download_token = m_context.get_download_token();
+        server_logger->info("Started download of {} for {} client", download_token->get_file_path(),
+                            m_socket.get_endpoint());
+        m_download_manager.start_download(std::move(download_token));
+    }
 
-        case protocol::ProtocolMode::download:
+    void Client::start_upload() {
+        auto upload_token = m_context.get_upload_token();
+        server_logger->info("Started upload of {} for {} client", upload_token->get_file_path(),
+                            m_socket.get_endpoint());
+        m_upload_manager.start_upload(std::move(upload_token));
+    }
+
+    void Client::handle_output() {
+        if(m_sender.has_responses()) {
+            handle_executor_output();
+        } else if(m_context.get_mode() == protocol::ProtocolMode::download) {
             handle_download_manager_output();
-            break;
         }
     }
 

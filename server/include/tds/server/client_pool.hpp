@@ -15,7 +15,7 @@ namespace tds::server {
         ClientPool(const ClientPool&) = delete;
         ClientPool& operator=(const ClientPool&) = delete;
 
-        void add_client(ip::TcpSocket socket);
+        void spawn_client(ip::TcpSocket socket);
 
         std::size_t get_client_count();
         bool has_client(int fd);
