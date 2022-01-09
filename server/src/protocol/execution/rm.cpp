@@ -30,7 +30,7 @@ namespace tds::protocol::execution {
             throw ProtocolError{ProtocolCode::in_use};
         } else {
             const std::uintmax_t count = fs::remove_all(full_path);
-            m_response_builder.add_line(fmt::format("Removed {} entries", count));
+            m_response_builder.add_line(std::to_string(count));
         }
     }
 
