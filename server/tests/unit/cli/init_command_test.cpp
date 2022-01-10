@@ -25,7 +25,8 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
     }
 
     SECTION("Test creating instance in current path") {
-        const fs::path test_dir = "/tmp/tds_test1";
+        const fs::path test_dir = "/tmp/tds_unit_init_test1";
+        const fs::path old_dir = fs::current_path();
         fs::create_directory(test_dir);
         fs::current_path(test_dir);
 
@@ -37,10 +38,14 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
         REQUIRE(fs::exists(tds_root));
         REQUIRE(fs::exists(tds_root / "config"));
         REQUIRE(fs::exists(tds_root / "users"));
+
+        std::error_code errc;
+        fs::current_path(old_dir, errc);
+        fs::remove_all(test_dir, errc);
     }
 
     SECTION("Test creating instance in different path") {
-        const fs::path test_dir = "/tmp/tds_test2";
+        const fs::path test_dir = "/tmp/tds_unit_init_test2";
         fs::create_directory(test_dir);
         const std::array args = {std::string_view{test_dir.native()}};
 
@@ -55,12 +60,15 @@ TEST_CASE("tds::cli::InitCommand", "[cli]") {
     }
 
     SECTION("Test creating instance where instance already exists") {
-        const fs::path test_dir = "/tmp/tds_test2";
+        const fs::path test_dir = "/tmp/tds_unit_init_test2";
         const std::array args = {std::string_view{test_dir.native()}};
 
         InitCommand init;
         REQUIRE_NOTHROW(init.parse_arguments(args));
         REQUIRE_THROWS_AS(init.execute(), InvalidCommandExecutionError);
+
+        std::error_code errc;
+        fs::remove_all(test_dir, errc);
     }
 
     SECTION("Test creating instance in different (invalid) path") {

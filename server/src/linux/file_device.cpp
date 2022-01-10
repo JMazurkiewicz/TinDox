@@ -10,7 +10,7 @@ namespace tds::linux {
     }
 
     void FileDevice::open(const char* name, int flags) {
-        const int fd = ::open(name, flags);
+        const int fd = ::open(name, flags, 0600);
         if(fd == -1) {
             throw LinuxError{"open(2)"};
         } else {

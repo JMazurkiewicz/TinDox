@@ -31,7 +31,7 @@ struct BadCommand2 {
 
 struct BadCommand3 { };
 
-TEST_CASE("tds::cli::Command", "[cli]") {
+TEST_CASE("tds::command::Command", "[command]") {
     SECTION("Test good commands") {
         REQUIRE(Command<GoodCommand1>);
         REQUIRE(Command<GoodCommand2>);
