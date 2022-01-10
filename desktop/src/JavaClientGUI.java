@@ -8,6 +8,7 @@ public class JavaClientGUI extends JFrame {
     private JButton button4;
     private JTree tree1;
     private JTextArea textArea1;
+    private JTextField textField1;
 
     public JavaClientGUI(String title) {
         super (title);
