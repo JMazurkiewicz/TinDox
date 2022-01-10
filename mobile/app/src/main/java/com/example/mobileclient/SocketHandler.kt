@@ -24,14 +24,17 @@ object SocketHandler {
         return nSocket
     }
 
+    @Synchronized
     fun getOutputStream(): OutputStream{
         return nSocket.getOutputStream()
     }
 
+    @Synchronized
     fun getInputStream(): InputStream {
         return nSocket.getInputStream()
     }
 
+    @Synchronized
     fun connected(): Boolean{
         return nSocket.isConnected()
     }

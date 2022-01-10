@@ -8,20 +8,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import android.view.inputmethod.EditorInfo
 
 import android.widget.TextView.OnEditorActionListener
-
-
+import kotlinx.coroutines.*
 
 
 class CommandActivity: AppCompatActivity() {
@@ -43,18 +38,17 @@ class CommandActivity: AppCompatActivity() {
             send()
             setResponseText()
             setCommandText()
-            commandText.requestFocus()
         }
 
         commandText.text = null
     }
 
-    private suspend fun send(){
+    private fun send(){
 
         if (commandText.text.toString() != "") {
 
-            Log.i("help", "appending")
             message += commandText.text.toString() + "\n"
+            Log.i("message", message)
 
         }else if (message != "") {
             message += "\n"
@@ -90,15 +84,10 @@ class CommandActivity: AppCompatActivity() {
 
             }
 
-
-            Log.i("fin", "fin")
-
             answer = stringBuffer.toString()
 
 
         }
-        Log.i("message", message)
-//        Log.i("answer", answer)
 
     }
 
@@ -125,12 +114,12 @@ class CommandActivity: AppCompatActivity() {
         commandTextView = findViewById(R.id.responseTextView)
         responseTextView = findViewById(R.id.commandTextView)
 
-        commandText.setOnEditorActionListener(OnEditorActionListener { _, actionId, event ->
-            if (event != null && event.keyCode === KeyEvent.KEYCODE_ENTER || actionId == EditorInfo.IME_ACTION_DONE) {
-                submit(submitButton)
-            }
-            false
-        })
+//        commandText.setOnEditorActionListener(OnEditorActionListener { _, actionId, event ->
+//            if (event != null && event.keyCode === KeyEvent.KEYCODE_ENTER || actionId == EditorInfo.IME_ACTION_DONE) {
+//                submit(submitButton)
+//            }
+//            false
+//        })
 
     }
 }
