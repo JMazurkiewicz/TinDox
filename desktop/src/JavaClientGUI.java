@@ -8,6 +8,7 @@ public class JavaClientGUI extends JFrame {
     private JButton button4;
     private JTree tree1;
     private JTextArea textArea1;
+    private JTextField textField1;
 
     public JavaClientGUI(String title) {
         super (title);
@@ -17,8 +18,8 @@ public class JavaClientGUI extends JFrame {
         this.pack();
     }
 
-    public static void main (String[] args) {
+    /*public static void main (String[] args) {
         JFrame frame = new JavaClientGUI( "Java client");
         frame.setVisible(true);
-    }
+    }*/
 }
