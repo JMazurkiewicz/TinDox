@@ -11,25 +11,31 @@ void Connection::createSocket() {
 	if (sock == -1)
 		throw std::system_error(errno, std::generic_category(), "creating socket");
 
-	epfd_read = epoll_create1(0);
-	epfd_write = epoll_create1(0);
+	//epfd_read = epoll_create1(0);
+	//epfd_write = epoll_create1(0);
+	epfd = epoll_create1(0);
 	if (epfd_read == -1 || epfd_write == -1) {
 		closeConnection();
 		throw std::system_error(errno, std::generic_category(), "creating epoll fd");
 	}
 
-	struct epoll_event event_read_sock{}, event_write_sock{};
-	memset(&event_read_sock, 0, sizeof(event_read_sock));
-	memset(&event_write_sock, 0, sizeof(event_write_sock));
-	event_read_sock.data.fd = sock;
-	event_write_sock.data.fd = sock;
-	event_read_sock.events = EPOLLIN;
-	event_write_sock.events = EPOLLOUT;
-	if (epoll_ctl(epfd_read, EPOLL_CTL_ADD, sock, &event_read_sock) == -1
-	    || epoll_ctl(epfd_write, EPOLL_CTL_ADD, sock, &event_write_sock) == -1) {
-		closeConnection();
-		throw std::system_error(errno, std::generic_category(), "epoll - add");
-	}
+	struct epoll_event events = {};
+	events.data.fd = sock;
+	events.events = EPOLLOUT | EPOLLET;
+	epoll_ctl(...);
+
+	//struct epoll_event event_read_sock{}, event_write_sock{};
+	//memset(&event_read_sock, 0, sizeof(event_read_sock));
+	//memset(&event_write_sock, 0, sizeof(event_write_sock));
+	//event_read_sock.data.fd = sock;
+	//event_write_sock.data.fd = sock;
+	//event_read_sock.events = EPOLLIN;
+	//event_write_sock.events = EPOLLOUT;
+	//if (epoll_ctl(epfd_read, EPOLL_CTL_ADD, sock, &event_read_sock) == -1
+	//    || epoll_ctl(epfd_write, EPOLL_CTL_ADD, sock, &event_write_sock) == -1) {
+	//	closeConnection();
+	//	throw std::system_error(errno, std::generic_category(), "epoll - add");
+	//}
 }
 
 void Connection::connectToServer(const string &serv_ip, int serv_port) {
@@ -51,9 +57,38 @@ void Connection::closeConnection() {
 	if (isConnectionOpen) {
 
 		if (close(sock) != 0)
-			throw std::system_error(errno, std::generic_category(), "closing socket");
+			//throw std::system_error(errno, std::generic_category(), "closing socket");
 
 		isConnectionOpen = false;
+	}
+}
+
+void Connection::main_loop() {
+	epoll_event events[2];
+	while(isConnectionOpen) {
+		ssize_t count = epoll_wait(epfd, events, 2, -1);
+		for(auto& event : events | take(count)) {
+			if(event.data.fd == sock) {
+				if((event.events & EPOLLIN) == 0) {
+					// czytasz całe wejście i przygotowujesz dane do wysłania
+				} else if((event.events & EPOLLOUT) == 0) {
+					// wysyłasz tyle ile się da
+				}
+			} else {
+				// źle
+			}
+
+			epoll_event new_event = {};
+			new_event.data.fd = sock;
+			new_event.events = EPOLLET;
+			if(nie_dostałem_całej_odpowiedzi_od_serwera) {
+				new_event.events |= EPOLLIN;
+			} else {
+				new_event.events |= EPOLLOUT;
+			}
+
+			epoll_ctl(epfd, EPOLL_CTL_MOD, sock, &new_event);
+		}
 	}
 }
 
@@ -94,15 +129,14 @@ bool Connection::receiveAllReadyFromServer(std::string &message) {
 		return false;
 
 	message.clear();
-	char *buf = new char[BUF_MAX_SIZE];
+	char buf[BUF_MAX_SIZE];
+	///char *buf = new char[BUF_MAX_SIZE];
 	memset(buf, '\0', sizeof buf);
 	int new_events = epoll_wait(epfd_read, events, MAX_EPOLL_EVENTS, -1);
 	if (new_events == -1) {
 		closeConnection();
-		delete[] buf;
 		throw std::system_error(errno, std::generic_category(), "waiting for response");
 	} else if (new_events == 0) { //timeout expired
-		delete[] buf;
 		return false;
 	}
 
@@ -112,22 +146,36 @@ bool Connection::receiveAllReadyFromServer(std::string &message) {
 				ssize_t read_bytes = read(sock, buf, BUF_MAX_SIZE - 1);
 				if (read_bytes == -1) {
 					if (errno == EAGAIN || errno == EWOULDBLOCK) {
-						break;
+					ś	break;
 					} else {
-						delete[] buf;
 						closeConnection();
 						throw std::system_error(errno, std::generic_category(), "reading message");
 					}
 				} else if (read_bytes == 0) { //EOF -> connection closed
-					delete[] buf;
 					closeConnection();
 					return false;
 				}
+
 				message.append(buf);
 			}
+
+			if(message.ends_with("\n\n")) {
+				// oddajesz do analizatora
+				nie_dostałem_całej_odpowiedzi_od_serwera = false;
+			} else {
+				// czekamy na kolejne bajty
+			}
+
+			//switch()
+			//	// czy wysyłam komendy, czy pobieram plik
+
+				// CHECK: czy dwa ostatnie znaki to '\n'
+				// dl
+				// name:
+				// dls
+				// OSTRZEŻENIE DLA UŻYTKOWNIKA -- zgłosił do @JMaz
 		}
 	}
-	delete[] buf;
 
 	if (message.empty())
 		return false;

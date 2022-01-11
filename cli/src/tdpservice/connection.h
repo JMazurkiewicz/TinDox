@@ -15,7 +15,7 @@ public:
 
 	Connection() = default;
 
-	~Connection() {
+	~Connection()ś {
 		closeConnection();
 	}
 

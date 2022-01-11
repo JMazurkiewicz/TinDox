@@ -8,6 +8,7 @@
 using namespace std;
 
 int main() {
+	signal(SIGPIPE, SIG_IGN);
 
 	TDPService service;
 	service.initConnection("127.0.0.1", 37666);
@@ -17,7 +18,7 @@ int main() {
 
 	service.rename("big", "very_big");
 	cout << service.last_sent_command << service.received_response;
-	
+
 	service.ls("", "", "");
 	cout << service.last_sent_command << service.received_response;
 
