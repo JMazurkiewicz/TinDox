@@ -1,6 +1,5 @@
 #include "tds/protocol/execution/dls.hpp"
 
-#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_mode.hpp"
 
 #include <algorithm>

@@ -1,6 +1,5 @@
 #include "tds/protocol/execution/cp.hpp"
 
-#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 
 #include <fmt/core.h>

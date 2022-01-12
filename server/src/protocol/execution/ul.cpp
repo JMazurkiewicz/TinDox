@@ -1,6 +1,5 @@
 #include "tds/protocol/execution/ul.hpp"
 
-#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 #include "tds/protocol/protocol_mode.hpp"
 

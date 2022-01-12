@@ -1,6 +1,5 @@
 #include "tds/protocol/client_context.hpp"
 
-#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 
 namespace fs = std::filesystem;

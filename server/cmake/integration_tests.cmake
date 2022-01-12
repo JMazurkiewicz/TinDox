@@ -11,7 +11,7 @@ foreach(TEST_NAME ${TDS_INTEGRATION_TESTS_CLI_TESTS})
     )
 endforeach()
 
-set(TDS_INTEGRATION_TESTS_REQUEST_TESTS auth cd rm)
+set(TDS_INTEGRATION_TESTS_REQUEST_TESTS auth cd rm rename)
 foreach(TEST_NAME ${TDS_INTEGRATION_TESTS_REQUEST_TESTS})
     add_test(
         NAME "INTEGRATION::request_tests::${TEST_NAME}"

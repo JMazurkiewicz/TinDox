@@ -1,7 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "tds/protocol/protocol_code.hpp"
-
 using namespace tds::protocol;
 
 consteval bool is_info_code(ProtocolCode code) noexcept {

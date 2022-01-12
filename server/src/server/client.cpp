@@ -2,7 +2,6 @@
 
 #include "tds/linux/event_type.hpp"
 #include "tds/linux/linux_error.hpp"
-#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 #include "tds/protocol/protocol_mode.hpp"
 #include "tds/protocol/request.hpp"

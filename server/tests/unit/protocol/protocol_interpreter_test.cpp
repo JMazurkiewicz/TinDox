@@ -6,6 +6,7 @@
 #include "tds/protocol/request.hpp"
 
 #include <algorithm>
+#include <random>
 
 using namespace tds::protocol;
 using namespace std::string_view_literals;
@@ -203,5 +204,26 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
         std::span input{std::as_const(str)};
         REQUIRE_THROWS_AS(interpreter.commit_bytes(input), ProtocolError);
         REQUIRE(!interpreter.has_available_request());
+    }
+}
+
+TEST_CASE("tds::protocol::ProtocolInterpreter{fuzzing}", "[protocol]") {
+    SECTION("Test input without new lines") {
+        std::mt19937 gen{0xDEADBEEF};
+        std::uniform_int_distribution dist{33, 126}; // see 'std::isgraph'
+        std::string str;
+        std::ranges::generate_n(std::back_inserter(str), 2048 * 20, [&] { return dist(gen); });
+
+        ProtocolInterpreter interpreter;
+        std::span<const char> input{str};
+
+        try {
+            interpreter.commit_bytes(input);
+        } catch(const ProtocolError& e) {
+            REQUIRE(e.get_code() == ProtocolCode::too_long_line);
+        }
+
+        REQUIRE(!interpreter.has_available_request());
+        REQUIRE(input.empty());
     }
 }

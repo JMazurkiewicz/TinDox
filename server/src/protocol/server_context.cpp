@@ -3,7 +3,6 @@
 #include "tds/protocol/auth_token.hpp"
 #include "tds/protocol/download_token.hpp"
 #include "tds/protocol/path_lock.hpp"
-#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 
 #include <algorithm>
