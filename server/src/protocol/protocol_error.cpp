@@ -1,8 +1,10 @@
 #include "tds/protocol/protocol_error.hpp"
 
-#include "tds/protocol/protocol_code.hpp"
-
 namespace tds::protocol {
+    std::error_code make_error_code(ProtocolCode code) {
+        return std::error_code(static_cast<int>(code), get_tdp_category());
+    }
+
     namespace {
         class TdpCategory : public std::error_category {
         public:

@@ -6,6 +6,7 @@
 #include "tds/protocol/request.hpp"
 
 #include <algorithm>
+#include <random>
 
 using namespace tds::protocol;
 using namespace std::string_view_literals;
@@ -183,4 +184,73 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
 
         REQUIRE(loop_counter == 3);
     }
+
+    SECTION("Send too much data") {
+        ProtocolInterpreter interpreter;
+        const std::string str(2049, 'A');
+        std::span input{str};
+        REQUIRE_THROWS_AS(interpreter.commit_bytes(input), ProtocolError);
+        REQUIRE(!interpreter.has_available_request());
+    }
+
+    SECTION("Send too many fields") {
+        std::string str = "command";
+        for(int i = 0; i < 20; ++i) {
+            str += "field: value\n";
+        }
+        str += '\n';
+
+        ProtocolInterpreter interpreter;
+        std::span input{std::as_const(str)};
+        REQUIRE_THROWS_AS(interpreter.commit_bytes(input), ProtocolError);
+        REQUIRE(!interpreter.has_available_request());
+    }
+}
+
+TEST_CASE("tds::protocol::ProtocolInterpreter{fuzzing}", "[protocol]") {
+    std::mt19937 gen{0xDEADBEEF};
+    std::uniform_int_distribution dist{33, 126}; // see 'std::isgraph'
+    ProtocolInterpreter interpreter;
+
+    SECTION("Test input without line feeds") {
+        std::string str;
+        std::ranges::generate_n(std::back_inserter(str), 2048 * 20, [&] { return dist(gen); });
+        std::span<const char> input{str};
+
+        try {
+            interpreter.commit_bytes(input);
+        } catch(const ProtocolError& e) {
+            REQUIRE(e.get_code() == ProtocolCode::too_long_line);
+        }
+
+        REQUIRE(!interpreter.has_available_request());
+        REQUIRE(input.empty());
+    }
+
+    SECTION("Test input with line feeds") {
+        std::string str;
+        for(int i = 0; i < 341; ++i) {
+            std::ranges::generate_n(std::back_inserter(str), 2048, [&] { return dist(gen); });
+            str += '\n';
+        }
+        str += '\n';
+        std::span<const char> input{str};
+
+        do {
+            try {
+                interpreter.commit_bytes(input);
+            } catch(const ProtocolError& e) {
+                REQUIRE((e.get_code() == ProtocolCode::too_long_line || e.get_code() == ProtocolCode::too_many_fields));
+            }
+        } while(!input.empty());
+
+        REQUIRE(!interpreter.has_available_request());
+        REQUIRE(input.empty());
+    }
+
+    std::span<const char> good_input = "example\n\n"sv;
+    interpreter.commit_bytes(good_input);
+    REQUIRE(interpreter.has_available_request());
+    REQUIRE(good_input.empty());
+    REQUIRE(interpreter.get_request().get_name() == "example");
 }

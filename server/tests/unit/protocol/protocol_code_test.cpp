@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "tds/protocol/protocol_code.hpp"
+#include "tds/protocol/protocol_error.hpp"
 
 using namespace tds::protocol;
 

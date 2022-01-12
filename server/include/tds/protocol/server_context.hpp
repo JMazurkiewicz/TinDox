@@ -34,7 +34,7 @@ namespace tds::protocol {
 
     private:
         bool is_user_authorized(std::string_view username);
-        void check_path(const std::filesystem::path& path);
+        void throw_on_invalid_path(const std::filesystem::path& path);
 
         void remove_expired_auth_tokens();
         void remove_expired_path_locks();

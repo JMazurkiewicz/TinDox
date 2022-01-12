@@ -27,7 +27,7 @@ namespace tds::config::defaults {
     }
 
     std::uintmax_t get_default_upload_max_size() noexcept {
-        return static_cast<std::uintmax_t>(1) << 31;
+        return (static_cast<std::uintmax_t>(1) << 31) - 1;
     }
 
     std::string get_default_config_file() {

@@ -27,6 +27,7 @@ set(
     tests/unit/cli/invalid_command_arguments_error_test.cpp
     tests/unit/cli/run_command_test.cpp
     tests/unit/cli/user_command_test.cpp
+    tests/unit/cli/version_command_test.cpp
 
     tests/unit/command/command_executor_test.cpp
     tests/unit/command/command_test.cpp
@@ -38,14 +39,19 @@ set(
     tests/unit/ip/endpoint_v4_test.cpp
     tests/unit/ip/ip_error_test.cpp
     tests/unit/ip/port_test.cpp
+    tests/unit/ip/socket_type_test.cpp
     tests/unit/ip/tcp_listener_test.cpp
 
     tests/unit/linux/epoll_buffer_test.cpp
     tests/unit/linux/epoll_device_test.cpp
+    tests/unit/linux/event_type_test.cpp
+    tests/unit/linux/file_device_test.cpp
+    tests/unit/linux/hash_test.cpp
     tests/unit/linux/io_device_test.cpp
     tests/unit/linux/linux_error_test.cpp
     tests/unit/linux/pipe_device_test.cpp
     tests/unit/linux/signal_device_test.cpp
+    tests/unit/linux/transfer_bytes_test.cpp
 
     tests/unit/protocol/field_test.cpp
     tests/unit/protocol/path_lock_test.cpp

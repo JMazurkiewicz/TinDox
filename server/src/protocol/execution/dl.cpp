@@ -11,10 +11,15 @@
 namespace fs = std::filesystem;
 
 namespace tds::protocol::execution {
+    Dl::Dl()
+        : m_offset{0} { }
+
     void Dl::parse_fields(std::span<const Field> fields) {
         for(auto&& field : fields) {
             if(field.get_name() == "name") {
                 parse_name(field);
+            } else if(field.get_name() == "offset") {
+                parse_offset(field);
             }
         }
 
@@ -24,8 +29,10 @@ namespace tds::protocol::execution {
     }
 
     void Dl::execute() {
-        m_client_context->set_download_token(
-            m_server_context->download_file(m_client_context->get_current_path() / *m_name));
+        auto token = m_server_context->download_file(m_client_context->get_current_path() / *m_name);
+        token->set_file_offset(m_offset);
+        m_response_builder.add_line(std::to_string(token->get_file_size() - token->get_file_offset()));
+        m_client_context->set_download_token(std::move(token));
     }
 
     void Dl::parse_name(const Field& name_field) {
@@ -46,5 +53,14 @@ namespace tds::protocol::execution {
         }
 
         m_name.emplace(std::move(name_as_path));
+    }
+
+    void Dl::parse_offset(const Field& offset_field) {
+        const auto offset = offset_field.get_integer();
+        if(!offset.has_value()) {
+            throw ProtocolError{ProtocolCode::invalid_field_value, "offset has invalid value type (should be integer)"};
+        } else {
+            m_offset = *offset;
+        }
     }
 }

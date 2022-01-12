@@ -17,12 +17,12 @@
 #include <execinfo.h>
 #include <toml++/toml.h>
 
-void handle_sigsegv(int signal) {
+[[noreturn]] inline void handle_sigsegv(int signal) {
     std::array<void*, 50> buffer;
     const size_t size = backtrace(buffer.data(), buffer.size());
     fprintf(stderr, "Got SIGSEGV\n");
     backtrace_symbols_fd(buffer.data(), size, STDERR_FILENO);
-    exit(1);
+    std::exit(EXIT_FAILURE);
 }
 
 int main(int argc, char** argv) {
@@ -30,40 +30,37 @@ int main(int argc, char** argv) {
     std::signal(SIGPIPE, SIG_IGN);
     std::signal(SIGSEGV, handle_sigsegv);
 
+    using namespace tds::cli;
+
     if(argc <= 1) {
-        tds::cli::HelpCommand help;
+        HelpCommand help;
         help.execute();
     } else {
         try {
-            const std::vector<std::string_view> argument_vector(argv + 2, argv + argc);
+            CommandExecutor<HelpCommand, InitCommand, RunCommand, UserCommand, VersionCommand> executor;
 
-            using namespace tds::cli;
-            using Executor = CommandExecutor<HelpCommand, InitCommand, RunCommand, UserCommand, VersionCommand>;
+            const std::string_view command_name = argv[1];
+            executor.set_command(command_name);
+            const std::vector<std::string_view> args(argv + 2, argv + argc);
+            executor.parse_arguments(args);
 
-            Executor executor;
-            executor.set_command(argv[1]);
-            executor.parse_arguments(argument_vector);
             executor.execute();
             return EXIT_SUCCESS;
         } catch(const toml::parse_error& e) {
-            std::cerr << "TOML parse error:\n"
-                         "Description: "
-                      << e.description()
-                      << "\n"
-                         "Source file: "
-                      << e.source() << '\n';
+            std::cerr << "TOML parse error:\nDescription: " << e.description() << "\nSource file: " << e.source();
         } catch(const tds::command::NoSuchCommandError& e) {
-            std::cerr << "tds: '" << e.what() << "' is not a tds command. See 'tds help'" << '\n';
-        } catch(const tds::cli::InvalidCommandExecutionError& e) {
-            std::cerr << "tds: " << e.what() << '\n';
-        } catch(const tds::cli::CliError& e) {
-            std::cerr << "error: '" << e.what() << "'\n";
+            std::cerr << "tds: '" << e.what() << "' is not a tds command. See 'tds help'";
+        } catch(const InvalidCommandExecutionError& e) {
+            std::cerr << "tds: " << e.what();
+        } catch(const CliError& e) {
+            std::cerr << "error: '" << e.what() << '\'';
         } catch(const std::exception& e) {
-            std::cerr << "fatal error: '" << e.what() << "'\n";
+            std::cerr << "fatal error: '" << e.what() << '\'';
         } catch(...) {
-            std::cerr << "Unknown fatal error!\n";
+            std::cerr << "unknown fatal error";
         }
     }
 
+    std::cerr << '\n';
     return EXIT_FAILURE;
 }

@@ -2,8 +2,6 @@
 
 #include "tds/cli/cli_error.hpp"
 
-#include <stdexcept>
-
 using namespace tds::cli;
 
 TEST_CASE("tds::cli::CliError", "[cli]") {
@@ -15,7 +13,7 @@ TEST_CASE("tds::cli::CliError", "[cli]") {
         REQUIRE_THROWS_AS(throwing(), CliError);
     }
 
-    SECTION("Test class relations") {
+    SECTION("Test relations") {
         REQUIRE(std::derived_from<CliError, std::runtime_error>);
         REQUIRE(std::derived_from<CliError, std::exception>);
     }

@@ -4,7 +4,6 @@
 #include "tds/command/no_such_command_error.hpp"
 #include "tds/protocol/client_context.hpp"
 #include "tds/protocol/execution/command.hpp"
-#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 #include "tds/protocol/server_context.hpp"
 

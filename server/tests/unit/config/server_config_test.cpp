@@ -29,6 +29,10 @@ TEST_CASE("tds::config::ServerConfig", "[config]") {
         const tds::ip::Port port{65000};
         config.set_port(port);
         REQUIRE(config.get_port() == port);
+
+        const std::uintmax_t upload_max_size = 1 << 16;
+        config.set_upload_max_size(upload_max_size);
+        REQUIRE(config.get_upload_max_size() == upload_max_size);
     }
 
     SECTION("Test setters with bad values") {

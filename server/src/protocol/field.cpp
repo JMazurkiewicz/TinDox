@@ -1,7 +1,6 @@
 #include "tds/protocol/field.hpp"
 
 #include "tds/protocol/field_value.hpp"
-#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 
 #include <algorithm>

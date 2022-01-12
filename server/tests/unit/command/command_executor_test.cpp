@@ -23,7 +23,7 @@ struct PrintCommand {
     }
 };
 
-TEST_CASE("tds::cli::CommandExecutor", "[cli]") {
+TEST_CASE("tds::command::CommandExecutor", "[command]") {
     SECTION("Check commands") {
         REQUIRE(Command<SpawnCommand>);
         REQUIRE(Command<PrintCommand>);

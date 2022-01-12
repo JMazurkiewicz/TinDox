@@ -12,11 +12,13 @@ namespace tds::protocol {
         explicit DownloadToken(std::filesystem::path file);
 
         const std::filesystem::path& get_file_path() const noexcept;
+        std::uintmax_t get_file_size() const noexcept;
         std::uintmax_t get_file_offset() const noexcept;
 
-        void set_file_offset(std::uintmax_t offset) noexcept;
+        void set_file_offset(std::uintmax_t offset);
 
     private:
+        std::uintmax_t m_size;
         std::uintmax_t m_offset;
     };
 

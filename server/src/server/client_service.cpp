@@ -50,12 +50,8 @@ namespace tds::server {
         try {
             client.handle(events);
         } catch(const std::system_error& e) {
-            server_logger->error("ClientService: error caused by client from {}: {} ({})", endpoint, e.what(),
+            server_logger->error("ClientService: system error caused by client from {}: {} ({})", endpoint, e.what(),
                                  e.code());
-        } catch(const std::exception& e) {
-            server_logger->error("ClientService: error caused by client from {}: {}", endpoint, e.what());
-        } catch(...) {
-            server_logger->error("ClientService: unknown fatal error caused by client from {}", endpoint);
         }
 
         m_supervisor.rearm_device(client.get_socket());

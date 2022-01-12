@@ -1,6 +1,5 @@
 #include "tds/protocol/client_context.hpp"
 
-#include "tds/protocol/protocol_code.hpp"
 #include "tds/protocol/protocol_error.hpp"
 
 namespace fs = std::filesystem;
@@ -75,11 +74,7 @@ namespace tds::protocol {
     }
 
     void ClientContext::set_downloaded_file_offset(std::uintmax_t offset) {
-        if(offset <= fs::file_size(m_download_token->get_file_path())) {
-            m_download_token->set_file_offset(offset);
-        } else {
-            throw ProtocolError{ProtocolCode::invalid_field_value, "invalid offset (greater than file size)"};
-        }
+        m_download_token->set_file_offset(offset);
     }
 
     std::shared_ptr<DownloadToken> ClientContext::get_download_token() {
