@@ -98,8 +98,8 @@ namespace tds::server {
                 execute_command(m_interpreter.get_request());
             }
         } catch(const protocol::ProtocolError& e) {
-            server_logger->warn("Interpreter error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
-                                e.what(), static_cast<int>(e.get_code()));
+            server_logger->error("Interpreter error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
+                                 e.what(), static_cast<int>(e.get_code()));
             protocol::ResponseBuilder builder;
             builder.set_code(e.get_code());
             builder.set_command_name("<interpreter>");
@@ -133,8 +133,8 @@ namespace tds::server {
                 }
             }
         } catch(const protocol::ProtocolError& e) {
-            server_logger->warn("Execution error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
-                                e.what(), static_cast<int>(e.get_code()));
+            server_logger->error("Execution error caused by client from {}: '{}' ({})", m_socket.get_endpoint(),
+                                 e.what(), static_cast<int>(e.get_code()));
             protocol::ResponseBuilder builder;
             builder.set_code(e.get_code());
             builder.set_command_name(std::string{request.get_name()});

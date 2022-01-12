@@ -53,7 +53,7 @@ namespace tds::protocol {
     std::shared_ptr<PathLock> ServerContext::lock_path(const std::filesystem::path& path) {
         std::lock_guard lock{m_locks_mutex};
         remove_expired_path_locks();
-        check_path(path);
+        throw_on_invalid_path(path);
 
         auto path_lock = make_path_lock(path);
         m_path_locks.emplace_back(path_lock);
@@ -63,7 +63,7 @@ namespace tds::protocol {
     std::shared_ptr<DownloadToken> ServerContext::download_file(const std::filesystem::path& path) {
         std::lock_guard lock{m_locks_mutex};
         remove_expired_path_locks();
-        check_path(path);
+        throw_on_invalid_path(path);
 
         auto download_lock = make_download_token(path);
         m_path_locks.emplace_back(download_lock);
@@ -128,7 +128,7 @@ namespace tds::protocol {
                m_auth_tokens.end();
     }
 
-    void ServerContext::check_path(const std::filesystem::path& path) {
+    void ServerContext::throw_on_invalid_path(const std::filesystem::path& path) {
         if(!path.native().starts_with(get_root_path().native()) || !fs::exists(path)) {
             throw std::runtime_error{"ServerContext: invalid path to lock (not subpath of root)"};
         }
