@@ -80,7 +80,10 @@ namespace tds::protocol {
             throw ProtocolError{ProtocolCode::file_already_exists};
         } else if(!fs::exists(path.parent_path())) {
             throw ProtocolError{ProtocolCode::not_found};
-        } else if(size > m_upload_max_size) {
+        }
+
+        const auto space_info = fs::space(get_root_path());
+        if(size > m_upload_max_size || size > space_info.available) {
             throw ProtocolError{ProtocolCode::too_large_file};
         }
 
