@@ -183,4 +183,25 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
 
         REQUIRE(loop_counter == 3);
     }
+
+    SECTION("Send too much data") {
+        ProtocolInterpreter interpreter;
+        const std::string str(2049, 'A');
+        std::span input{str};
+        REQUIRE_THROWS_AS(interpreter.commit_bytes(input), ProtocolError);
+        REQUIRE(!interpreter.has_available_request());
+    }
+
+    SECTION("Send too many fields") {
+        std::string str = "command";
+        for(int i = 0; i < 20; ++i) {
+            str += "field: value\n";
+        }
+        str += '\n';
+
+        ProtocolInterpreter interpreter;
+        std::span input{std::as_const(str)};
+        REQUIRE_THROWS_AS(interpreter.commit_bytes(input), ProtocolError);
+        REQUIRE(!interpreter.has_available_request());
+    }
 }
