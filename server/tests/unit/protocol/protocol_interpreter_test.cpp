@@ -208,13 +208,13 @@ TEST_CASE("tds::protocol::ProtocolInterpreter", "[protocol]") {
 }
 
 TEST_CASE("tds::protocol::ProtocolInterpreter{fuzzing}", "[protocol]") {
-    SECTION("Test input without new lines") {
-        std::mt19937 gen{0xDEADBEEF};
-        std::uniform_int_distribution dist{33, 126}; // see 'std::isgraph'
+    std::mt19937 gen{0xDEADBEEF};
+    std::uniform_int_distribution dist{33, 126}; // see 'std::isgraph'
+    ProtocolInterpreter interpreter;
+
+    SECTION("Test input without line feeds") {
         std::string str;
         std::ranges::generate_n(std::back_inserter(str), 2048 * 20, [&] { return dist(gen); });
-
-        ProtocolInterpreter interpreter;
         std::span<const char> input{str};
 
         try {
@@ -226,4 +226,31 @@ TEST_CASE("tds::protocol::ProtocolInterpreter{fuzzing}", "[protocol]") {
         REQUIRE(!interpreter.has_available_request());
         REQUIRE(input.empty());
     }
+
+    SECTION("Test input with line feeds") {
+        std::string str;
+        for(int i = 0; i < 341; ++i) {
+            std::ranges::generate_n(std::back_inserter(str), 2048, [&] { return dist(gen); });
+            str += '\n';
+        }
+        str += '\n';
+        std::span<const char> input{str};
+
+        do {
+            try {
+                interpreter.commit_bytes(input);
+            } catch(const ProtocolError& e) {
+                REQUIRE((e.get_code() == ProtocolCode::too_long_line || e.get_code() == ProtocolCode::too_many_fields));
+            }
+        } while(!input.empty());
+
+        REQUIRE(!interpreter.has_available_request());
+        REQUIRE(input.empty());
+    }
+
+    std::span<const char> good_input = "example\n\n"sv;
+    interpreter.commit_bytes(good_input);
+    REQUIRE(interpreter.has_available_request());
+    REQUIRE(good_input.empty());
+    REQUIRE(interpreter.get_request().get_name() == "example");
 }
