@@ -5,7 +5,7 @@
 #include "tds/server/client.hpp"
 
 #include <memory>
-#include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 
 namespace tds::server {
@@ -17,16 +17,16 @@ namespace tds::server {
 
         void spawn_client(ip::TcpSocket socket);
 
-        std::size_t get_client_count();
-        bool has_client(int fd);
-        Client& get_client(int fd);
+        std::size_t get_client_count() const;
+        bool has_client(int fd) const;
+        Client& get_client(int fd) const;
 
         void close_one(int fd);
         void close_all();
 
     private:
         protocol::ServerContext& m_server_context;
-        std::mutex m_mut;
+        mutable std::shared_mutex m_mut;
         std::unordered_map<int, std::unique_ptr<Client>> m_pool;
     };
 }

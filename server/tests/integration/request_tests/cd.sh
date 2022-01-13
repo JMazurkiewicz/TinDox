@@ -8,7 +8,7 @@ mkdir two
 touch file.txt
 
 tds init
-tds run >server_log 2>&1 &
+tds run --debug >server_log 2>&1 &
 TDS_PID=$!
 echo "TDS_PID = $TDS_PID"
 

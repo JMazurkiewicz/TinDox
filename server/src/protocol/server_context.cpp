@@ -1,13 +1,8 @@
 #include "tds/protocol/server_context.hpp"
 
-#include "tds/protocol/auth_token.hpp"
-#include "tds/protocol/download_token.hpp"
-#include "tds/protocol/path_lock.hpp"
 #include "tds/protocol/protocol_error.hpp"
 
 #include <algorithm>
-#include <filesystem>
-#include <stdexcept>
 
 namespace fs = std::filesystem;
 
@@ -36,12 +31,17 @@ namespace tds::protocol {
     }
 
     std::shared_ptr<AuthToken> ServerContext::authorize_user(std::string_view username, const std::string& password) {
-        std::lock_guard lock{m_auth_mutex};
+        std::scoped_lock lock{m_auth_mutex};
         remove_expired_auth_tokens();
 
         if(!m_user_table.has_user(username) || !m_user_table.verify_password_of_user(username, password)) {
             throw ProtocolError{ProtocolCode::invalid_credentials};
-        } else if(is_user_authorized(username)) {
+        }
+
+        const bool already_authorized = std::ranges::find(m_auth_tokens, username, [](auto& ptr) {
+                                            return ptr.lock()->get_username();
+                                        }) != m_auth_tokens.end();
+        if(already_authorized) {
             throw ProtocolError{ProtocolCode::user_already_logged};
         }
 
@@ -51,29 +51,20 @@ namespace tds::protocol {
     }
 
     std::shared_ptr<PathLock> ServerContext::lock_path(const std::filesystem::path& path) {
-        std::lock_guard lock{m_locks_mutex};
-        remove_expired_path_locks();
         throw_on_invalid_path(path);
-
         auto path_lock = make_path_lock(path);
-        m_path_locks.emplace_back(path_lock);
+        insert_path_lock(path_lock);
         return path_lock;
     }
 
     std::shared_ptr<DownloadToken> ServerContext::download_file(const std::filesystem::path& path) {
-        std::lock_guard lock{m_locks_mutex};
-        remove_expired_path_locks();
         throw_on_invalid_path(path);
-
         auto download_lock = make_download_token(path);
-        m_path_locks.emplace_back(download_lock);
+        insert_path_lock(download_lock);
         return download_lock;
     }
 
     std::shared_ptr<UploadToken> ServerContext::upload_file(const std::filesystem::path& path, std::uintmax_t size) {
-        std::lock_guard loc{m_locks_mutex};
-        remove_expired_path_locks();
-
         if(!path.is_absolute()) {
             throw ProtocolError{ProtocolCode::invalid_file_type};
         } else if(fs::exists(path)) {
@@ -87,14 +78,9 @@ namespace tds::protocol {
             throw ProtocolError{ProtocolCode::too_large_file};
         }
 
-        for(auto&& lock : m_path_locks) {
-            if(lock.lock()->get_locked_path() == path) {
-                throw ProtocolError{ProtocolCode::in_use};
-            }
-        }
-
+        throw_if_file_is_already_uploaded(path);
         auto upload_lock = make_upload_token(path, size);
-        m_path_locks.emplace_back(upload_lock);
+        insert_path_lock(upload_lock);
         return upload_lock;
     }
 
@@ -107,12 +93,14 @@ namespace tds::protocol {
         }
     }
 
-    bool ServerContext::is_path_locked(const std::filesystem::path& path) {
-        std::lock_guard lock{m_locks_mutex};
-        remove_expired_path_locks();
+    bool ServerContext::is_path_locked(const std::filesystem::path& path) const {
+        auto is_locking_path = [&path](auto& lock_ptr) {
+            const std::shared_ptr<const PathLock> lock_shared_ptr = lock_ptr.lock();
+            return lock_shared_ptr != nullptr && lock_shared_ptr->has_locked_path(path);
+        };
 
-        return std::ranges::find_if(m_path_locks, [&](auto& ptr) { return ptr.lock()->has_locked_path(path); }) !=
-               m_path_locks.end();
+        std::shared_lock lock{m_path_locks_mutex};
+        return std::ranges::find_if(m_path_locks, is_locking_path) != m_path_locks.end();
     }
 
     std::string ServerContext::get_partial_file_path(const fs::path& filename_stem) const {
@@ -123,19 +111,30 @@ namespace tds::protocol {
         return get_config_directory_path() / (filename_stem.native() + ".upload");
     }
 
-    bool ServerContext::is_user_authorized(std::string_view username) {
-        return std::ranges::find(m_auth_tokens, username, [](auto& ptr) { return ptr.lock()->get_username(); }) !=
-               m_auth_tokens.end();
+    void ServerContext::remove_expired_auth_tokens() {
+        std::erase_if(m_auth_tokens, [](auto& ptr) { return ptr.expired(); });
     }
 
-    void ServerContext::throw_on_invalid_path(const std::filesystem::path& path) {
+    void ServerContext::throw_on_invalid_path(const std::filesystem::path& path) const {
         if(!path.native().starts_with(get_root_path().native()) || !fs::exists(path)) {
             throw std::runtime_error{"ServerContext: invalid path to lock (not subpath of root)"};
         }
     }
 
-    void ServerContext::remove_expired_auth_tokens() {
-        std::erase_if(m_auth_tokens, [](auto& ptr) { return ptr.expired(); });
+    void ServerContext::throw_if_file_is_already_uploaded(const std::filesystem::path& path) const {
+        std::shared_lock lock{m_path_locks_mutex};
+        for(auto&& lock_ptr : std::as_const(m_path_locks)) {
+            const std::shared_ptr<const PathLock> lock_shared_ptr = lock_ptr.lock();
+            if(lock_shared_ptr != nullptr && lock_shared_ptr->get_locked_path() == path) {
+                throw ProtocolError{ProtocolCode::in_use};
+            }
+        }
+    }
+
+    void ServerContext::insert_path_lock(std::weak_ptr<PathLock> path_lock) {
+        std::scoped_lock lock{m_path_locks_mutex};
+        remove_expired_path_locks();
+        m_path_locks.emplace_back(std::move(path_lock));
     }
 
     void ServerContext::remove_expired_path_locks() {

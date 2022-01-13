@@ -1,11 +1,5 @@
 #include "tds/server/client_pool.hpp"
 
-#include "tds/server/server_logger.hpp"
-
-#include <mutex>
-#include <stdexcept>
-#include <utility>
-
 #include <fmt/core.h>
 
 namespace tds::server {
@@ -13,7 +7,7 @@ namespace tds::server {
         : m_server_context{server_context} { }
 
     void ClientPool::spawn_client(ip::TcpSocket socket) {
-        std::lock_guard lock{m_mut};
+        std::scoped_lock lock{m_mut};
         const int socket_fd = socket.get_fd();
         auto [_, inserted] = m_pool.insert({socket_fd, std::make_unique<Client>(std::move(socket), m_server_context)});
         if(!inserted) {
@@ -22,18 +16,18 @@ namespace tds::server {
         }
     }
 
-    std::size_t ClientPool::get_client_count() {
-        std::lock_guard lock{m_mut};
+    std::size_t ClientPool::get_client_count() const {
+        std::shared_lock lock{m_mut};
         return m_pool.size();
     }
 
-    bool ClientPool::has_client(int fd) {
-        std::lock_guard lock{m_mut};
+    bool ClientPool::has_client(int fd) const {
+        std::shared_lock lock{m_mut};
         return m_pool.find(fd) != m_pool.end();
     }
 
-    Client& ClientPool::get_client(int fd) {
-        std::lock_guard lock{m_mut};
+    Client& ClientPool::get_client(int fd) const {
+        std::shared_lock lock{m_mut};
         if(auto it = m_pool.find(fd); it != m_pool.end()) {
             return *it->second;
         } else {
@@ -42,7 +36,7 @@ namespace tds::server {
     }
 
     void ClientPool::close_one(int fd) {
-        std::lock_guard lock{m_mut};
+        std::scoped_lock lock{m_mut};
         if(auto it = m_pool.find(fd); it != m_pool.end()) {
             m_pool.erase(it);
         } else {
@@ -51,7 +45,7 @@ namespace tds::server {
     }
 
     void ClientPool::close_all() {
-        std::lock_guard lock{m_mut};
+        std::scoped_lock lock{m_mut};
         m_pool.clear();
     }
 }

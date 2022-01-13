@@ -10,7 +10,7 @@ namespace tds::protocol {
         PathLock(const PathLock&) = delete;
         PathLock& operator=(const PathLock&) = delete;
 
-        bool has_locked_path(const std::filesystem::path& path);
+        bool has_locked_path(const std::filesystem::path& path) const;
         const std::filesystem::path& get_locked_path() const noexcept;
         void set_locked_path(const std::filesystem::path& new_path);
 
