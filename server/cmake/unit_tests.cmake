@@ -53,12 +53,15 @@ set(
     tests/unit/linux/signal_device_test.cpp
     tests/unit/linux/transfer_bytes_test.cpp
 
+    tests/unit/protocol/auth_token_test.cpp
+    tests/unit/protocol/download_token_test.cpp
     tests/unit/protocol/field_test.cpp
     tests/unit/protocol/path_lock_test.cpp
     tests/unit/protocol/protocol_code_test.cpp
     tests/unit/protocol/protocol_interpreter_test.cpp
     tests/unit/protocol/receiver_test.cpp
     tests/unit/protocol/request_test.cpp
+    tests/unit/protocol/response_builder_test.cpp
     tests/unit/protocol/response_test.cpp
     tests/unit/protocol/sender_test.cpp
     tests/unit/protocol/server_context_test.cpp
