@@ -1,12 +1,8 @@
 #include "tds/protocol/server_context.hpp"
 
-#include "tds/protocol/auth_token.hpp"
-#include "tds/protocol/download_token.hpp"
-#include "tds/protocol/path_lock.hpp"
 #include "tds/protocol/protocol_error.hpp"
 
 #include <algorithm>
-#include <mutex>
 
 namespace fs = std::filesystem;
 
@@ -82,15 +78,7 @@ namespace tds::protocol {
             throw ProtocolError{ProtocolCode::too_large_file};
         }
 
-        std::shared_lock lock{m_locks_mutex};
-        for(auto&& lock_ptr : std::as_const(m_path_locks)) {
-            const std::shared_ptr<const PathLock> lock_shared_ptr = lock_ptr.lock();
-            if(lock_shared_ptr != nullptr && lock_shared_ptr->get_locked_path() == path) {
-                throw ProtocolError{ProtocolCode::in_use};
-            }
-        }
-        lock.unlock();
-
+        throw_if_file_is_already_uploaded(path);
         auto upload_lock = make_upload_token(path, size);
         insert_path_lock(upload_lock);
         return upload_lock;
@@ -111,7 +99,7 @@ namespace tds::protocol {
             return lock_shared_ptr != nullptr && lock_shared_ptr->has_locked_path(path);
         };
 
-        std::shared_lock lock{m_locks_mutex};
+        std::shared_lock lock{m_path_locks_mutex};
         return std::ranges::find_if(m_path_locks, is_locking_path) != m_path_locks.end();
     }
 
@@ -133,8 +121,18 @@ namespace tds::protocol {
         }
     }
 
+    void ServerContext::throw_if_file_is_already_uploaded(const std::filesystem::path& path) const {
+        std::shared_lock lock{m_path_locks_mutex};
+        for(auto&& lock_ptr : std::as_const(m_path_locks)) {
+            const std::shared_ptr<const PathLock> lock_shared_ptr = lock_ptr.lock();
+            if(lock_shared_ptr != nullptr && lock_shared_ptr->get_locked_path() == path) {
+                throw ProtocolError{ProtocolCode::in_use};
+            }
+        }
+    }
+
     void ServerContext::insert_path_lock(std::weak_ptr<PathLock> path_lock) {
-        std::scoped_lock lock{m_locks_mutex};
+        std::scoped_lock lock{m_path_locks_mutex};
         remove_expired_path_locks();
         m_path_locks.emplace_back(std::move(path_lock));
     }

@@ -36,6 +36,7 @@ namespace tds::protocol {
         void remove_expired_auth_tokens();
 
         void throw_on_invalid_path(const std::filesystem::path& path) const;
+        void throw_if_file_is_already_uploaded(const std::filesystem::path& path) const;
         void insert_path_lock(std::weak_ptr<PathLock> path_lock);
         void remove_expired_path_locks();
 
@@ -47,7 +48,7 @@ namespace tds::protocol {
         user::UserTable m_user_table;
         std::vector<std::weak_ptr<AuthToken>> m_auth_tokens;
 
-        mutable std::shared_mutex m_locks_mutex;
+        mutable std::shared_mutex m_path_locks_mutex;
         std::vector<std::weak_ptr<PathLock>> m_path_locks;
     };
 }
