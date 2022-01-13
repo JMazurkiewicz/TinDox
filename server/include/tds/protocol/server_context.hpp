@@ -27,7 +27,7 @@ namespace tds::protocol {
         [[nodiscard]] std::shared_ptr<UploadToken> upload_file(const std::filesystem::path& path, std::uintmax_t size);
 
         [[nodiscard]] bool is_path_forbidden(const std::filesystem::path& path) const;
-        [[nodiscard]] bool is_path_locked(const std::filesystem::path& path);
+        [[nodiscard]] bool is_path_locked(const std::filesystem::path& path) const;
 
         [[nodiscard]] std::string get_partial_file_path(const std::filesystem::path& filename_stem) const;
         [[nodiscard]] std::string get_backup_file_path(const std::filesystem::path& filename_stem) const;
@@ -47,7 +47,7 @@ namespace tds::protocol {
         user::UserTable m_user_table;
         std::vector<std::weak_ptr<AuthToken>> m_auth_tokens;
 
-        std::shared_mutex m_locks_mutex;
+        mutable std::shared_mutex m_locks_mutex;
         std::vector<std::weak_ptr<PathLock>> m_path_locks;
     };
 }

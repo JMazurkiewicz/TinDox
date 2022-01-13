@@ -105,7 +105,7 @@ namespace tds::protocol {
         }
     }
 
-    bool ServerContext::is_path_locked(const std::filesystem::path& path) {
+    bool ServerContext::is_path_locked(const std::filesystem::path& path) const {
         auto is_locking_path = [&path](auto& lock_ptr) {
             const std::shared_ptr<const PathLock> lock_shared_ptr = lock_ptr.lock();
             return lock_shared_ptr != nullptr && lock_shared_ptr->has_locked_path(path);
