@@ -14,7 +14,7 @@ mkdir lock_dir
 tds init
 printf "Blocker\nPasswd\nPasswd\n" | tds user add >/dev/null
 
-tds run >server_log 2>&1 &
+tds run --debug >server_log 2>&1 &
 TDS_PID=$!
 echo "TDS_PID = $TDS_PID"
 
@@ -25,10 +25,10 @@ printf "auth\nlogin:admin\npasswd:admin\n\nrm\nname:empty_dir\n\nexit\n\n" | net
 echo "Test removing non-empty directory"
 printf "auth\nlogin:admin\npasswd:admin\n\nrm\nname:not_emptydir\n\nexit\n\n" | netcat localhost 37666
 
-echo "Test renaming occupied directory"
+echo "Test removing occupied directory"
 printf "auth\nlogin:Blocker\npasswd:Passwd\n\ncd\npath:lock_dir\n\n" | netcat localhost 37666 &
 BLOCKER_PID=$!
-printf "auth\nlogin:admin\npasswd:admin\n\nrename\noname:lock_dir\nnname:not_lock_dir\n\nexit\n\n" | netcat localhost 37666
+printf "auth\nlogin:admin\npasswd:admin\n\nrm\nname:lock_dir\n\nexit\n\n" | netcat localhost 37666
 kill $BLOCKER_PID
 wait $BLOCKER_PID
 

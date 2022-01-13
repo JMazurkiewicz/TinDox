@@ -8,7 +8,7 @@ tds init
 printf "Login1\nPasswd1\nPasswd1\n" | tds user add >/dev/null
 printf "Login2\nPasswd2\nPasswd2\n" | tds user add >/dev/null
 
-tds run >server_log 2>&1 &
+tds run --debug >server_log 2>&1 &
 TDS_PID=$!
 echo "TDS_PID = $TDS_PID"
 
