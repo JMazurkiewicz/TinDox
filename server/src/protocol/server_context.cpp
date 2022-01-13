@@ -35,7 +35,7 @@ namespace tds::protocol {
     }
 
     std::shared_ptr<AuthToken> ServerContext::authorize_user(std::string_view username, const std::string& password) {
-        std::lock_guard lock{m_auth_mutex};
+        std::scoped_lock lock{m_auth_mutex};
         remove_expired_auth_tokens();
 
         if(!m_user_table.has_user(username) || !m_user_table.verify_password_of_user(username, password)) {
@@ -134,7 +134,7 @@ namespace tds::protocol {
     }
 
     void ServerContext::insert_path_lock(std::weak_ptr<PathLock> path_lock) {
-        std::lock_guard lock{m_locks_mutex};
+        std::scoped_lock lock{m_locks_mutex};
         remove_expired_path_locks();
         m_path_locks.emplace_back(std::move(path_lock));
     }
