@@ -3,12 +3,12 @@
 #include "tds/config/server_config.hpp"
 #include "tds/protocol/auth_token.hpp"
 #include "tds/protocol/download_token.hpp"
-#include "tds/protocol/path_lock.hpp"
 #include "tds/protocol/upload_token.hpp"
 #include "tds/user/user_table.hpp"
 
 #include <filesystem>
 #include <mutex>
+#include <shared_mutex>
 
 namespace tds::protocol {
     class ServerContext {
@@ -33,21 +33,21 @@ namespace tds::protocol {
         [[nodiscard]] std::string get_backup_file_path(const std::filesystem::path& filename_stem) const;
 
     private:
-        bool is_user_authorized(std::string_view username);
-        void throw_on_invalid_path(const std::filesystem::path& path);
-
         void remove_expired_auth_tokens();
+
+        void throw_on_invalid_path(const std::filesystem::path& path) const;
+        void insert_path_lock(std::weak_ptr<PathLock> path_lock);
         void remove_expired_path_locks();
 
         const std::filesystem::path m_root;
         const std::filesystem::path m_config_directory;
+        const std::uintmax_t m_upload_max_size;
 
         std::mutex m_auth_mutex;
         user::UserTable m_user_table;
         std::vector<std::weak_ptr<AuthToken>> m_auth_tokens;
-        const std::uintmax_t m_upload_max_size;
 
-        std::mutex m_locks_mutex;
+        std::shared_mutex m_locks_mutex;
         std::vector<std::weak_ptr<PathLock>> m_path_locks;
     };
 }

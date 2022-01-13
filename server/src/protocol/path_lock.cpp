@@ -10,7 +10,7 @@ namespace tds::protocol {
         }
     }
 
-    bool PathLock::has_locked_path(const std::filesystem::path& path) {
+    bool PathLock::has_locked_path(const std::filesystem::path& path) const {
         if(!path.is_absolute()) {
             throw std::runtime_error{"PathLock::has_locked_path: path must be absolute"};
         } else {
