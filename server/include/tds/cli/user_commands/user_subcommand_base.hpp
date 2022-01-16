@@ -5,6 +5,8 @@
 namespace tds::cli::user_commands {
     class UserSubcommandBase {
     public:
+        static constexpr int max_try_count = 3;
+
         void set_user_table(user::UserTable& user_table);
 
     protected:
