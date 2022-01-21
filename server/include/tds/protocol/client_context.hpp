@@ -4,7 +4,6 @@
 #include "tds/protocol/download_token.hpp"
 #include "tds/protocol/protocol_interpreter.hpp"
 #include "tds/protocol/protocol_mode.hpp"
-#include "tds/protocol/server_context.hpp"
 #include "tds/protocol/upload_token.hpp"
 #include "tds/user/permissions.hpp"
 
