@@ -27,14 +27,6 @@ namespace tds::linux {
         return get_fd() >= 0;
     }
 
-    IoDevice::operator bool() const noexcept {
-        return is_valid();
-    }
-
-    int IoDevice::release() noexcept {
-        return std::exchange(m_fd, -1);
-    }
-
     ssize_t IoDevice::read(void* buffer, std::size_t size) {
         std::errc code = {};
         const ssize_t count = read(buffer, size, code);
@@ -69,10 +61,6 @@ namespace tds::linux {
             code = static_cast<std::errc>(errno);
         }
         return count;
-    }
-
-    bool IoDevice::operator==(const IoDevice& other) const noexcept {
-        return get_fd() == other.get_fd();
     }
 
     IoDevice::IoDevice(int fd)

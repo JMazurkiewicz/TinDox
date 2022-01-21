@@ -3,6 +3,7 @@
 #include "tds/linux/linux_error.hpp"
 
 #include <netinet/in.h>
+#include <unistd.h>
 
 namespace tds::ip {
     TcpListener::TcpListener()

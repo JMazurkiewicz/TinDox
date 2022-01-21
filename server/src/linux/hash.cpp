@@ -9,20 +9,19 @@
 
 namespace tds::linux {
     namespace {
-        inline constexpr std::string_view salt_chars =
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
+        constexpr std::string_view salt_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 
-        const char* hash_impl(const char* str, std::size_t len) {
-            auto salt = [&]() -> std::array<char, 3> {
-                if(len >= 2) {
-                    const unsigned char first = str[0];
-                    const unsigned char last = str[len - 1];
-                    return {salt_chars[(first ^ last) % salt_chars.size()],
-                            salt_chars[(first * last) % salt_chars.size()], '\0'};
-                } else {
-                    return {'.', '0', '\0'};
-                }
-            }();
+        const char* do_hash(const char* str, std::size_t len) {
+            std::array<char, 3> salt;
+            if(len >= 2) {
+                const unsigned char first = str[0];
+                const unsigned char last = str[len - 1];
+                salt[0] = salt_chars[(first ^ last) % salt_chars.size()];
+                salt[1] = salt_chars[(first * last) % salt_chars.size()];
+            } else {
+                salt[0] = '.';
+                salt[1] = '0';
+            }
 
             if(const auto result = crypt(str, salt.data()); result == nullptr) {
                 throw LinuxError{"linux::hash"};
@@ -33,10 +32,10 @@ namespace tds::linux {
     }
 
     std::string hash(const std::string& word) {
-        return hash_impl(word.c_str(), word.size());
+        return do_hash(word.c_str(), word.size());
     }
 
     std::string hash(const char* word) {
-        return hash_impl(word, std::strlen(word));
+        return do_hash(word, std::strlen(word));
     }
 }

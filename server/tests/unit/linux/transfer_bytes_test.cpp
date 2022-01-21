@@ -23,7 +23,7 @@ TEST_CASE("tds::linux::transfer_bytes", "[linux]") {
         ofile.write(message.data(), message.size());
     }
 
-    auto [read_pipe, write_pipe] = make_pipe(true);
+    auto [read_pipe, write_pipe] = make_pipe();
 
     FileDevice ifile;
     ifile.open(file_name, O_RDONLY);

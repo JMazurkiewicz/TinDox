@@ -13,9 +13,9 @@
 namespace tds::server {
     ClientServiceSupervisor::ClientServiceSupervisor(protocol::ServerContext& server_context)
         : m_running{true}
-        , m_pipes{linux::make_pipe(true)}
+        , m_pipes{linux::make_pipe()}
         , m_clients{server_context} {
-        m_epoll.add_device(m_pipes.m_read_device);
+        m_epoll.add_device(m_pipes.m_read_device, linux::EventType::in);
     }
 
     ClientServiceSupervisor::~ClientServiceSupervisor() {

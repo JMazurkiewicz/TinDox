@@ -1,5 +1,4 @@
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/internal/catch_test_registry.hpp>
 
 #include "tds/linux/hash.hpp"
 

@@ -11,17 +11,13 @@
 
 using namespace tds::linux;
 
-// clang-format off
 template<typename T>
-concept TestableProcess = std::invocable<T> && std::same_as<std::invoke_result_t<T>, int>;
-// clang-format on
-
-template<TestableProcess Test>
-void test_in_new_process(Test&& test) {
+    requires(std::invocable<T>&& std::same_as<std::invoke_result_t<T>, int>)
+void test_in_new_process(T&& test) {
     if(const int pid = fork(); pid == -1) {
         REQUIRE_FALSE("`test_in_new_process` failed to create process with fork(2)");
     } else if(pid == 0) {
-        const int status = std::invoke(std::forward<Test>(test));
+        const int status = std::invoke(std::forward<T>(test));
         _exit(status);
     } else {
         int status = 1;
@@ -39,7 +35,7 @@ TEST_CASE("tds::linux::SignalDevice", "[linux]") {
             int status = 1;
 
             signal_device.add_handler(SIGINT, [&](int) { status = 0; });
-            signal_device.apply();
+            signal_device.start_signal_device();
 
             std::raise(SIGINT);
             signal_device.handle_signal();
@@ -55,7 +51,7 @@ TEST_CASE("tds::linux::SignalDevice", "[linux]") {
                 int status = 1;
 
                 signal_device.add_handler(SIGINT, [&](int) { status = 0; });
-                signal_device.apply();
+                signal_device.start_signal_device();
 
                 std::raise(SIGINT);
                 signal_device.handle_signal();
@@ -75,10 +71,10 @@ TEST_CASE("tds::linux::{SignalDevice+EpollDevice}", "[linux]") {
             int status = 1;
 
             signal_device.add_handler(SIGINT, [&](int) { status = 0; });
-            signal_device.apply();
+            signal_device.start_signal_device();
 
             EpollDevice epoll_device;
-            epoll_device.add_device(signal_device);
+            epoll_device.add_device(signal_device, EventType::in);
             std::raise(SIGINT);
 
             EpollBuffer buffer{4};
@@ -99,10 +95,10 @@ TEST_CASE("tds::linux::{SignalDevice+EpollDevice}", "[linux]") {
                 int status = 1;
 
                 signal_device.add_handler(SIGINT, [&](int) { status = 0; });
-                signal_device.apply();
+                signal_device.start_signal_device();
 
                 EpollDevice epoll_device;
-                epoll_device.add_device(signal_device);
+                epoll_device.add_device(signal_device, EventType::in);
                 std::raise(SIGINT);
 
                 EpollBuffer buffer{4};

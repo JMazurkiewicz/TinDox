@@ -21,12 +21,10 @@ TEST_CASE("tds::linux::FileDevice", "[linux]") {
         FileDevice file;
         REQUIRE(file.get_fd() == -1);
         REQUIRE(!file.is_valid());
-        REQUIRE(!file);
 
         REQUIRE_NOTHROW(file.open(file_name, O_WRONLY | O_APPEND | O_CREAT));
         REQUIRE(file.get_fd() > 2);
         REQUIRE(file.is_valid());
-        REQUIRE(file);
 
         const ssize_t written_bytes = file.write(message.data(), message.size());
         REQUIRE(written_bytes == message.size());
@@ -40,7 +38,6 @@ TEST_CASE("tds::linux::FileDevice", "[linux]") {
         REQUIRE_NOTHROW(file.open(file_name_str, O_RDWR));
         REQUIRE(file.get_fd() > 2);
         REQUIRE(file.is_valid());
-        REQUIRE(file);
 
         std::array<char, message.size()> buffer;
         const ssize_t read_bytes = file.read(buffer.data(), buffer.size());

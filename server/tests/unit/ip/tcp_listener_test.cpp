@@ -1,7 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "tds/ip/tcp_listener.hpp"
+#include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/epoll_device.hpp"
+#include "tds/linux/event_type.hpp"
 #include "tds/linux/linux_error.hpp"
 
 #include <thread>
@@ -85,7 +87,7 @@ TEST_CASE("tds::ip::{TcpListener+EpollDevice}", "[ip]") {
             tcp.listen(server_port);
 
             tds::linux::EpollDevice epoll_device;
-            epoll_device.add_device(tcp);
+            epoll_device.add_device(tcp, tds::linux::EventType::in);
 
             tds::linux::EpollBuffer buffer{16};
             epoll_device.wait_for_events(buffer);
