@@ -2,6 +2,7 @@
 
 #include "tds/config/server_config.hpp"
 #include "tds/protocol/auth_token.hpp"
+#include "tds/protocol/client_context.hpp"
 #include "tds/protocol/download_token.hpp"
 #include "tds/protocol/upload_token.hpp"
 #include "tds/user/user_table.hpp"
@@ -31,6 +32,8 @@ namespace tds::protocol {
 
         [[nodiscard]] std::string get_partial_file_path(const std::filesystem::path& filename_stem) const;
         [[nodiscard]] std::string get_backup_file_path(const std::filesystem::path& filename_stem) const;
+
+        void set_path_of_client(ClientContext& client_context, std::filesystem::path new_path);
 
     private:
         void remove_expired_auth_tokens();
