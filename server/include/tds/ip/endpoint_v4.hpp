@@ -12,17 +12,10 @@ namespace tds::ip {
         AddressV4 get_address() const;
         Port get_port() const;
 
-        bool operator==(const EndpointV4&) const noexcept = default;
-
     private:
         AddressV4 m_address;
         Port m_port;
     };
 
     std::ostream& operator<<(std::ostream& stream, EndpointV4 endpoint);
-
-    EndpointV4 make_endpoint_v4(const std::string& endpoint);
-    EndpointV4 make_endpoint_v4(const char* endpoint);
-
-    std::string to_string(EndpointV4 endpoint);
 }

@@ -93,7 +93,6 @@ set(
 
     src/ip/address_v4.cpp
     src/ip/endpoint_v4.cpp
-    src/ip/ip_error.cpp
     src/ip/port.cpp
     src/ip/tcp_listener.cpp
     src/ip/tcp_socket.cpp

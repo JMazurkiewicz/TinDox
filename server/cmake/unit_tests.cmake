@@ -37,7 +37,6 @@ set(
 
     tests/unit/ip/address_v4_test.cpp
     tests/unit/ip/endpoint_v4_test.cpp
-    tests/unit/ip/ip_error_test.cpp
     tests/unit/ip/port_test.cpp
     tests/unit/ip/socket_type_test.cpp
     tests/unit/ip/tcp_listener_test.cpp

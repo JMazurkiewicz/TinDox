@@ -4,6 +4,7 @@
 
 #include <filesystem>
 #include <optional>
+#include <span>
 
 namespace tds::cli {
     class RunCommand {

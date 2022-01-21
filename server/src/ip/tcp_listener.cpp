@@ -1,15 +1,8 @@
 #include "tds/ip/tcp_listener.hpp"
 
-#include "tds/ip/address_v4.hpp"
-#include "tds/ip/endpoint_v4.hpp"
 #include "tds/linux/linux_error.hpp"
 
-#include <cstring>
-#include <stdexcept>
-
 #include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
 namespace tds::ip {
     TcpListener::TcpListener()
