@@ -10,30 +10,27 @@ using std::shared_ptr;
 
 class ResponseAnalyzer {
 public:
-	ResponseAnalyzer(shared_ptr<Connection> conn) : connectionToServer(std::move(conn)) {}
+    ResponseAnalyzer() = default;
 
-	ConnectionError readSimpleResponse(string command_name, string &received_response, string &response_body,
-	                                   bool isSpecificAnswerExpected);
+    ConnectionError analyseSimpleResponse(string command_name, string &received_response, string &response_body,
+                                          bool isSpecificAnswerExpected);
 
-	ConnectionError readMultilineResponse(string &received_response, string &response_body, string command_name);
+    ConnectionError analyseMultilineResponse(string command_name, string &received_response, string &response_body);
 
 private:
-	string read_buf;
-	shared_ptr<Connection> connectionToServer;
+    string read_buf;
 
-	ConnectionError getResponseHeader(string::iterator &iter, string &command_name);
+    ConnectionError getResponseHeader(string::iterator &iter, string &command_name);
 
-	ConnectionError getErrorCode(string::iterator &iter);
+    ConnectionError getErrorCode(string::iterator &iter);
 
-	ConnectionError readRestIntoBuf(string::iterator &iter);
+    ConnectionError checkRestOfResponseHeader(string::iterator &iter, const string &command_name);
 
-	ConnectionError checkRestOfResponseHeader(string::iterator &iter, const string &command_name);
+    ConnectionError nextReadChar(string::iterator &iter);
 
-	ConnectionError nextReadChar(string::iterator &iter);
+    ConnectionError getResponseLine(string::iterator &iter, string &response_body);
 
-	ConnectionError getResponseLine(string::iterator &iter, string &response_body);
-
-	ConnectionError getMultipleLineResponse(string::iterator &iter, string &response_body);
+    ConnectionError getMultipleLineResponse(string::iterator &iter, string &response_body);
 };
 
 

@@ -26,9 +26,9 @@ public:
 
 private:
 
-    int sock, epfd;
+    int sock{}, epfd{};
     bool isConnectionOpen = false;
-    struct sockaddr_in server;
+    struct sockaddr_in server{};
 
     void createSocket();
 
