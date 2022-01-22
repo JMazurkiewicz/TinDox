@@ -1,27 +1,20 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
-project(
-    TinDoxServer
-    LANGUAGES CXX
-    VERSION 0.1.1
-    HOMEPAGE_URL https://github.com/JMazurkiewicz/TinDox/tree/main/server
-    DESCRIPTION "TinDox Server"
-)
-
 if(NOT UNIX OR APPLE)
     message(FATAL_ERROR "This project is only supported by Linux OS.")
 endif()
 
+project(
+    TinDoxServer
+    LANGUAGES CXX
+    VERSION 0.1.2
+    HOMEPAGE_URL https://github.com/JMazurkiewicz/TinDox/tree/main/server
+    DESCRIPTION "TinDox Server"
+)
+
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-option(TDS_TESTS "Enable tests for TinDox Server.")
-option(TDS_STATIC "Build static library instead of dynamic.")
-
 include(cmake/checks.cmake)
-
 include(FetchContent)
-set(FETCHCONTENT_QUIET OFF)
 
 find_package(tomlplusplus 2.6 QUIET)
 if(tomlplusplus_FOUND)
@@ -165,16 +158,18 @@ configure_file(cmake/config.hpp.in include/tds/config.hpp)
 
 add_library(tds-dev SHARED ${TDS_DEV_SOURCES})
 target_compile_features(tds-dev PUBLIC cxx_std_20)
-target_include_directories(tds-dev PUBLIC include)
 target_include_directories(tds-dev PRIVATE ${PROJECT_BINARY_DIR}/include)
-target_link_libraries(tds-dev PRIVATE Threads::Threads fmt::fmt crypt)
-target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus spdlog::spdlog)
+target_include_directories(tds-dev PUBLIC include)
+target_link_libraries(tds-dev PRIVATE crypt Threads::Threads fmt::fmt spdlog::spdlog)
+target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus)
+set_target_properties(tds-dev PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_executable(tds src/main.cpp)
 target_link_libraries(tds PUBLIC tds-dev)
 
 include("cmake/install.cmake")
 
+option(TDS_TESTS "Enable tests for TinDox Server.")
 if(TDS_TESTS)
     enable_testing()
     include("cmake/unit_tests.cmake")
