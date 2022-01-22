@@ -7,178 +7,145 @@
 #include <unistd.h>
 
 void Connection::createSocket() {
-	sock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
-	if (sock == -1)
-		throw std::system_error(errno, std::generic_category(), "creating socket");
+    sock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+    if (sock == -1)
+        throw std::system_error(errno, std::generic_category(), "creating socket");
 
-	//epfd_read = epoll_create1(0);
-	//epfd_write = epoll_create1(0);
-	epfd = epoll_create1(0);
-	if (epfd_read == -1 || epfd_write == -1) {
-		closeConnection();
-		throw std::system_error(errno, std::generic_category(), "creating epoll fd");
-	}
+    epfd = epoll_create1(0);
+    if (epfd == -1) {
+        closeConnection();
+        throw std::system_error(errno, std::generic_category(), "creating epoll fd");
+    }
 
-	struct epoll_event events = {};
-	events.data.fd = sock;
-	events.events = EPOLLOUT | EPOLLET;
-	epoll_ctl(...);
+    struct epoll_event events = {};
+    events.data.fd = sock;
+    events.events = EPOLLOUT | EPOLLET;
 
-	//struct epoll_event event_read_sock{}, event_write_sock{};
-	//memset(&event_read_sock, 0, sizeof(event_read_sock));
-	//memset(&event_write_sock, 0, sizeof(event_write_sock));
-	//event_read_sock.data.fd = sock;
-	//event_write_sock.data.fd = sock;
-	//event_read_sock.events = EPOLLIN;
-	//event_write_sock.events = EPOLLOUT;
-	//if (epoll_ctl(epfd_read, EPOLL_CTL_ADD, sock, &event_read_sock) == -1
-	//    || epoll_ctl(epfd_write, EPOLL_CTL_ADD, sock, &event_write_sock) == -1) {
-	//	closeConnection();
-	//	throw std::system_error(errno, std::generic_category(), "epoll - add");
-	//}
+    if (epoll_ctl(epfd, EPOLL_CTL_ADD, sock, &events) == -1) {
+        closeConnection();
+        throw std::system_error(errno, std::generic_category(), "epoll - add");
+    }
 }
 
 void Connection::connectToServer(const string &serv_ip, int serv_port) {
-	createSocket();
-	server.sin_family = AF_INET;
-	server.sin_port = htons(serv_port);
-	server.sin_addr.s_addr = inet_addr(serv_ip.c_str());
-	memset(server.sin_zero, '\0', sizeof server.sin_zero);
-	isConnectionOpen = true;
-	if (connect(sock, (struct sockaddr *) &server, sizeof server) == -1) {
-		if (errno != EINPROGRESS) {
-			closeConnection();
-			throw std::system_error(errno, std::generic_category(), "connecting to server");
-		}
-	}
+    createSocket();
+    server.sin_family = AF_INET;
+    server.sin_port = htons(serv_port);
+    server.sin_addr.s_addr = inet_addr(serv_ip.c_str());
+    memset(server.sin_zero, '\0', sizeof server.sin_zero);
+    isConnectionOpen = true;
+    if (connect(sock, (struct sockaddr *) &server, sizeof server) == -1) {
+        if (errno != EINPROGRESS) {
+            closeConnection();
+            throw std::system_error(errno, std::generic_category(), "connecting to server");
+        }
+    }
 }
 
 void Connection::closeConnection() {
-	if (isConnectionOpen) {
-
-		if (close(sock) != 0)
-			//throw std::system_error(errno, std::generic_category(), "closing socket");
-
-		isConnectionOpen = false;
-	}
+    if (isConnectionOpen) {
+        close(sock);
+        isConnectionOpen = false;
+    }
 }
 
-void Connection::main_loop() {
-	epoll_event events[2];
-	while(isConnectionOpen) {
-		ssize_t count = epoll_wait(epfd, events, 2, -1);
-		for(auto& event : events | take(count)) {
-			if(event.data.fd == sock) {
-				if((event.events & EPOLLIN) == 0) {
-					// czytasz całe wejście i przygotowujesz dane do wysłania
-				} else if((event.events & EPOLLOUT) == 0) {
-					// wysyłasz tyle ile się da
-				}
-			} else {
-				// źle
-			}
+bool Connection::exchangeWithServer(std::string &data) {
+    if (isConnectionOpen) {
+        bool gotWholeResponse = false, readyForReading = false;
+        unsigned long sent_buf_pos = 0;
+        epoll_event events[2];
+        while (!gotWholeResponse) {
+            ssize_t count = epoll_wait(epfd, events, 2, -1);
+            if (count == -1) {
+                closeConnection();
+                throw std::system_error(errno, std::generic_category(), "waiting on epoll");
+            }
 
-			epoll_event new_event = {};
-			new_event.data.fd = sock;
-			new_event.events = EPOLLET;
-			if(nie_dostałem_całej_odpowiedzi_od_serwera) {
-				new_event.events |= EPOLLIN;
-			} else {
-				new_event.events |= EPOLLOUT;
-			}
+            for (int i = 0; i < count; i++) {
+                if (events[i].data.fd == sock) {
+                    if (events[i].events & EPOLLOUT) {
+                        if (sendToServer(data, sent_buf_pos)) {
+                            readyForReading = true;
+                            data.clear();
+                        }
+                    } else if (events[i].events & EPOLLIN) {
+                        if (!receiveAllReadyFromServer(data, gotWholeResponse))
+                            return false;
+                        readyForReading = !gotWholeResponse;
+                    }
+                } else {
+                    closeConnection();
+                    throw std::runtime_error("epoll - wrong event");
+                }
 
-			epoll_ctl(epfd, EPOLL_CTL_MOD, sock, &new_event);
-		}
-	}
+                changeEpollEvents(readyForReading);
+            }
+        }
+    } else
+        return false;
+
+    return true;
 }
 
-bool Connection::sendToServer(std::string &message) {
-	if (isConnectionOpen) {
-		const char *msg = message.c_str();
-		unsigned long len = message.size();
-		unsigned long buf_pos = 0;
-		while (len) {
-			int new_events = epoll_wait(epfd_write, events, MAX_EPOLL_EVENTS, -1);
-			if (new_events == -1) {
-				closeConnection();
-				throw std::system_error(errno, std::generic_category(), "waiting to send message");
-			}
-			for (int i = 0; i < new_events; i++) {
-				if ((events[i].events & EPOLLOUT)) {
-					while (len) {
-						ssize_t sent_bytes = write(sock, msg + buf_pos, len);
-						if (sent_bytes < 0) {
-							if (errno == EAGAIN || errno == EWOULDBLOCK)
-								break;
-							throw std::system_error(errno, std::generic_category(), "sending message");
-						}
-						buf_pos += sent_bytes;
-						len -= sent_bytes;
-					}
-				}
-			}
-		}
-	} else
-		return false;
+bool Connection::sendToServer(std::string &message, unsigned long &sent_buf_pos) const {
+    const char *msg = message.c_str();
+    unsigned long len = message.size() - sent_buf_pos;
 
-	return true;
+    while (len) {
+        ssize_t sent_bytes = write(sock, msg + sent_buf_pos, len);
+        if (sent_bytes < 0) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+                break;
+            throw std::system_error(errno, std::generic_category(), "sending message");
+        }
+        sent_buf_pos += sent_bytes;
+        len -= sent_bytes;
+    }
+
+    if (!len)
+        return true;
+    else
+        return false;
 }
 
-bool Connection::receiveAllReadyFromServer(std::string &message) {
-	if (!isConnectionOpen)
-		return false;
+bool Connection::receiveAllReadyFromServer(std::string &message, bool &gotWholeResponse) {
+    char buf[BUF_MAX_SIZE];
 
-	message.clear();
-	char buf[BUF_MAX_SIZE];
-	///char *buf = new char[BUF_MAX_SIZE];
-	memset(buf, '\0', sizeof buf);
-	int new_events = epoll_wait(epfd_read, events, MAX_EPOLL_EVENTS, -1);
-	if (new_events == -1) {
-		closeConnection();
-		throw std::system_error(errno, std::generic_category(), "waiting for response");
-	} else if (new_events == 0) { //timeout expired
-		return false;
-	}
+    while (true) {
+        memset(buf, '\0', sizeof buf);
+        ssize_t read_bytes = read(sock, buf, BUF_MAX_SIZE - 1);
+        if (read_bytes == -1) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                break;
+            } else {
+                closeConnection();
+                throw std::system_error(errno, std::generic_category(), "reading message");
+            }
+        } else if (read_bytes == 0) { //EOF -> connection closed
+            closeConnection();
+            return false;
+        }
 
-	for (int i = 0; i < new_events; i++) {
-		if ((events[i].events & EPOLLIN)) {
-			while (true) {
-				ssize_t read_bytes = read(sock, buf, BUF_MAX_SIZE - 1);
-				if (read_bytes == -1) {
-					if (errno == EAGAIN || errno == EWOULDBLOCK) {
-					ś	break;
-					} else {
-						closeConnection();
-						throw std::system_error(errno, std::generic_category(), "reading message");
-					}
-				} else if (read_bytes == 0) { //EOF -> connection closed
-					closeConnection();
-					return false;
-				}
+        message.append(buf);
+    }
 
-				message.append(buf);
-			}
+    gotWholeResponse = message.ends_with("\n\n");
 
-			if(message.ends_with("\n\n")) {
-				// oddajesz do analizatora
-				nie_dostałem_całej_odpowiedzi_od_serwera = false;
-			} else {
-				// czekamy na kolejne bajty
-			}
+    return true;
+}
 
-			//switch()
-			//	// czy wysyłam komendy, czy pobieram plik
+void Connection::changeEpollEvents(bool &readyForReading) {
+    epoll_event new_events = {};
+    new_events.data.fd = sock;
+    new_events.events = EPOLLET;
+    if (readyForReading) {
+        new_events.events |= EPOLLIN;
+    } else {
+        new_events.events |= EPOLLOUT;
+    }
 
-				// CHECK: czy dwa ostatnie znaki to '\n'
-				// dl
-				// name:
-				// dls
-				// OSTRZEŻENIE DLA UŻYTKOWNIKA -- zgłosił do @JMaz
-		}
-	}
-
-	if (message.empty())
-		return false;
-	else
-		return true;
+    if (epoll_ctl(epfd, EPOLL_CTL_MOD, sock, &new_events) == -1) {
+        closeConnection();
+        throw std::system_error(errno, std::generic_category(), "epoll - add");
+    }
 }

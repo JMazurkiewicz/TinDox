@@ -4,6 +4,7 @@
 
 #include "tdpservice.h"
 #include <iostream>
+#include <csignal>
 
 using namespace std;
 

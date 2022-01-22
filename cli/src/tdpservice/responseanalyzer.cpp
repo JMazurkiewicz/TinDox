@@ -77,7 +77,7 @@ ConnectionError ResponseAnalyzer::getErrorCode(string::iterator &iter) {
 
 ConnectionError ResponseAnalyzer::readRestIntoBuf(string::iterator &iter) {
 	try {
-		if (connectionToServer->receiveAllReadyFromServer(read_buf)) {
+		if (connectionToServer->receiveAllReadyFromServer(read_buf)) { //TODO WHAT!?
 			iter = read_buf.begin();
 			return NONE;
 		} else
