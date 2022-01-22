@@ -12,9 +12,11 @@ project(
     DESCRIPTION "TinDox Server"
 )
 
-set(CMAKE_CXX_EXTENSIONS OFF)
 include(cmake/checks.cmake)
 include(FetchContent)
+
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
 
 find_package(tomlplusplus 2.6 QUIET)
 if(tomlplusplus_FOUND)
@@ -162,7 +164,6 @@ target_include_directories(tds-dev PRIVATE ${PROJECT_BINARY_DIR}/include)
 target_include_directories(tds-dev PUBLIC include)
 target_link_libraries(tds-dev PRIVATE crypt Threads::Threads fmt::fmt spdlog::spdlog)
 target_link_libraries(tds-dev PUBLIC tomlplusplus::tomlplusplus)
-set_target_properties(tds-dev PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_executable(tds src/main.cpp)
 target_link_libraries(tds PUBLIC tds-dev)
