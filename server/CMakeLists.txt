@@ -16,7 +16,7 @@ include(cmake/checks.cmake)
 include(FetchContent)
 
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(tomlplusplus 2.6 QUIET)
 if(tomlplusplus_FOUND)
