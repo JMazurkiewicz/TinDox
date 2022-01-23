@@ -34,14 +34,14 @@ else()
     endif()
 endif()
 
-find_package(fmt 8.0 QUIET)
+find_package(fmt 8.1 QUIET)
 if(fmt_FOUND)
     message(STATUS "Found {fmt}: ${fmt_DIR} (found version \"${fmt_VERSION}\")")
 else()
     FetchContent_Declare(
         fmt
         GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-        GIT_TAG 8.0.1
+        GIT_TAG 8.1.1
     )
 
     if(NOT fmt_POPULATED)
