@@ -18,14 +18,14 @@ include(FetchContent)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-find_package(tomlplusplus 2.6 QUIET)
+find_package(tomlplusplus 3.0 QUIET)
 if(tomlplusplus_FOUND)
     message(STATUS "Found tomlplusplus: ${tomlplusplus_DIR} (found version \"${tomlplusplus_VERSION}\")")
 else()
     FetchContent_Declare(
         tomlplusplus
         GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
-        GIT_TAG v2.5.0
+        GIT_TAG v3.0.1
     )
 
     if(NOT tomlplusplus_POPULATED)
