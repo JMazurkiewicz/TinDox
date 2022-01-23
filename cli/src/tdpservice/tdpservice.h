@@ -4,6 +4,8 @@
 #include "connection.h"
 #include "responseanalyzer.h"
 
+typedef unsigned long long ull;
+
 class TDPService {
 public:
     TDPService() = default;
@@ -41,6 +43,8 @@ public:
     bool perms();
 
     bool pwd();
+
+    bool ul(const string &name, const string &path, const bool &retry);
 
     string response_body;
     string received_response;

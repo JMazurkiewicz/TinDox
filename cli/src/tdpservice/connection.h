@@ -4,10 +4,12 @@
 #include <string>
 #include <netdb.h>
 #include <sys/epoll.h>
+#include <thread>
 
 #define BUF_MAX_SIZE 2048
 
-using std::string;
+using std::string, std::thread;
+typedef unsigned long long ull;
 
 class Connection {
 public:
@@ -24,9 +26,12 @@ public:
 
     bool exchangeWithServer(string &data);
 
+    bool uploadFile(int &fd, off_t &offset, const size_t &size);
+
 private:
 
     int sock{}, epfd{};
+    thread dl_ul_thread;  //TODO jak to połączyć z TUI?
     bool isConnectionOpen = false;
     struct sockaddr_in server{};
 

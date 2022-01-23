@@ -1,5 +1,7 @@
 #include "tdpservice.h"
 #include <sstream>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 bool TDPService::initConnection(const string &serv_ip, int serv_port) {
     try {
@@ -133,6 +135,34 @@ bool TDPService::pwd() {
     else
         return false;
 }
+
+bool TDPService::ul(const string &name, const string &path, const bool &retry) {
+    int fd = open(path.c_str(), O_RDONLY);
+    if(fd == -1)
+        return false;
+
+    struct stat st = {};
+    if(fstat(fd, &st) == -1)
+        return false;
+
+   size_t size = st.st_size;
+
+    try {
+        if (sendAndGetResponse("ul", "name", name, "size", std::to_string(size), "retry", retry ? "true" : "false")
+            &&
+            (error_code = responseAnalyzer.analyseSimpleResponse("ul", received_response, response_body, true)) == OK) {
+
+            off_t offset = std::stol(response_body);
+            bool result = connectionToServer.uploadFile(fd, offset, size);
+            close(fd);
+            return result;
+        }
+    } catch (std::runtime_error &ex) {
+        close(fd);
+    }
+    return false;
+}
+
 
 bool TDPService::sendAndGetResponse(const string &command_name, const string &field_name1, const string &field_value1,
                                     const string &field_name2, const string &field_value2, const string &field_name3,

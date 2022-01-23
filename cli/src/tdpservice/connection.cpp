@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <sys/sendfile.h>
 
 void Connection::createSocket() {
     sock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
@@ -148,4 +149,50 @@ void Connection::changeEpollEvents(bool &readyForReading) {
         closeConnection();
         throw std::system_error(errno, std::generic_category(), "epoll - add");
     }
+}
+
+bool Connection::uploadFile(int &fd, off_t &offset, const size_t &size) {
+    size_t remaining_size = size - offset;
+    bool result;
+    if (isConnectionOpen) {
+        epoll_event events[2];
+
+        while (remaining_size) {
+            ssize_t count = epoll_wait(epfd, events, 2, -1);
+            if (count == -1) {
+                closeConnection();
+                throw std::system_error(errno, std::generic_category(), "waiting on epoll");
+            }
+
+            for (int i = 0; i < count; i++) {
+                if (events[i].data.fd == sock) {
+                    if (events[i].events & EPOLLOUT) {
+
+                        while (remaining_size) {
+                            size_t written_bytes = sendfile(sock, fd, &offset, remaining_size);
+                            if (written_bytes >= 0) {
+                                remaining_size -= written_bytes;
+                            } else if (errno == EAGAIN || errno == EWOULDBLOCK)
+                                break;
+                            else {
+                                closeConnection();
+                                throw std::system_error(errno, std::generic_category(), "sending file");
+                            }
+                        }
+
+                    }
+                } else {
+                    closeConnection();
+                    throw std::runtime_error("epoll - wrong event");
+                }
+            }
+        }
+        result = true;
+    } else
+        result = false;
+
+    bool readyForReading = false;
+    changeEpollEvents(readyForReading);
+
+    return result;
 }
