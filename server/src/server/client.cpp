@@ -30,7 +30,7 @@ namespace tds::server {
         return m_context.is_alive();
     }
 
-    linux::EventType Client::get_required_events() const noexcept {
+    linux::EventType Client::get_required_events() const {
         const protocol::ProtocolMode mode = m_context.get_mode();
         if((!m_pending_input.empty() && mode == protocol::ProtocolMode::command) || m_sender.has_responses() ||
            mode == protocol::ProtocolMode::download) {
@@ -38,7 +38,7 @@ namespace tds::server {
         } else if(mode == protocol::ProtocolMode::command || mode == protocol::ProtocolMode::upload) {
             return linux::EventType::in;
         } else {
-            __builtin_unreachable(); // should never happen
+            throw std::runtime_error{"Unexpected event required by client"};
         }
     }
 

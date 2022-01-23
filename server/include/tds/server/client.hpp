@@ -26,7 +26,7 @@ namespace tds::server {
         ip::TcpSocket& get_socket() noexcept;
 
         bool is_alive() const noexcept;
-        linux::EventType get_required_events() const noexcept;
+        linux::EventType get_required_events() const;
         void handle(linux::EventType events);
 
     private:
