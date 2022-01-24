@@ -6,4 +6,6 @@ add_subdirectory(tdpservice/)
 add_executable(cli
         main.cpp)
 
-target_link_libraries(cli PRIVATE tdpservice)
+find_package(Threads REQUIRED)
+
+target_link_libraries(cli PRIVATE tdpservice Threads::Threads)

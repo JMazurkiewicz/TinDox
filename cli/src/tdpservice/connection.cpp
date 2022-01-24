@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <sys/sendfile.h>
 
 void Connection::createSocket() {
     sock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
@@ -49,7 +50,7 @@ void Connection::closeConnection() {
     }
 }
 
-bool Connection::exchangeWithServer(std::string &data) {
+bool Connection::exchangeWithServer(std::string &data, size_t bytes_to_read, bool downloadingFile, int fd) {
     if (isConnectionOpen) {
         bool gotWholeResponse = false, readyForReading = false;
         unsigned long sent_buf_pos = 0;
@@ -69,7 +70,7 @@ bool Connection::exchangeWithServer(std::string &data) {
                             data.clear();
                         }
                     } else if (events[i].events & EPOLLIN) {
-                        if (!receiveAllReadyFromServer(data, gotWholeResponse))
+                        if (!receiveAllReadyFromServer(data, gotWholeResponse, bytes_to_read, downloadingFile, fd))
                             return false;
                         readyForReading = !gotWholeResponse;
                     }
@@ -102,13 +103,11 @@ bool Connection::sendToServer(std::string &message, unsigned long &sent_buf_pos)
         len -= sent_bytes;
     }
 
-    if (!len)
-        return true;
-    else
-        return false;
+    return !static_cast<bool>(len);
 }
 
-bool Connection::receiveAllReadyFromServer(std::string &message, bool &gotWholeResponse) {
+bool Connection::receiveAllReadyFromServer(std::string &message, bool &gotWholeResponse, size_t &bytes_to_read,
+                                           bool readFile, int fd) {
     char buf[BUF_MAX_SIZE];
 
     while (true) {
@@ -126,10 +125,19 @@ bool Connection::receiveAllReadyFromServer(std::string &message, bool &gotWholeR
             return false;
         }
 
+        if (readFile) {
+            bytes_to_read -= read_bytes;
+            if (write(fd, buf, read_bytes) != read_bytes)
+                return false;
+        }
+
         message.append(buf);
     }
 
-    gotWholeResponse = message.ends_with("\n\n");
+    if (readFile)
+        gotWholeResponse = !static_cast<bool>(bytes_to_read);
+    else
+        gotWholeResponse = message.ends_with("\n\n");
 
     return true;
 }
@@ -148,4 +156,50 @@ void Connection::changeEpollEvents(bool &readyForReading) {
         closeConnection();
         throw std::system_error(errno, std::generic_category(), "epoll - add");
     }
+}
+
+bool Connection::uploadFile(int &fd, off_t &offset, const size_t &size) {
+    size_t remaining_size = size - offset;
+    bool result;
+    if (isConnectionOpen) {
+        epoll_event events[2];
+
+        while (remaining_size) {
+            ssize_t count = epoll_wait(epfd, events, 2, -1);
+            if (count == -1) {
+                closeConnection();
+                throw std::system_error(errno, std::generic_category(), "waiting on epoll");
+            }
+
+            for (int i = 0; i < count; i++) {
+                if (events[i].data.fd == sock) {
+                    if (events[i].events & EPOLLOUT) {
+
+                        while (remaining_size) {
+                            size_t written_bytes = sendfile(sock, fd, &offset, remaining_size);
+                            if (written_bytes >= 0) {
+                                remaining_size -= written_bytes;
+                            } else if (errno == EAGAIN || errno == EWOULDBLOCK)
+                                break;
+                            else {
+                                closeConnection();
+                                throw std::system_error(errno, std::generic_category(), "sending file");
+                            }
+                        }
+
+                    }
+                } else {
+                    closeConnection();
+                    throw std::runtime_error("epoll - wrong event");
+                }
+            }
+        }
+        result = true;
+    } else
+        result = false;
+
+    bool readyForReading = false;
+    changeEpollEvents(readyForReading);
+
+    return result;
 }

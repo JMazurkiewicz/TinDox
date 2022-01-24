@@ -1,5 +1,7 @@
 #include "tdpservice.h"
 #include <sstream>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 bool TDPService::initConnection(const string &serv_ip, int serv_port) {
     try {
@@ -134,6 +136,69 @@ bool TDPService::pwd() {
         return false;
 }
 
+bool TDPService::ul(const string &name, const string &path, const bool &retry) {
+    int fd = open(path.c_str(), O_RDONLY);
+    if (fd == -1)
+        return false;
+
+    struct stat st = {};
+    if (fstat(fd, &st) == -1) {
+        close(fd);
+        return false;
+    }
+
+    size_t size = st.st_size;
+
+    try {
+        if (sendAndGetResponse("ul", "name", name, "size", std::to_string(size), "retry", retry ? "true" : "false")
+            &&
+            (error_code = responseAnalyzer.analyseSimpleResponse("ul", received_response, response_body, true)) == OK) {
+
+            off_t offset = std::stol(response_body);
+            bool result = connectionToServer.uploadFile(fd, offset, size);
+            close(fd);
+            return result;
+        }
+    } catch (std::runtime_error &ex) {
+        close(fd);
+    }
+    return false;
+}
+
+bool TDPService::dl(const string &name, const string &path, const bool &retry) {
+    int fd;
+    if (retry)
+        fd = open(path.c_str(), O_RDWR | O_APPEND);
+    else
+        fd = open(path.c_str(), O_RDWR | O_TRUNC | O_CREAT);
+
+    if (fd == -1)
+        return false;
+
+    struct stat st = {};
+    if (fstat(fd, &st) == -1) {
+        close(fd);
+        return false;
+    }
+    size_t size = st.st_size;
+
+    try {
+        if (sendAndGetResponse("dl", "name", name, retry ? "size" : "", retry ? std::to_string(size) : "", "", "")
+            &&
+            (error_code = responseAnalyzer.analyseSimpleResponse("dl", received_response, response_body, true)) == OK) {
+
+            size_t bytes_to_read = std::stoul(response_body);
+            bool result = downloadFileData(bytes_to_read, fd);
+            close(fd);
+            chmod(path.c_str(), S_IRWXU);
+            return result;
+        }
+    } catch (std::runtime_error &ex) {
+        close(fd);
+    }
+    return false;
+}
+
 bool TDPService::sendAndGetResponse(const string &command_name, const string &field_name1, const string &field_value1,
                                     const string &field_name2, const string &field_value2, const string &field_name3,
                                     const string &field_value3) {
@@ -162,6 +227,22 @@ bool TDPService::sendAndGetResponse(const string &command_name, const string &fi
 
     try {
         if (connectionToServer.exchangeWithServer(received_response))
+            return true;
+        else
+            error_code = E_CLOSED_CON;
+    } catch (const std::runtime_error &ex) {
+        error_code = E_EXCHANGE_MESSAGE;
+    }
+
+    return false;
+}
+
+bool TDPService::downloadFileData(size_t &bytes_to_download, int &fd) {
+    error_code = NONE;
+    last_sent_command = (received_response = "dls\n\n");
+
+    try {
+        if (connectionToServer.exchangeWithServer(received_response, bytes_to_download, true, fd))
             return true;
         else
             error_code = E_CLOSED_CON;
