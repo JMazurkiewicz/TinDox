@@ -2,27 +2,29 @@
  * Autor: Łukasz Reszka (300257)
  * */
 
-#include "tdpservice.h"
-#include <iostream>
-#include <csignal>
+//#include <csignal>
+#include <ftxui/dom/elements.hpp>
+#include <ftxui/screen/screen.hpp>
 
-using namespace std;
+using namespace ftxui;
 
 int main() {
-    signal(SIGPIPE, SIG_IGN);
+    //signal(SIGPIPE, SIG_IGN);
 
-    TDPService service;
-    service.initConnection("127.0.0.1", 37666);
+    // Define the document
+    Element document =
+            hbox({
+                         text("left") | border,
+                         text("middle") | border | flex,
+                         text("right") | border,
+                 });
 
-    service.auth("admin", "admin");
-    cout << service.last_sent_command << service.received_response;
+    auto screen = Screen::Create(
+            Dimension::Full(),       // Width
+            Dimension::Fit(document) // Height
+    );
+    Render(screen, document);
+    screen.Print();
 
-    if (service.dl("tin.pdf", "./tin.pdf", false))
-        cout << service.last_sent_command << service.received_response;
-
-    service.logout();
-    cout << service.last_sent_command << service.received_response;
-
-    service.closeConnection();
-    return 0;
+    return EXIT_SUCCESS;
 }

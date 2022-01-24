@@ -6,6 +6,4 @@ add_subdirectory(tdpservice/)
 add_executable(cli
         main.cpp)
 
-find_package(Threads REQUIRED)
-
-target_link_libraries(cli PRIVATE tdpservice Threads::Threads)
+target_link_libraries(cli PRIVATE tdpservice ftxui::screen ftxui::dom)
