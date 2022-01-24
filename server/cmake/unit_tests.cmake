@@ -2,16 +2,13 @@ find_package(Catch2 3 QUIET)
 if(Catch2_FOUND)
     message(STATUS "Found Catch2: ${Catch2_DIR} (found version \"${Catch2_VERSION}\")")
 else()
-    include(FetchContent)
-    set(FETCHCONTENT_QUIET OFF)
-
     FetchContent_Declare(
         Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
         GIT_TAG devel
     )
-    FetchContent_MakeAvailable(Catch2)
 
+    FetchContent_MakeAvailable(Catch2)
     list(APPEND CMAKE_MODULE_PATH "${Catch2_SOURCE_DIR}/extras")
 endif()
 
@@ -37,7 +34,6 @@ set(
 
     tests/unit/ip/address_v4_test.cpp
     tests/unit/ip/endpoint_v4_test.cpp
-    tests/unit/ip/ip_error_test.cpp
     tests/unit/ip/port_test.cpp
     tests/unit/ip/socket_type_test.cpp
     tests/unit/ip/tcp_listener_test.cpp
@@ -53,12 +49,15 @@ set(
     tests/unit/linux/signal_device_test.cpp
     tests/unit/linux/transfer_bytes_test.cpp
 
+    tests/unit/protocol/auth_token_test.cpp
+    tests/unit/protocol/download_token_test.cpp
     tests/unit/protocol/field_test.cpp
     tests/unit/protocol/path_lock_test.cpp
     tests/unit/protocol/protocol_code_test.cpp
     tests/unit/protocol/protocol_interpreter_test.cpp
     tests/unit/protocol/receiver_test.cpp
     tests/unit/protocol/request_test.cpp
+    tests/unit/protocol/response_builder_test.cpp
     tests/unit/protocol/response_test.cpp
     tests/unit/protocol/sender_test.cpp
     tests/unit/protocol/server_context_test.cpp
@@ -68,5 +67,4 @@ set(
 
 add_executable(tds-unit-tests ${TDS_UNIT_TESTS_SOURCES})
 target_link_libraries(tds-unit-tests PRIVATE Catch2::Catch2WithMain tds-dev Threads::Threads)
-target_include_directories(tds-unit-tests PRIVATE tests/unit)
 catch_discover_tests(tds-unit-tests TEST_PREFIX "UNIT::")

@@ -10,13 +10,19 @@ namespace tds::protocol {
         : m_socket{socket} { }
 
     void DownloadManager::start_download(std::shared_ptr<DownloadToken> token) {
-        m_token = std::move(token);
-        m_file.open(m_token->get_file_path(), O_RDONLY);
-        m_offset = m_token->get_file_offset();
-        m_file_size = std::filesystem::file_size(m_token->get_file_path());
+        if(token->get_file_size() > 0) {
+            m_token = std::move(token);
+            m_file.open(m_token->get_file_path(), O_RDONLY);
+            m_offset = m_token->get_file_offset();
+            m_file_size = token->get_file_size();
+        }
     }
 
     ssize_t DownloadManager::send() {
+        if(has_finished()) {
+            return 0;
+        }
+
         const off64_t old_offset = m_offset;
         std::errc code = {};
         const int count = linux::transfer_bytes(m_file, m_socket, m_offset, m_file_size - m_offset, code);

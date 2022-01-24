@@ -1,8 +1,7 @@
 #pragma once
 
-#include "tds/linux/epoll_event.hpp"
+#include "tds/linux/epoll_device.hpp"
 
-#include <cstddef>
 #include <memory>
 #include <ranges>
 #include <span>
@@ -31,7 +30,7 @@ namespace tds::linux {
 
     inline auto EpollBuffer::get_events() const noexcept {
         std::span<epoll_event> available_events{m_buffer.get(), m_size};
-        return available_events | std::views::transform([](const epoll_event& event) -> EpollEvent {
+        return available_events | std::views::transform([](const epoll_event& event) -> EpollDevice::Event {
                    return {event.data.fd, static_cast<EventType>(event.events)};
                });
     }

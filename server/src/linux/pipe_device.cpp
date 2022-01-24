@@ -2,6 +2,8 @@
 
 #include "tds/linux/linux_error.hpp"
 
+#include <array>
+
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -12,11 +14,8 @@ namespace tds::linux {
     PipeWriteDevice::PipeWriteDevice(int fd)
         : IoDevice(fd) { }
 
-    PipeDevices make_pipe(bool blocking) {
-        int fds[2];
-        const int flags = (blocking ? 0 : O_NONBLOCK);
-
-        if(pipe2(fds, flags) == -1) {
+    PipeDevices make_pipe() {
+        if(std::array<int, 2> fds; pipe2(fds.data(), 0) == -1) {
             throw LinuxError{"pipe2(2)"};
         } else {
             return {PipeReadDevice{fds[0]}, PipeWriteDevice{fds[1]}};

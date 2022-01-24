@@ -13,8 +13,6 @@ namespace tds::ip {
         TcpSocket& operator=(TcpSocket&&) = default;
 
         EndpointV4 get_endpoint() const noexcept;
-        AddressV4 get_address() const noexcept;
-        Port get_port() const noexcept;
 
     private:
         EndpointV4 m_endpoint;

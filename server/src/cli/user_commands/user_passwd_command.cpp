@@ -2,7 +2,6 @@
 
 #include "tds/cli/invalid_command_arguments_error.hpp"
 #include "tds/cli/invalid_command_execution_error.hpp"
-#include "tds/config/limits.hpp"
 #include "tds/linux/echoless_terminal_guard.hpp"
 #include "tds/linux/hash.hpp"
 #include "tds/user/user_table.hpp"
@@ -20,7 +19,7 @@ namespace tds::cli::user_commands {
     namespace {
         [[noreturn]] void throw_too_many_attempts_error() {
             throw InvalidCommandExecutionError{
-                fmt::format("too many attempts (max is {})", config::limits::max_try_count)};
+                fmt::format("too many attempts (max is {})", UserPasswdCommand::max_try_count)};
         }
     }
 
@@ -45,7 +44,7 @@ namespace tds::cli::user_commands {
     void UserPasswdCommand::read_old_password() const {
         linux::EcholessTerminalGuard terminal_guard;
         std::string old_password;
-        for(int i = 0; i < config::limits::max_try_count; ++i) {
+        for(int i = 0; i < max_try_count; ++i) {
             if(i == 0) {
                 std::cout << "Enter old password: ";
             } else {
@@ -64,7 +63,7 @@ namespace tds::cli::user_commands {
 
     void UserPasswdCommand::read_new_password() {
         linux::EcholessTerminalGuard terminal_guard;
-        for(int i = 0; i < config::limits::max_try_count; ++i) {
+        for(int i = 0; i < max_try_count; ++i) {
             if(i == 0) {
                 std::cout << "Enter new password: ";
             } else {
@@ -84,7 +83,7 @@ namespace tds::cli::user_commands {
     void UserPasswdCommand::read_new_password_repeated() const {
         linux::EcholessTerminalGuard terminal_guard;
         std::string repeated_password;
-        for(int i = 0; i < config::limits::max_try_count; ++i) {
+        for(int i = 0; i < max_try_count; ++i) {
             if(i == 0) {
                 std::cout << "Repeat new password: ";
             } else {

@@ -65,4 +65,8 @@ TEST_CASE("tds::protocol::ServerContext", "[protocol]") {
         REQUIRE(context.is_path_forbidden(root / ".tds"));
         REQUIRE(!context.is_path_forbidden(root / "tds"));
     }
+
+    SECTION("Remove tds instance") {
+        fs::remove_all(root);
+    }
 }

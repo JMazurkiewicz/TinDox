@@ -2,9 +2,6 @@
 
 #include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/epoll_device.hpp"
-#include "tds/linux/linux_error.hpp"
-
-#include <unistd.h>
 
 using namespace tds::linux;
 

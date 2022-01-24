@@ -1,5 +1,6 @@
 #include "tds/linux/epoll_device.hpp"
 
+#include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/linux_error.hpp"
 
 #include <algorithm>
@@ -24,12 +25,6 @@ namespace tds::linux {
 
     void EpollDevice::rearm_device(IoDevice& dev, EventType events) {
         epoll_ctl(dev.get_fd(), EPOLL_CTL_MOD, events);
-    }
-
-    void EpollDevice::remove_device(const IoDevice& dev) {
-        if(::epoll_ctl(get_fd(), EPOLL_CTL_DEL, dev.get_fd(), nullptr) == -1) {
-            throw LinuxError{"epoll_ctl(2)"};
-        }
     }
 
     int EpollDevice::wait_for_events(EpollBuffer& buffer) {

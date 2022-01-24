@@ -15,6 +15,8 @@ sudo dpkg -i TinDoxServer.deb
 dpkg -s TinDoxServer
 ```
 
+This method works only on Debian-based distributions (e.g. Ubuntu, Linux Mint).
+
 ### Hard way: build it yourself
 
 #### Get some dependencies
@@ -22,7 +24,12 @@ dpkg -s TinDoxServer
 This step is not required - CMake will take care of dependencies anyway.
 
 ```sh
+# On Debian-based distributions (e.g. Ubuntu, Linux Mint):
 sudo apt-get libfmt-dev libspdlog-dev
+
+# On Arch-based distributions (e.g. Manjaro, Arco):
+sudo pacman -S fmt spdlog
+sudo pamac install tomlplusplus
 ```
 
 #### Build and install
@@ -40,7 +47,7 @@ sudo cmake --install build
 ```sh
 mkdir my_tds # Create directory for your TDS
 cd my_tds
-tds init     # Create TDS server instance
+tds init     # Create TDS instance
 tds run      # Run
 ```
 

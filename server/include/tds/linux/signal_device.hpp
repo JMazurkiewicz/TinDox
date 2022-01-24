@@ -8,15 +8,19 @@
 #include <sys/signalfd.h>
 
 namespace tds::linux {
-    using SignalHandler = std::function<void(int)>;
-
     class SignalDevice : public IoDevice {
     public:
+        using SignalHandler = std::function<void(int)>;
+
         SignalDevice() = default;
 
         void add_handler(int signal, SignalHandler handler);
-        void apply();
+        void start_signal_device();
         void handle_signal();
+
+    protected:
+        using IoDevice::read;
+        using IoDevice::write;
 
     private:
         void create_mask();

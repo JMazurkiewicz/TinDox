@@ -22,7 +22,7 @@ namespace tds::config {
                     set_integer_field(name, integer->get());
                 } else {
                     throw std::runtime_error{
-                        fmt::format("ConfigReader: field {} of type {} is invalid", name, value.type())};
+                        fmt::format("ConfigReader: field '{}' is invalid", name)};
                 }
             }
         }

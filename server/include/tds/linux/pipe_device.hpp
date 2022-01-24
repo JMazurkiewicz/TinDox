@@ -30,5 +30,5 @@ namespace tds::linux {
         PipeWriteDevice m_write_device;
     };
 
-    PipeDevices make_pipe(bool blocking);
+    PipeDevices make_pipe();
 }

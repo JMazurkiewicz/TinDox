@@ -22,7 +22,7 @@
     const size_t size = backtrace(buffer.data(), buffer.size());
     fprintf(stderr, "Got SIGSEGV\n");
     backtrace_symbols_fd(buffer.data(), size, STDERR_FILENO);
-    std::exit(EXIT_FAILURE);
+    std::quick_exit(EXIT_FAILURE);
 }
 
 int main(int argc, char** argv) {

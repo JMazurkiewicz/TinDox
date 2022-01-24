@@ -1,7 +1,5 @@
 #include "tds/linux/linux_error.hpp"
 
-#include <system_error>
-
 namespace tds::linux {
     LinuxError::LinuxError(const std::string& msg)
         : LinuxError(msg.c_str()) { }

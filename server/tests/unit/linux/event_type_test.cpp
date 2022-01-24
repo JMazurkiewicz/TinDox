@@ -2,8 +2,6 @@
 
 #include "tds/linux/event_type.hpp"
 
-#include <sys/epoll.h>
-
 using namespace tds::linux;
 using enum EventType;
 

@@ -4,7 +4,6 @@
 
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <unistd.h>
 
 namespace tds::ip {
     TcpSocket::TcpSocket()
@@ -21,13 +20,5 @@ namespace tds::ip {
 
     EndpointV4 TcpSocket::get_endpoint() const noexcept {
         return m_endpoint;
-    }
-
-    AddressV4 TcpSocket::get_address() const noexcept {
-        return get_endpoint().get_address();
-    }
-
-    Port TcpSocket::get_port() const noexcept {
-        return get_endpoint().get_port();
     }
 }

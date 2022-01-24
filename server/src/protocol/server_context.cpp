@@ -111,6 +111,11 @@ namespace tds::protocol {
         return get_config_directory_path() / (filename_stem.native() + ".upload");
     }
 
+    void ServerContext::set_path_of_client(ClientContext& client_context, std::filesystem::path new_path) {
+        std::scoped_lock lock{m_path_locks_mutex};
+        client_context.set_current_path(std::move(new_path));
+    }
+
     void ServerContext::remove_expired_auth_tokens() {
         std::erase_if(m_auth_tokens, [](auto& ptr) { return ptr.expired(); });
     }

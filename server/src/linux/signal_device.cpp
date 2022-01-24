@@ -2,13 +2,10 @@
 
 #include "tds/linux/linux_error.hpp"
 
-#include <algorithm>
 #include <csignal>
 #include <ranges>
-#include <stdexcept>
 
 #include <fmt/core.h>
-#include <unistd.h>
 
 namespace tds::linux {
     void SignalDevice::add_handler(int signal, SignalHandler handler) {
@@ -18,7 +15,7 @@ namespace tds::linux {
         }
     }
 
-    void SignalDevice::apply() {
+    void SignalDevice::start_signal_device() {
         create_mask();
         block_signals();
         create_fd();
@@ -42,7 +39,9 @@ namespace tds::linux {
 
     void SignalDevice::create_mask() {
         sigemptyset(&m_mask);
-        std::ranges::for_each(m_handlers | std::views::keys, std::bind_front(&::sigaddset, &m_mask));
+        for(int signo : m_handlers | std::views::keys) {
+            sigaddset(&m_mask, signo);
+        }
     }
 
     void SignalDevice::block_signals() {

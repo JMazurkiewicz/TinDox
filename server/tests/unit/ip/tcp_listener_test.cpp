@@ -1,16 +1,14 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "tds/ip/address_v4.hpp"
 #include "tds/ip/tcp_listener.hpp"
 #include "tds/linux/epoll_buffer.hpp"
 #include "tds/linux/epoll_device.hpp"
+#include "tds/linux/event_type.hpp"
 #include "tds/linux/linux_error.hpp"
 
 #include <thread>
 
 #include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
 using namespace tds::ip;
 using namespace std::chrono_literals;
@@ -25,7 +23,8 @@ TEST_CASE("tds::ip::TcpListener", "[ip]") {
         try {
             TcpListener tcp;
             tcp.set_connection_handler([&](TcpSocket socket) {
-                connection_established = (socket.get_fd() >= 0) && (socket.get_address() == AddressV4::localhost);
+                connection_established =
+                    (socket.get_fd() >= 0) && (socket.get_endpoint().get_address() == AddressV4{INADDR_LOOPBACK});
             });
             tcp.listen(server_port);
             tcp.handle_connection();
@@ -82,12 +81,13 @@ TEST_CASE("tds::ip::{TcpListener+EpollDevice}", "[ip]") {
             TcpListener tcp;
             tcp.set_connection_handler([&](TcpSocket socket) {
                 epoll_handled = true;
-                connection_established = (socket.get_fd() >= 0) && (socket.get_address() == AddressV4::localhost);
+                connection_established =
+                    (socket.get_fd() >= 0) && (socket.get_endpoint().get_address() == AddressV4{INADDR_LOOPBACK});
             });
             tcp.listen(server_port);
 
             tds::linux::EpollDevice epoll_device;
-            epoll_device.add_device(tcp);
+            epoll_device.add_device(tcp, tds::linux::EventType::in);
 
             tds::linux::EpollBuffer buffer{16};
             epoll_device.wait_for_events(buffer);

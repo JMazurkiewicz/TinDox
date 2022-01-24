@@ -11,7 +11,7 @@ namespace tds::cli {
     }
 
     void VersionCommand::execute() {
-        std::cout << "TinDox Server " TDS_VERSION_STRING "\n";
+        std::cout << "TinDox Server " TDS_VERSION_STRING " [" TDS_BUILD_TYPE " build]\n";
         if(!m_empty_args) {
             throw InvalidCommandArgumentsError{"help command takes no arguments", "tds help"};
         }

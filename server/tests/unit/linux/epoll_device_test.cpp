@@ -17,7 +17,7 @@ TEST_CASE("tds::linux::EpollDevice", "[linux]") {
         auto test = [] {
             EpollDevice epoll_device;
             Stdin in;
-            epoll_device.add_device(in);
+            epoll_device.add_device(in, EventType::in);
         };
         REQUIRE_NOTHROW(test());
     }
@@ -28,7 +28,7 @@ TEST_CASE("tds::linux::EpollDevice", "[linux]") {
         auto test = [] {
             EpollDevice epoll_device;
             InvalidDevice invalid;
-            epoll_device.add_device(invalid);
+            epoll_device.add_device(invalid, EventType::in);
         };
         REQUIRE_THROWS_AS(test(), LinuxError);
     }

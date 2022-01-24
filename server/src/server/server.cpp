@@ -48,7 +48,7 @@ namespace tds::server {
         m_signal_device.add_handler(SIGINT, handler);
         m_signal_device.add_handler(SIGQUIT, handler);
         m_signal_device.add_handler(SIGTERM, handler);
-        m_signal_device.apply();
+        m_signal_device.start_signal_device();
     }
 
     void Server::configure_listener() {
@@ -64,8 +64,8 @@ namespace tds::server {
 
     void Server::configure_main_epoll() {
         server_logger->info("Server: configuring main epoll device");
-        m_epoll.add_device(m_signal_device);
-        m_epoll.add_device(m_tcp_listener);
+        m_epoll.add_device(m_signal_device, linux::EventType::in);
+        m_epoll.add_device(m_tcp_listener, linux::EventType::in);
     }
 
     void Server::handle_stop_signal(int code) {

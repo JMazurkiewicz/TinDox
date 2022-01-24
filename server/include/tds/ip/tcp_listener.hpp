@@ -8,10 +8,10 @@
 #include <functional>
 
 namespace tds::ip {
-    using ConnectionHandler = std::function<void(TcpSocket)>;
-
     class TcpListener : public linux::IoDevice {
     public:
+        using ConnectionHandler = std::function<void(TcpSocket)>;
+
         TcpListener();
 
         void set_backlog(int new_backlog);
