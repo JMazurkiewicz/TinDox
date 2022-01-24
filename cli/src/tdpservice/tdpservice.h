@@ -46,6 +46,8 @@ public:
 
     bool ul(const string &name, const string &path, const bool &retry);
 
+    bool dl(const string &name, const string &path, const bool &retry);
+
     string response_body;
     string received_response;
     string last_sent_command;
@@ -55,9 +57,12 @@ private:
     Connection connectionToServer;
     ResponseAnalyzer responseAnalyzer;
 
+
     bool sendAndGetResponse(const string &command_name, const string &field_name1, const string &field_value1,
                             const string &field_name2, const string &field_value2,
                             const string &field_name3, const string &field_value3);
+
+    bool downloadFileData(size_t &bytes_to_download, int &fd);
 };
 
 

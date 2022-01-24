@@ -50,7 +50,7 @@ void Connection::closeConnection() {
     }
 }
 
-bool Connection::exchangeWithServer(std::string &data) {
+bool Connection::exchangeWithServer(std::string &data, size_t bytes_to_read, bool downloadingFile, int fd) {
     if (isConnectionOpen) {
         bool gotWholeResponse = false, readyForReading = false;
         unsigned long sent_buf_pos = 0;
@@ -70,7 +70,7 @@ bool Connection::exchangeWithServer(std::string &data) {
                             data.clear();
                         }
                     } else if (events[i].events & EPOLLIN) {
-                        if (!receiveAllReadyFromServer(data, gotWholeResponse))
+                        if (!receiveAllReadyFromServer(data, gotWholeResponse, bytes_to_read, downloadingFile, fd))
                             return false;
                         readyForReading = !gotWholeResponse;
                     }
@@ -103,13 +103,11 @@ bool Connection::sendToServer(std::string &message, unsigned long &sent_buf_pos)
         len -= sent_bytes;
     }
 
-    if (!len)
-        return true;
-    else
-        return false;
+    return !static_cast<bool>(len);
 }
 
-bool Connection::receiveAllReadyFromServer(std::string &message, bool &gotWholeResponse) {
+bool Connection::receiveAllReadyFromServer(std::string &message, bool &gotWholeResponse, size_t &bytes_to_read,
+                                           bool readFile, int fd) {
     char buf[BUF_MAX_SIZE];
 
     while (true) {
@@ -127,10 +125,19 @@ bool Connection::receiveAllReadyFromServer(std::string &message, bool &gotWholeR
             return false;
         }
 
+        if (readFile) {
+            bytes_to_read -= read_bytes;
+            if (write(fd, buf, read_bytes) != read_bytes)
+                return false;
+        }
+
         message.append(buf);
     }
 
-    gotWholeResponse = message.ends_with("\n\n");
+    if (readFile)
+        gotWholeResponse = !static_cast<bool>(bytes_to_read);
+    else
+        gotWholeResponse = message.ends_with("\n\n");
 
     return true;
 }

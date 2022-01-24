@@ -24,7 +24,7 @@ public:
 
     void closeConnection();
 
-    bool exchangeWithServer(string &data);
+    bool exchangeWithServer(string &data, size_t bytes_to_read = 0, bool downloadingFile = false, int fd = -1);
 
     bool uploadFile(int &fd, off_t &offset, const size_t &size);
 
@@ -39,7 +39,8 @@ private:
 
     bool sendToServer(std::string &message, unsigned long &sent_buf_pos) const;
 
-    bool receiveAllReadyFromServer(std::string &message, bool &gotWholeResponse);
+    bool receiveAllReadyFromServer(std::string &message, bool &gotWholeResponse, size_t &bytes_to_read,
+                                   bool readFile = false, int fd = -1);
 
     void changeEpollEvents(bool &readyForReading);
 };

@@ -17,11 +17,8 @@ int main() {
     service.auth("admin", "admin");
     cout << service.last_sent_command << service.received_response;
 
-    service.ul("tin.pdf", "./tin.pdf", false);
-    cout << service.last_sent_command << service.received_response;
-
-    service.ls("", "true", "true");
-    cout << service.last_sent_command << service.received_response;
+    if (service.dl("tin.pdf", "./tin.pdf", false))
+        cout << service.last_sent_command << service.received_response;
 
     service.logout();
     cout << service.last_sent_command << service.received_response;
