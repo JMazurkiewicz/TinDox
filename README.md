@@ -2,13 +2,24 @@
 
 [![Server build](https://github.com/JMazurkiewicz/TinDox/actions/workflows/server.yaml/badge.svg)](https://github.com/JMazurkiewicz/TinDox/actions/workflows/server.yaml)
 
-## Directories
+## Goals
 
-* `server` - TinDox Server (TDS),
-* `mobile` - TinDox mobile client for Android,
-* `dekstop` - TinDox desktop client for any desktop operating system,
-* `cli` - TinDox command line client for Linux,
-* `docs-pl` - project documentation (in Polish).
+* Design simple network filesystem protocol
+* Implement efficient server with event-driven architecture
+* Create clients for various platforms - command line, desktop and mobile
+
+## Projects
+
+* TinDox Server (TDS) - `server` directory
+* TinDox mobile client for Android (unfinished) - `mobile` directory
+* TinDox desktop client - `dekstop` directory
+* TinDox command line client for Linux - `cli` directory
+
+## Requirements
+
+TDS and command line client require CMake and C++20 compiler (with `<ranges>` support).
+
+Mobile client requires any Java compiler.
 
 ## Team
 
