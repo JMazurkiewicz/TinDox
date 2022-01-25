@@ -12,7 +12,7 @@
 
 * TinDox Server (TDS) - `server` directory
 * TinDox mobile client for Android (unfinished) - `mobile` directory
-* TinDox desktop client - `dekstop` directory
+* TinDox desktop client - `desktop` directory
 * TinDox command line client for Linux - `cli` directory
 
 ## Requirements
