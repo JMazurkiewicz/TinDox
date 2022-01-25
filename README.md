@@ -4,7 +4,7 @@
 
 ## Goals
 
-* Design simple network filesystem protocol
+* Design network filesystem protocol with most important functionalities like uploading and downloading files 
 * Implement efficient server with event-driven architecture
 * Create clients for various platforms - command line, desktop and mobile
 
