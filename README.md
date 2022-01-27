@@ -1,8 +1,29 @@
-# Network file system
+# TinDox - simple network filesystem
+
+[![Server build](https://github.com/JMazurkiewicz/TinDox/actions/workflows/server.yaml/badge.svg)](https://github.com/JMazurkiewicz/TinDox/actions/workflows/server.yaml)
+
+## Goals
+
+* Design network filesystem protocol with most important functionalities like uploading and downloading files 
+* Implement efficient server with event-driven architecture
+* Create clients for various platforms - command line, desktop and mobile
+
+## Projects
+
+* TinDox Server (TDS) - `server` directory
+* TinDox mobile client for Android (unfinished) - `mobile` directory
+* TinDox desktop client - `desktop` directory
+* TinDox command line client for Linux - `cli` directory
+
+## Requirements
+
+TDS and command line client require CMake and C++20 compiler (with `<ranges>` support).
+
+Mobile client requires any Java compiler.
 
 ## Team
 
-* Jakub Mazurkiewicz ([@JMazurkiewicz](https://github.com/JMazurkiewicz))
-* Damian Piotrowski ([@dam1508](https://github.com/dam1508))
-* Anna Pyrka ([@annapyrka](https://github.com/annapyrka))
-* Łukasz Reszka ([@LukaszReszka](https://github.com/LukaszReszka))
+* Server - [Jakub Mazurkiewicz](https://github.com/JMazurkiewicz)
+* Mobile client - [Damian Piotrowski](https://github.com/dam1508)
+* Desktop client - [Anna Pyrka](https://github.com/annapyrka)
+* Console client - [Łukasz Reszka](https://github.com/LukaszReszka)
