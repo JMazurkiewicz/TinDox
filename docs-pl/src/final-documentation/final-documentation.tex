@@ -490,7 +490,7 @@ Przy ponawianiu operacji istotne jest, aby pola \texttt{name} i \texttt{size} by
 Polecenie \texttt{help} służy do wyświetlenia pomocy, czyli między innymi listy dostępnych komend.
 
 \subsubsection{Polecenie \texttt{init}}
-Polecenie \texttt{init} służy do utworzenia instancji serwera, czyli katalogu \texttt{.tds} oraz innych istotnych plików konfiguracyjnych. Może być wywołane bez parametrów, wówczas instancja zostanie utworzona w bieżącym katalogu, lub z jednym argumentem, który jest ścieżką do istniejącego, docelowego folderu. Przykłady użycia:
+Polecenie \texttt{init} służy do utworzenia instancji serwera, czyli katalogu \quotcode{.tds}, pliku \quotcode{.tds/config} zawierającego modyfikowalne parametry serwera oraz pliku \quotcode{.tds/users} zawierającego listę użytkowników wraz z ich hasłami i uprawnieniami. Może być wywołane bez parametrów, wówczas instancja zostanie utworzona w bieżącym katalogu, lub z jednym argumentem, który jest ścieżką do istniejącego, docelowego folderu. Przykłady użycia:
 \begin{itemize}
     \item \texttt{tds init} -- utworzenie instancji w bieżącym katalogu,
     \item \texttt{tds init .} -- to samo co wyżej,
@@ -535,12 +535,12 @@ Polecenie \texttt{version} służy do wyświetlenia aktualnej wersji serwera.
 \begin{itemize}
     \item \texttt{cli} -- moduł odpowiadający za obsługę linii komend.
     \item \texttt{cli::user\_command} -- podmoduł odpowiadający za obsługę polecenia \texttt{tds user [...]}.
-    \item \texttt{command} -- moduł zawierający klasy służące do wykonywania poleceń (wzorzec \quotes{\href{https://en.wikipedia.org/wiki/Command_pattern}{Polecenie}}). Jest on bezpośrednio używany tylko przez moduły \texttt{cli} (implementacja poleceń administratora serwera) oraz \texttt{protocol} (implementacja poleceń klienta).
-    \item \texttt{config} -- moduł odpowiadający za obsługę i tworzenie domyślnych plików konfiguracyjnych serwera.
-    \item \texttt{ip} -- moduł udostępniający klasy i funkcje związane ze stosem sieciowym, np. abstrakcję adresów IP, obsługę gniazd.
+    \item \texttt{command} -- moduł zawierający klasy służące do wykonywania poleceń (wzorzec \quotes{\href{https://en.wikipedia.org/wiki/Command_pattern}{Polecenie}}). Jest on bezpośrednio używany tylko przez moduły \texttt{cli} (implementacja obsługi poleceń linii komend) oraz \texttt{protocol} (implementacja poleceń klienta).
+    \item \texttt{config} -- moduł odpowiadający za obsługę plików konfiguracyjnych serwera. Jest on używany bezpośrednio przez moduły \texttt{cli} (tworzenie domyślnych plików konfiguracyjnych) oraz \texttt{server} (wczytywanie konfiguracji lub pobieranie domyślnej konfiguracji w przypadku braku pliku \quotcode{config}).
+    \item \texttt{ip} -- moduł udostępniający klasy i funkcje związane ze stosem sieciowym, np. abstrakcję adresów IP, obsługę gniazd. Stanowi on rozbudowanie modułu \quotcode{linux}.
     \item \texttt{linux} -- moduł udostępniający klasy i funkcje związane z systemem Linux, np. obsługę mechanizmu systemowego \texttt{epoll}, sygnałów systemowych i potoków.
-    \item \texttt{protocol} -- moduł odpowiadający za obsługę protokołu TinDox. Zawiera między innymi interpreter poleceń, obsługę błędów protokołu czy realizację modelu \quotes{Receiver--Sender}.
-    \item \texttt{protocol::execution} -- podmoduł zawierający klasy odpowiadające za wykonywanie i odpowiadanie na polecenia klienta.
+    \item \texttt{protocol} -- moduł odpowiadający za obsługę protokołu TinDox. Zawiera między innymi interpreter poleceń, obsługę błędów protokołu czy realizację modelu \quotes{Receiver--Sender}. Korzysta on bezpośrednio z modułów \quotcode{linux} oraz \quotcode{ip} -- jest wyższą warstwą abstrakcji.
+    \item \texttt{protocol::execution} -- podmoduł zawierający klasy odpowiadające za wykonywanie i odpowiadanie na polecenia protokołu TinDox. Jest używany przez wykonawcę komend z modułu \quotcode{protocol}.
     \item \texttt{server} -- moduł zawierający klasy najwyższego poziomu odpowiadające za uruchamianie i działanie serwera. Ponadto kontroluje on działania klientów oraz odpowiada za obsługę błędów.
     \item \texttt{user} -- moduł odpowiadający za parametry użytkowników serwera (np. uprawnienia).
 \end{itemize}
