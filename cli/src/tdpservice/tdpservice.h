@@ -4,8 +4,6 @@
 #include "connection.h"
 #include "responseanalyzer.h"
 
-typedef unsigned long long ull;
-
 class TDPService {
 public:
     TDPService() = default;

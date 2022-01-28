@@ -29,17 +29,22 @@ void Connection::createSocket() {
 }
 
 void Connection::connectToServer(const string &serv_ip, int serv_port) {
-    createSocket();
-    server.sin_family = AF_INET;
-    server.sin_port = htons(serv_port);
-    server.sin_addr.s_addr = inet_addr(serv_ip.c_str());
-    memset(server.sin_zero, '\0', sizeof server.sin_zero);
-    isConnectionOpen = true;
-    if (connect(sock, (struct sockaddr *) &server, sizeof server) == -1) {
-        if (errno != EINPROGRESS) {
-            closeConnection();
-            throw std::system_error(errno, std::generic_category(), "connecting to server");
+    if (!isConnectionOpen) {
+        createSocket();
+        server.sin_family = AF_INET;
+        server.sin_port = htons(serv_port);
+        server.sin_addr.s_addr = inet_addr(serv_ip.c_str());
+        memset(server.sin_zero, '\0', sizeof server.sin_zero);
+
+        if (connect(sock, (struct sockaddr *) &server, sizeof server) == -1) {
+
+            if ((errno != EINPROGRESS && errno != EAGAIN) || !checkIfConnectingSucceeded()) {
+                closeConnection();
+                throw std::system_error(errno, std::generic_category(), "connecting to server");
+            }
+
         }
+        isConnectionOpen = true;
     }
 }
 
@@ -202,4 +207,24 @@ bool Connection::uploadFile(int &fd, off_t &offset, const size_t &size) {
     changeEpollEvents(readyForReading);
 
     return result;
+}
+
+bool Connection::checkIfConnectingSucceeded() const {
+    epoll_event event[2];
+    if (epoll_wait(epfd, event, 2, -1) == -1)
+        return false;
+
+    int error_code = 0;
+    socklen_t len = sizeof(error_code);
+
+    if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &error_code, &len) != 0)
+        return false;
+
+    if (error_code == 0) {
+        struct epoll_event events = {};
+        events.data.fd = sock;
+        events.events = EPOLLOUT | EPOLLET;
+        return (epoll_ctl(epfd, EPOLL_CTL_MOD, sock, &events) == 0);
+    } else
+        return false;
 }

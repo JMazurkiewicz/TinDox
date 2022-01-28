@@ -2,29 +2,18 @@
  * Autor: Łukasz Reszka (300257)
  * */
 
-//#include <csignal>
-#include <ftxui/dom/elements.hpp>
-#include <ftxui/screen/screen.hpp>
-
-using namespace ftxui;
+#include <csignal>
+#include "tui.h"
 
 int main() {
-    //signal(SIGPIPE, SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
 
-    // Define the document
-    Element document =
-            hbox({
-                         text("left") | border,
-                         text("middle") | border | flex,
-                         text("right") | border,
-                 });
-
-    auto screen = Screen::Create(
-            Dimension::Full(),       // Width
-            Dimension::Fit(document) // Height
-    );
-    Render(screen, document);
-    screen.Print();
+    try {
+        Tui tui("127.0.0.1", 37666);
+        tui.runTDPClient();
+    } catch (const return_exception &ex) {
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }

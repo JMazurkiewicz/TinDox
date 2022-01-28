@@ -36,7 +36,8 @@ bool TDPService::logout() {
 }
 
 bool TDPService::auth(const string &login, const string &passwd) {
-    if (sendAndGetResponse("auth", "login", login, "passwd", passwd, "", "")
+    if (sendAndGetResponse("auth", "login", login.empty() ? "." : login, "passwd", passwd.empty() ? "." : passwd, "",
+                           "")
         && (error_code = responseAnalyzer.analyseSimpleResponse("auth", received_response, response_body, false)) == OK)
         return true;
     else
