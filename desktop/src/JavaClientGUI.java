@@ -8,7 +8,6 @@ public class JavaClientGUI extends JFrame {
     private JPanel mainPanel;
     private JButton treeButton;
     private JButton renameButton;
-    private JButton ulButton;
     private JTextArea textArea;
     private JTextField textField;
     private JButton authButton;
@@ -20,7 +19,6 @@ public class JavaClientGUI extends JFrame {
     private JButton namePermsButton;
     private JButton pwdButton;
     private JButton mvButton;
-    private JButton dlButton;
     private JButton cdButton;
     private JTextField textField1;
     private JTextField textField2;
@@ -200,38 +198,7 @@ public class JavaClientGUI extends JFrame {
                 setSent(false);
             }
         });
-        dlButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String msg = "dl\n";
-                String name= textField.getText();
 
-                msg += "name" + ":" + name + "\n";
-                msg += "\n";
-
-                setMsg(msg);
-                setSent(false);
-            }
-        });
-
-        //todo size, retry
-        ulButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String msg = "ul\n";
-                String name= textField.getText();
-                String size= textField1.getText();
-                String retry= textField1.getText();
-
-                msg += "name" + ":" + name + "\n";
-                msg += "size" + ":" + size + "\n";
-                msg += "retry" + ":" + retry + "\n";
-                msg += "\n";
-
-                setMsg(msg);
-                setSent(false);
-            }
-        });
     }
 
 
