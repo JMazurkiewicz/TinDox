@@ -9,8 +9,6 @@ import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//TODO obsługa plików,
-
 
 public class Client {
     private static final String serverHost = "localhost";

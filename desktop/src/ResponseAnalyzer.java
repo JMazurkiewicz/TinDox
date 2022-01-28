@@ -30,13 +30,8 @@ public class ResponseAnalyzer {
         errors.put(415, "TOO_LARGE_FILE");
 
 
-        dl=false;
-        dls=false;
-        ul=false;
+
     }
-    public boolean dl;
-    public boolean dls;
-    public boolean ul;
 
     private String receivedResponse;
     private int code;
@@ -44,11 +39,9 @@ public class ResponseAnalyzer {
         return receivedResponse.isEmpty();
     }
 
-
     public void setCode() {
         this.code = parseInt(receivedResponse.substring(0,3));
     }
-
 
     private boolean isMessageComplete() {
         return receivedResponse.endsWith("\n\n");
@@ -56,8 +49,6 @@ public class ResponseAnalyzer {
 
     private void addToReceivedResponse(String receivedResponse) {
         this.receivedResponse += receivedResponse;
-    }
-    private void clearReceivedResponse(){this.receivedResponse= "";
     }
 
     public boolean isCodeValid(JavaClientGUI fr) {
@@ -79,25 +70,6 @@ public class ResponseAnalyzer {
 
     private void analyzeLongResponse(String response,JavaClientGUI fr ) {
 
-        //
-        //dl dls - pobireanie plików
-        //ul
-
-        if (dl) {
-            if (dls) {
-
-            }
-            else{
-                String size = receivedResponse.substring(receivedResponse.indexOf("dl") + 3);
-                System.out.println(size);
-                System.out.println(receivedResponse);
-            }
-        }
-        else if (ul) {
-
-
-        }
-        else {
             int begin = response.indexOf("\n") + 1;
             int finish = response.indexOf("\n\n");
             String display = "\n" + response.substring(begin, finish);
@@ -105,26 +77,18 @@ public class ResponseAnalyzer {
             String replacement= "   ";
             display = display.replaceAll(toReplace,replacement);
             fr.appendTextArea(display);
-        }
 
     }
 
 
     public void analyze(String response, JavaClientGUI fr) {
         addToReceivedResponse(response);
-        System.out.println(receivedResponse);
         if (isMessageComplete()) {
             setCode();
             if (isCodeValid(fr)) {
-                if (receivedResponse.substring(4, 6).equals("dl")) {
-                    dl=true;
-                }
-                if (receivedResponse.substring(4, 6).equals("ul")) {
-                    ul=true;
-                }
 
                 long nlines = receivedResponse.lines().count();
-                if (nlines > 2 || dl || ul) {
+                if (nlines > 2) {
                     analyzeLongResponse(receivedResponse, fr);
                 }
             }

@@ -98,28 +98,12 @@
           <text value="Change directory"/>
         </properties>
       </component>
-      <component id="4e3d0" class="javax.swing.JButton" binding="dlButton">
-        <constraints>
-          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Download  file"/>
-        </properties>
-      </component>
-      <component id="498d8" class="javax.swing.JButton" binding="ulButton">
-        <constraints>
-          <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Upload  file"/>
-        </properties>
-      </component>
       <component id="c3afb" class="javax.swing.JButton" binding="rmButton">
         <constraints>
           <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Delete file"/>
+          <text value="Delete"/>
         </properties>
       </component>
       <component id="796d" class="javax.swing.JButton" binding="cpButton">
@@ -128,14 +112,6 @@
         </constraints>
         <properties>
           <text value="Copy file"/>
-        </properties>
-      </component>
-      <component id="55b72" class="javax.swing.JButton" binding="mkdirButton">
-        <constraints>
-          <grid row="8" column="2" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Make directory"/>
         </properties>
       </component>
       <component id="9891" class="javax.swing.JButton" binding="renameButton" default-binding="true">
@@ -177,6 +153,14 @@
         </constraints>
         <properties>
           <text value=""/>
+        </properties>
+      </component>
+      <component id="55b72" class="javax.swing.JButton" binding="mkdirButton">
+        <constraints>
+          <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Make directory"/>
         </properties>
       </component>
     </children>
