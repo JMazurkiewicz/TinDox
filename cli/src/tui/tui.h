@@ -8,7 +8,7 @@
 #include "return_exception.h"
 #include "../tdpservice/tdpservice.h"
 
-using std::string;
+using std::string, std::vector;
 
 namespace ftxui {
     class ScreenInteractive;
@@ -45,6 +45,10 @@ private:
     void logInUser(string &login, string &password);
 
     void showFilesView();
+
+    bool updateFilesEntries(string &path, std::vector<string> &entries);
+
+    bool getUserName(string &name);
 };
 
 

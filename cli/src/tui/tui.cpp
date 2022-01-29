@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <sstream>
 #include "modalwindow.h"
 
 #include "ftxui/component/captured_mouse.hpp"  // for ftxui
@@ -109,25 +110,134 @@ void Tui::logInUser(string &login, string &password) {
 void Tui::showFilesView() {
     using namespace ftxui;
 
+    vector<string> file_entries;
+    string location, user_name;
+    int selected_file = 0;
+
+    if (!getUserName(user_name) || !updateFilesEntries(location, file_entries))
+        return;
+
     auto screen = ScreenInteractive::TerminalOutput();
 
     auto header = center(bold(text("TinDox Console Client")));
+    auto user_info = vbox({
+                                  text(" User: ") | center | color(Color::Cyan) | bold,
+                                  text(" " + user_name + " ") | center | color(Color::CyanLight)
+                          });
 
     auto logoutButton = Button("  Logout  ", screen.ExitLoopClosure());
+    auto no_border_opt = ButtonOption();
+    no_border_opt.border = false;
+    auto createButton = Button("Create", screen.ExitLoopClosure(), no_border_opt);
+    auto copyButton = Button("Copy", screen.ExitLoopClosure(), no_border_opt);
+    auto moveButton = Button("Move", screen.ExitLoopClosure(), no_border_opt);
+    auto deleteButton = Button("Delete", screen.ExitLoopClosure(), no_border_opt);
+    auto uploadButton = Button("Upload", screen.ExitLoopClosure(), no_border_opt);
+    auto downloadButton = Button("Download", screen.ExitLoopClosure(), no_border_opt);
 
-    auto buttons_component = Container::Horizontal({logoutButton});
+    auto bottom_buttons = Container::Horizontal(
+            {createButton, copyButton, moveButton, deleteButton, uploadButton, downloadButton});
 
-    auto main_view_components = buttons_component;
+    MenuOption menu_opt;
+    menu_opt.style_selected = bgcolor(Color::Blue);
+    menu_opt.style_focused = bgcolor(Color::BlueLight);
+    menu_opt.style_selected_focused = bgcolor(Color::BlueLight);
+    menu_opt.on_enter = screen.ExitLoopClosure();
+    auto files_view_menu = Menu(&file_entries, &selected_file, &menu_opt);
+
+    auto main_view_components = Container::Vertical({
+                                                            logoutButton,
+                                                            files_view_menu,
+                                                            bottom_buttons
+                                                    });
 
     auto main_view = Renderer(main_view_components, [&] {
         return vbox({
-                            hbox(header | flex, separator(), logoutButton->Render()),
-                            separator()
+                            hbox(user_info, separator(), header | flex, separator(), logoutButton->Render()),
+                            separator(),
+                            text("Location: " + location) | dim,
+                            separator(),
+                            files_view_menu->Render() | vscroll_indicator | frame |
+                            size(HEIGHT, LESS_THAN, 15),
+                            separator(),
+                            hbox(createButton->Render() | center | flex, separator(),
+                                 copyButton->Render() | center | flex, separator(),
+                                 moveButton->Render() | center | flex, separator(),
+                                 deleteButton->Render() | center | flex, separator(),
+                                 uploadButton->Render() | center | flex, separator(),
+                                 downloadButton->Render() | center | flex)
 
                     }) | border;
     });
 
     screen.Loop(main_view);
+}
+
+bool Tui::updateFilesEntries(string &path, vector<string> &entries) {
+    if (!tdpService.pwd()) {
+        needToReconnect = true;
+        return false;
+    }
+    std::stringstream buf(tdpService.response_body);
+    buf >> path;
+
+    if (!tdpService.ls(path, "true", "true")) {
+        needToReconnect = true;
+        return false;
+    }
+    entries.clear();
+    if (path != "/")
+        entries.emplace_back("../");
+
+    std::stringstream ls_result(tdpService.response_body);
+    int word_counter = 0, space_numb;
+    string word, entry;
+
+    while (ls_result >> word) {
+
+        if (word_counter == 0 || word_counter == 2)
+            word.erase(word.begin());
+
+        if (word_counter == 0 || word_counter == 3)
+            word.pop_back();
+
+        entry += word;
+
+        if (word_counter == 0 || word_counter == 1) {
+            if (word_counter == 0)
+                space_numb = 40 - word.size();
+            else {
+                space_numb = 15 - word.size();
+                if (word == "-")
+                    entry.replace(entry.find_first_of(' '), 1, "/");
+            }
+
+            if (space_numb > 0)
+                entry += string(space_numb, ' ');
+            else
+                entry += ' ';
+
+        } else if (word_counter == 2)
+            entry += ' ';
+        else {
+            entries.push_back(entry);
+            entry.clear();
+        }
+
+        word_counter = (word_counter + 1) % 4;
+    }
+
+    return true;
+}
+
+bool Tui::getUserName(string &name) {
+    if (!tdpService.name()) {
+        needToReconnect = true;
+        return false;
+    }
+    std::stringstream buf(tdpService.response_body);
+    buf >> name;
+    return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------
