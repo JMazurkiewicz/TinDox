@@ -8,12 +8,8 @@
 int main() {
     signal(SIGPIPE, SIG_IGN);
 
-    try {
-        Tui tui("127.0.0.1", 37666);
-        tui.runTDPClient();
-    } catch (const return_exception &ex) {
-        return EXIT_FAILURE;
-    }
+    Tui tui("127.0.0.1", 37666);
+    tui.runTDPClient();
 
-    return EXIT_SUCCESS;
+    return 0;
 }

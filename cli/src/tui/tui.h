@@ -34,6 +34,7 @@ private:
     std::string server_ip;
     int server_port;
     bool needToReconnect = true;
+    bool terminateProgram = false;
 
     static void Nested(string path);
 
