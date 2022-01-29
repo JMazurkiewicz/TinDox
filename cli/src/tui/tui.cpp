@@ -18,7 +18,6 @@ void Tui::runTDPClient() {
     } while (needToReconnect && !terminateProgram);
 }
 
-
 void Tui::showLoginView() {
     using namespace ftxui;
 
@@ -38,7 +37,8 @@ void Tui::showLoginView() {
     auto quitButton = Button("  Quit  ", screen.ExitLoopClosure());
     auto loginButton = Button("  Sign in  ", [&] {
         logInUser(login, passwd);
-        //TODO widok plików
+        login = "";
+        passwd = "";
         if (needToReconnect) quitButton->OnEvent(Event::Return);
     });
 
@@ -99,7 +99,35 @@ void Tui::logInUser(string &login, string &password) {
             wrongCredentialsModal.showModalWindow();
             needToReconnect = true;
         }
+    } else {
+        showFilesView();
+        if (!tdpService.logout())
+            needToReconnect = true;
     }
+}
+
+void Tui::showFilesView() {
+    using namespace ftxui;
+
+    auto screen = ScreenInteractive::TerminalOutput();
+
+    auto header = center(bold(text("TinDox Console Client")));
+
+    auto logoutButton = Button("  Logout  ", screen.ExitLoopClosure());
+
+    auto buttons_component = Container::Horizontal({logoutButton});
+
+    auto main_view_components = buttons_component;
+
+    auto main_view = Renderer(main_view_components, [&] {
+        return vbox({
+                            hbox(header | flex, separator(), logoutButton->Render()),
+                            separator()
+
+                    }) | border;
+    });
+
+    screen.Loop(main_view);
 }
 
 //----------------------------------------------------------------------------------------------------------------

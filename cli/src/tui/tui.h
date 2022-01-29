@@ -43,6 +43,8 @@ private:
     void connectToServer();
 
     void logInUser(string &login, string &password);
+
+    void showFilesView();
 };
 
 
