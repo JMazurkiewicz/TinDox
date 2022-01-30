@@ -16,15 +16,22 @@ namespace ftxui {
 
 class Tui {
 public:
-    Tui(std::string ip, int port) :server_ip(std::move(ip)), server_port(port) { system("clear");}
-    ~Tui() { system("clear");}
+    Tui(std::string ip, int port) : server_ip(std::move(ip)), server_port(port) { system("clear"); }
+
+    ~Tui() { system("clear"); }
 
     void modal();
+
     void menu_framed();
+
     void select_menu();
+
     void menu_style();
+
     void nested_menus();
+
     void dropdown();
+
     void test();
 
     void runTDPClient();
@@ -49,6 +56,11 @@ private:
     bool updateFilesEntries(string &path, std::vector<string> &entries);
 
     bool getUserName(string &name);
+
+    bool changeDirectory(string &current_location, const string &new_directory_info, vector<string> &entries,
+                         int &selected_entry);
+
+    bool checkIfShouldReconnect();
 };
 
 

@@ -114,8 +114,10 @@ void Tui::showFilesView() {
     string location, user_name;
     int selected_file = 0;
 
-    if (!getUserName(user_name) || !updateFilesEntries(location, file_entries))
+    if (!getUserName(user_name) || !updateFilesEntries(location, file_entries)) {
+        needToReconnect = true;
         return;
+    }
 
     auto screen = ScreenInteractive::TerminalOutput();
 
@@ -142,7 +144,10 @@ void Tui::showFilesView() {
     menu_opt.style_selected = bgcolor(Color::Blue);
     menu_opt.style_focused = bgcolor(Color::BlueLight);
     menu_opt.style_selected_focused = bgcolor(Color::BlueLight);
-    menu_opt.on_enter = screen.ExitLoopClosure();
+    menu_opt.on_enter = [&] {
+        if (!changeDirectory(location, file_entries[selected_file], file_entries, selected_file))
+            logoutButton->OnEvent(Event::Return);
+    };
     auto files_view_menu = Menu(&file_entries, &selected_file, &menu_opt);
 
     auto main_view_components = Container::Vertical({
@@ -158,7 +163,7 @@ void Tui::showFilesView() {
                             text("Location: " + location) | dim,
                             separator(),
                             files_view_menu->Render() | vscroll_indicator | frame |
-                            size(HEIGHT, LESS_THAN, 15),
+                            size(HEIGHT, LESS_THAN, 15) | size(HEIGHT, GREATER_THAN, 15),
                             separator(),
                             hbox(createButton->Render() | center | flex, separator(),
                                  copyButton->Render() | center | flex, separator(),
@@ -238,6 +243,39 @@ bool Tui::getUserName(string &name) {
     std::stringstream buf(tdpService.response_body);
     buf >> name;
     return true;
+}
+
+bool Tui::changeDirectory(string &current_location, const string &new_directory_info, vector<string> &entries,
+                          int &selected_entry) {
+    size_t f_name_end;
+    if ((f_name_end = new_directory_info.find('/')) != string::npos) {
+
+        string relative_path = new_directory_info.substr(0, f_name_end + 1);
+        if (!tdpService.cd(relative_path)) {
+            if (!checkIfShouldReconnect()) {
+                ModalWindow cannotChangeDirModal(" Error occured while ", " changing directory. ");
+                cannotChangeDirModal.showModalWindow();
+                return true;
+            } else
+                return false;
+        }
+
+        if (!updateFilesEntries(current_location, entries))
+            return false;
+
+        selected_entry = 0;
+    }
+
+    return true;
+}
+
+bool Tui::checkIfShouldReconnect() {
+    if (tdpService.error_code == ConnectionError::E_CLOSED_CON ||
+        tdpService.error_code == ConnectionError::E_EXCHANGE_MESSAGE) {
+        needToReconnect = true;
+        return true;
+    }
+    return false;
 }
 
 //----------------------------------------------------------------------------------------------------------------
