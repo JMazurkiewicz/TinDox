@@ -1,9 +1,9 @@
-#include "modalwarningwindow.h"
+#include "modalinputwin.h"
 
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 
-void ModalWarningWindow::showModalWindow() {
+void ModalInputWin::showModalWindow() {
     using namespace ftxui;
 
     auto screen = ScreenInteractive::TerminalOutput();
@@ -12,8 +12,8 @@ void ModalWarningWindow::showModalWindow() {
 
     auto modalWindow = Renderer(okButton, [&] {
         return vbox({
-                            center(text(first_line)),
-                            center(text(second_line)),
+                            center(text(instr_text)),
+                            center(text(oper_button_txt)),
                             separator(),
                             okButton->Render() | center
                     }) | border | bgcolor(Color::Red) | clear_under;

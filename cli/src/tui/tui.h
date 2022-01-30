@@ -47,6 +47,8 @@ private:
     bool checkIfShouldReconnect();
 
     bool deleteFileView(const string &file_to_delete);
+
+    bool createDir();
 };
 
 

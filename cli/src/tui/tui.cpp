@@ -1,17 +1,13 @@
 #include "tui.h"
 
-#include <memory>
 #include <string>
 #include <vector>
 #include <sstream>
-#include "modalwarningwindow.h"
+#include "modalwarningwin.h"
 
-#include "ftxui/component/captured_mouse.hpp"  // for ftxui
-#include "ftxui/component/component.hpp"  // for Button, Renderer, Horizontal, Tab
-#include "ftxui/component/component_base.hpp"      // for ComponentBase
-#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
-#include "ftxui/dom/elements.hpp"  // for operator|, Element, filler, text, hbox, separator, center, vbox, bold, border, clear_under, dbox, size, GREATER_THAN, HEIGHT
-#include "ftxui/component/captured_mouse.hpp"  // for ftxui
+#include "ftxui/component/component.hpp"
+#include "ftxui/component/screen_interactive.hpp"
+#include "ftxui/dom/elements.hpp"
 
 void Tui::runTDPClient() {
     do {
@@ -75,7 +71,7 @@ void Tui::showLoginView() {
 void Tui::connectToServer() {
     using namespace ftxui;
 
-    ModalWarningWindow unableToConnectModal("Cannot connect to server.", "Try again.");
+    ModalWarningWin unableToConnectModal("Cannot connect to server.", "Try again.");
 
     for (int attempt = 1; attempt <= 5 && !tdpService.initConnection(server_ip, server_port); ++attempt) {
         unableToConnectModal.showModalWindow();
@@ -91,7 +87,7 @@ void Tui::connectToServer() {
 
 void Tui::logInUser(string &login, string &password) {
     if (!tdpService.auth(login, password)) {
-        ModalWarningWindow wrongCredentialsModal("Wrong login and/or password.", "Try again.");
+        ModalWarningWin wrongCredentialsModal("Wrong login and/or password.", "Try again.");
 
         if (tdpService.error_code == ConnectionError::E_INVALID_CREDENTIALS || tdpService.error_code == E_BAD_FIELD) {
             wrongCredentialsModal.showModalWindow();
@@ -131,13 +127,14 @@ void Tui::showFilesView() {
     auto logoutButton = Button("  Logout  ", screen.ExitLoopClosure());
     auto no_border_opt = ButtonOption();
     no_border_opt.border = false;
-    auto createButton = Button("Create", screen.ExitLoopClosure(), no_border_opt);
+    auto createButton = Button("Create", [&] {
+        if (!createDir() || !updateFilesEntries(location, file_entries, file_names))
+            logoutButton->OnEvent(Event::Return);
+    }, no_border_opt);
     auto copyButton = Button("Copy", screen.ExitLoopClosure(), no_border_opt);
     auto moveButton = Button("Move", screen.ExitLoopClosure(), no_border_opt);
     auto deleteButton = Button("Delete", [&] {
-        if (deleteFileView(file_names[selected_file]))
-            updateFilesEntries(location, file_entries, file_names);
-        else
+        if (!deleteFileView(file_names[selected_file]) || !updateFilesEntries(location, file_entries, file_names))
             logoutButton->OnEvent(Event::Return);
     }, no_border_opt);
     auto uploadButton = Button("Upload", screen.ExitLoopClosure(), no_border_opt);
@@ -190,7 +187,12 @@ bool Tui::updateFilesEntries(string &path, vector<string> &entries, vector<strin
         return false;
     }
     std::stringstream buf(tdpService.response_body);
-    buf >> path;
+    string tmp;
+    path.clear();
+    while (buf >> tmp) {
+        path += tmp + " ";
+    }
+    path.pop_back();
 
     if (!tdpService.ls(path, "true", "true")) {
         needToReconnect = true;
@@ -271,7 +273,7 @@ bool Tui::changeDirectory(string &current_location, const string &dir_name, vect
 
         if (!tdpService.cd(dir_name)) {
             if (!checkIfShouldReconnect()) {
-                ModalWarningWindow cannotChangeDirModal(" Error occured while ", " changing directory. ");
+                ModalWarningWin cannotChangeDirModal(" Error occured while ", " changing directory. ");
                 cannotChangeDirModal.showModalWindow();
                 return true;
             } else
@@ -308,10 +310,9 @@ bool Tui::deleteFileView(const string &file_to_delete) {
     auto okButton = Button("   Ok   ", [&] {
         if (!tdpService.rm(file_name)) {
             if (!checkIfShouldReconnect()) {
-                ModalWarningWindow errWind = ModalWarningWindow("Cannot delete file:", file_name);
+                ModalWarningWin errWind = ModalWarningWin("Cannot delete file:", file_name);
                 errWind.showModalWindow();
-            } else
-                needToReconnect = true;
+            }
         }
         cancelButton->OnEvent(Event::Return);
     });
@@ -322,6 +323,44 @@ bool Tui::deleteFileView(const string &file_to_delete) {
         return vbox({
                             center(text(" Do you want to delete file/directory ")),
                             center(text(" " + file_name + "? ")),
+                            separator(),
+                            buttons->Render() | center
+                    }) | border | bgcolor(Color::GrayDark) | clear_under;
+    });
+
+    screen.Loop(modalWindow);
+
+    if (needToReconnect)
+        return false;
+    else
+        return true;
+}
+
+bool Tui::createDir() {
+    using namespace ftxui;
+
+    string dir_name;
+
+    auto inputDirName = Input(&dir_name, "");
+    auto screen = ScreenInteractive::TerminalOutput();
+    auto cancelButton = Button("   Cancel   ", screen.ExitLoopClosure());
+    auto createButton = Button("   Create   ", [&] {
+        if (dir_name.empty() || !tdpService.mkdir(dir_name)) {
+            if (!checkIfShouldReconnect()) {
+                ModalWarningWin errWind = ModalWarningWin("Cannot create directory", dir_name);
+                errWind.showModalWindow();
+            }
+        }
+        cancelButton->OnEvent(Event::Return);
+    });
+
+    auto buttons = Container::Horizontal({createButton, cancelButton});
+    auto components = Container::Vertical({inputDirName, buttons});
+
+    auto modalWindow = Renderer(components, [&] {
+        return vbox({
+                            center(text(" Enter name of new directory: ")),
+                            window(text(""), inputDirName->Render()) | size(WIDTH, GREATER_THAN, 15) | center,
                             separator(),
                             buttons->Render() | center
                     }) | border | bgcolor(Color::GrayDark) | clear_under;
