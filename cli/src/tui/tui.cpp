@@ -8,6 +8,7 @@
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
+#include "modalinputwin.h"
 
 void Tui::runTDPClient() {
     do {
@@ -127,21 +128,45 @@ void Tui::showFilesView() {
     auto logoutButton = Button("  Logout  ", screen.ExitLoopClosure());
     auto no_border_opt = ButtonOption();
     no_border_opt.border = false;
+
     auto createButton = Button("Create", [&] {
         if (!createDir() || !updateFilesEntries(location, file_entries, file_names))
             logoutButton->OnEvent(Event::Return);
     }, no_border_opt);
-    auto copyButton = Button("Copy", screen.ExitLoopClosure(), no_border_opt);
-    auto moveButton = Button("Move", screen.ExitLoopClosure(), no_border_opt);
+
+    auto renameButton = Button("Rename", [&] {
+        if (file_names[selected_file] != "../") {
+            if (!renameFile(file_names[selected_file]) || !updateFilesEntries(location, file_entries, file_names))
+                logoutButton->OnEvent(Event::Return);
+        }
+    }, no_border_opt);
+
+    auto copyButton = Button("Copy", [&] {
+        if (file_names[selected_file] != "../") {
+            if (!copyFile(file_names[selected_file], location) ||
+                !updateFilesEntries(location, file_entries, file_names))
+                logoutButton->OnEvent(Event::Return);
+        }
+    }, no_border_opt);
+    auto moveButton = Button("Move", [&] {
+        if (file_names[selected_file] != "../") {
+            if (!moveFile(file_names[selected_file], location) ||
+                !updateFilesEntries(location, file_entries, file_names))
+                logoutButton->OnEvent(Event::Return);
+        }
+    }, no_border_opt);
+
     auto deleteButton = Button("Delete", [&] {
-        if (!deleteFileView(file_names[selected_file]) || !updateFilesEntries(location, file_entries, file_names))
-            logoutButton->OnEvent(Event::Return);
+        if (file_names[selected_file] != "../") {
+            if (!deleteFileView(file_names[selected_file]) || !updateFilesEntries(location, file_entries, file_names))
+                logoutButton->OnEvent(Event::Return);
+        }
     }, no_border_opt);
     auto uploadButton = Button("Upload", screen.ExitLoopClosure(), no_border_opt);
     auto downloadButton = Button("Download", screen.ExitLoopClosure(), no_border_opt);
 
     auto bottom_buttons = Container::Horizontal(
-            {createButton, copyButton, moveButton, deleteButton, uploadButton, downloadButton});
+            {createButton, renameButton, copyButton, moveButton, deleteButton, uploadButton, downloadButton});
 
     MenuOption menu_opt;
     menu_opt.style_selected = bgcolor(Color::Blue);
@@ -169,6 +194,7 @@ void Tui::showFilesView() {
                             size(HEIGHT, LESS_THAN, 15) | size(HEIGHT, GREATER_THAN, 15),
                             separator(),
                             hbox(createButton->Render() | center | flex, separator(),
+                                 renameButton->Render() | center | flex, separator(),
                                  copyButton->Render() | center | flex, separator(),
                                  moveButton->Render() | center | flex, separator(),
                                  deleteButton->Render() | center | flex, separator(),
@@ -206,7 +232,8 @@ bool Tui::updateFilesEntries(string &path, vector<string> &entries, vector<strin
     }
 
     std::stringstream ls_result(tdpService.response_body);
-    int word_counter = 0, space_numb;
+    int word_counter = 0;
+    size_t space_numb;
     string word, entry;
 
     while (ls_result >> word) {
@@ -262,7 +289,11 @@ bool Tui::getUserName(string &name) {
         return false;
     }
     std::stringstream buf(tdpService.response_body);
-    buf >> name;
+    string tmp;
+    while (buf >> tmp) {
+        name += tmp + " ";
+    }
+    name.pop_back();
     return true;
 }
 
@@ -330,46 +361,171 @@ bool Tui::deleteFileView(const string &file_to_delete) {
 
     screen.Loop(modalWindow);
 
-    if (needToReconnect)
-        return false;
-    else
-        return true;
+    return !needToReconnect;
 }
 
 bool Tui::createDir() {
     using namespace ftxui;
 
     string dir_name;
+    ModalInputWin createWind = ModalInputWin(" Enter name of new directory: ", "Create");
 
-    auto inputDirName = Input(&dir_name, "");
-    auto screen = ScreenInteractive::TerminalOutput();
-    auto cancelButton = Button("   Cancel   ", screen.ExitLoopClosure());
-    auto createButton = Button("   Create   ", [&] {
+    if (createWind.showModalWindow(dir_name)) {
         if (dir_name.empty() || !tdpService.mkdir(dir_name)) {
             if (!checkIfShouldReconnect()) {
                 ModalWarningWin errWind = ModalWarningWin("Cannot create directory", dir_name);
                 errWind.showModalWindow();
             }
         }
+    }
+
+    return !needToReconnect;
+}
+
+bool Tui::renameFile(const string &old_name) {
+    using namespace ftxui;
+
+    string o_name = old_name;
+    if (o_name.ends_with('/'))
+        o_name.pop_back();
+
+    string new_name = o_name;
+    ModalInputWin createWind = ModalInputWin(" Enter new name for file/directory '" + o_name + "':", "Rename");
+
+    if (createWind.showModalWindow(new_name)) {
+        if (new_name.empty() || !tdpService.rename(o_name, new_name)) {
+            if (!checkIfShouldReconnect()) {
+                ModalWarningWin errWind = ModalWarningWin("Cannot rename file/directory", o_name);
+                errWind.showModalWindow();
+            }
+        }
+    }
+
+    return !needToReconnect;
+}
+
+bool Tui::copyFile(const string &file_name, const string &current_location) {
+    if (!file_name.ends_with('/')) {
+        string selected_path = current_location;
+        ModalWarningWin errWind = ModalWarningWin(" Cannot copy file ", file_name);
+
+        if (showPathSelectWind("Copy file '" + file_name + "' to directory - enter  path:", "Copy", selected_path)) {
+
+            if (selected_path.empty() ||
+                ((!tdpService.cd(current_location) || !tdpService.cp(file_name, selected_path)) &&
+                 !checkIfShouldReconnect()))
+                errWind.showModalWindow();
+
+        } else if (!needToReconnect && !tdpService.cd(current_location) && !checkIfShouldReconnect()) {
+            errWind.showModalWindow();
+        }
+    }
+    return !needToReconnect;
+}
+
+bool Tui::moveFile(const string &file_name, const string &current_location) {
+    if (!file_name.ends_with('/')) {
+        string selected_path = current_location;
+        ModalWarningWin errWind = ModalWarningWin(" Cannot move file ", file_name);
+
+        if (showPathSelectWind("Move file '" + file_name + "' to directory - enter  path:", "Move", selected_path)) {
+
+            if (selected_path.empty() ||
+                ((!tdpService.cd(current_location) || !tdpService.mv(file_name, selected_path)) &&
+                 !checkIfShouldReconnect()))
+                errWind.showModalWindow();
+
+        } else if (!needToReconnect && !tdpService.cd(current_location) && !checkIfShouldReconnect()) {
+            errWind.showModalWindow();
+        }
+    }
+    return !needToReconnect;
+}
+
+bool Tui::showPathSelectWind(const string &instr_text, const string &oper_button_text, string &path) {
+    using namespace ftxui;
+
+    vector<string> file_names;
+    vector<string> file_entries;
+    string location;
+    bool proceedWithOperation = false;
+    int selected_file = 0, wind_depth = 0;
+
+    if (!updateFilesEntries(location, file_entries, file_names)) {
+        needToReconnect = true;
+        return false;
+    }
+
+    auto input_opt = InputOption();
+    input_opt.on_enter = [&] { wind_depth = 1; };
+    auto inputName = Input(&path, "", input_opt);
+    auto screen = ScreenInteractive::TerminalOutput();
+    auto cancelButton = Button("   Cancel   ", screen.ExitLoopClosure());
+    auto operationButton = Button("   " + oper_button_text + "   ", [&] {
+        proceedWithOperation = true;
         cancelButton->OnEvent(Event::Return);
     });
 
-    auto buttons = Container::Horizontal({createButton, cancelButton});
-    auto components = Container::Vertical({inputDirName, buttons});
+    auto buttons = Container::Horizontal({operationButton, cancelButton});
+    auto input_win_comp = Container::Vertical({inputName, buttons});
 
-    auto modalWindow = Renderer(components, [&] {
+    auto inputWindow = Renderer(input_win_comp, [&] {
         return vbox({
-                            center(text(" Enter name of new directory: ")),
-                            window(text(""), inputDirName->Render()) | size(WIDTH, GREATER_THAN, 15) | center,
+                            center(text(instr_text)),
+                            window(text(""), inputName->Render()) | size(WIDTH, GREATER_THAN, 15) | center,
                             separator(),
                             buttons->Render() | center
                     }) | border | bgcolor(Color::GrayDark) | clear_under;
     });
 
-    screen.Loop(modalWindow);
 
-    if (needToReconnect)
-        return false;
-    else
-        return true;
+    MenuOption menu_opt;
+    menu_opt.style_selected = bgcolor(Color::Blue);
+    menu_opt.style_focused = bgcolor(Color::BlueLight);
+    menu_opt.style_selected_focused = bgcolor(Color::BlueLight);
+    menu_opt.on_enter = [&] {
+        if (!changeDirectory(location, file_names[selected_file], file_entries, file_names,
+                             selected_file))
+            cancelButton->OnEvent(Event::Return);
+    };
+    auto files_view_menu = Menu(&file_entries, &selected_file, &menu_opt);
+
+    auto okButton = Button("   Ok   ", [&] {
+        path = location;
+        wind_depth = 0;
+    });
+
+    auto menu_comp = Container::Vertical({files_view_menu, okButton});
+    auto fileSelectWin = Renderer(menu_comp, [&] {
+        return vbox(
+                text("Choose location") | bold | center,
+                separator(),
+                text("Location: " + location),
+                separator(),
+                files_view_menu->Render() | vscroll_indicator | frame |
+                size(HEIGHT, LESS_THAN, 15) | size(HEIGHT, GREATER_THAN, 15),
+                separator(),
+                okButton->Render() | center
+        ) | border | bgcolor(Color::DarkGreen) | size(WIDTH, GREATER_THAN, screen.dimx() - 5);
+    });
+
+    auto modalWindComp = Container::Tab({
+                                                input_win_comp,
+                                                menu_comp
+                                        }, &wind_depth);
+
+    auto modalWind = Renderer(modalWindComp, [&] {
+        Element document = inputWindow->Render();
+        if (wind_depth == 1) {
+            document = dbox({
+                                    document,
+                                    fileSelectWin->Render() | clear_under | center,
+                            });
+        }
+        return document;
+    });
+
+    screen.Loop(modalWind);
+
+    return proceedWithOperation;
 }

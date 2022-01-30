@@ -8,15 +8,14 @@
 class ModalInputWin {
 public:
 
-    ModalInputWin(std::string instruction, std::string button_txt, bool winOnEnter) : instr_text(
-            std::move(instruction)), oper_button_txt(std::move(button_txt)), pickPathOnEnter(winOnEnter) {}
+    ModalInputWin(std::string instruction, std::string button_txt) : instr_text(
+            std::move(instruction)), oper_button_txt(std::move(button_txt)) {}
 
-    void showModalWindow();
+    bool showModalWindow(std::string &name);
 
 private:
     std::string instr_text;
     std::string oper_button_txt;
-    bool pickPathOnEnter;
 };
 
 

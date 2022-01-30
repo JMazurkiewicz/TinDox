@@ -10,10 +10,6 @@
 
 using std::string, std::vector;
 
-namespace ftxui {
-    class ScreenInteractive;
-}
-
 class Tui {
 public:
     Tui(std::string ip, int port) : server_ip(std::move(ip)), server_port(port) { system("clear"); }
@@ -49,6 +45,14 @@ private:
     bool deleteFileView(const string &file_to_delete);
 
     bool createDir();
+
+    bool renameFile(const string &old_name);
+
+    bool showPathSelectWind(const string &instr_text, const string &oper_button_text, string &path);
+
+    bool copyFile(const string &file_name, const string &current_location);
+
+    bool moveFile(const string &file_name, const string &current_location);
 };
 
 
