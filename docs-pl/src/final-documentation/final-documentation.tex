@@ -640,9 +640,17 @@ Połączenie z serwerem za pomocą klienta w aplikacji mobilnej zaimplementowane
 \section{Klient okienkowy}
 
 \subsection{Opis klienta}
-Połączenie z serwerem realizowane przez klienta okienkowego zaimplementowanego z użyciem języka Java i klasy Socket, która reprezentuje gniazda klienckie. Po uruchomieniu klient podejmie próbę połączenia z serwerem. W przypadku udanego połączenia aplikacja umożliwi interakcję ze zdalnym systemem plików.
+Połączenie z serwerem realizowane przez klienta okienkowego zaimplementowanego z użyciem języka Java i klasy klasy z pakietu java.nio implementującej nieblokujące IO. Pakiet ten jest częścią biblioteki standardowej Javy od wersji 1.4 i dostarcza narzędzi służących do przeprowadzania operacji wejścia/wyjścia zarówno w sposób blokujący, jak i nieblokujący. Po uruchomieniu klient podejmie próbę połączenia z serwerem. W przypadku udanego połączenia aplikacja umożliwi interakcję ze zdalnym systemem plików.
 
-\subsection{Narzędzia i biblioteki}
+\subsection{Podział na klasy}
+\begin{itemize}
+    \item \texttt{Connection} -- zawiera podstawowe elementy  połączenia, czyli SelectionKey, SocketChannel, oba ByteBuffery -wysyłający i odbierający.
+    \item \texttt{Client} -- obejmuje główną logikę aplikacji.
+    \item \texttt{ResponseAnalyzer} -- odpowiada za interpretacje wiadomości odebranych od serwera.
+    \item \texttt{ClientGUI} -- interfejs użytkownika.
+\end{itemize}
+
+\subsection{Narzędzia}
 \bgroup
     \begin{center}
         \def\arraystretch{1.3}
@@ -652,10 +660,7 @@ Połączenie z serwerem realizowane przez klienta okienkowego zaimplementowanego
             Język programowania & \texttt{Java}  \\
             \hline
             Kompilator & \texttt{javac} \\
-            \hline
-            Testy jednostkowe & \texttt{JUnit}  \\
-            \hline
-            System budowania & \texttt{Gradle}  \\
+        
         \end{tabular}
     \end{center}
 \egroup
@@ -663,9 +668,13 @@ Połączenie z serwerem realizowane przez klienta okienkowego zaimplementowanego
 \section{Klient konsolowy}
 
 \subsection{Opis klienta}
-Połączenie z serwerem realizowane poprzez klienta zaimplementowanego przy użyciu biblioteki \texttt{FTXUI} i języka \texttt{C++}. \href{https://github.com/ArthurSonzogni/FTXUI}{FTXUI \textit{(Functional Terminal (X) User interface)}} to biblioteka pozwalająca stworzyć zgrabne TUI. Wykorzystując jej elementy powstanie narzędzie do wykonywania operacji plikowych na zdalnym systemie plików.
+Połączenie z serwerem realizowane poprzez klienta zaimplementowanego przy użyciu biblioteki \texttt{FTXUI} i języka \texttt{C++}. \href{https://github.com/ArthurSonzogni/FTXUI}{FTXUI \textit{(Functional Terminal (X) User interface)}} to biblioteka pozwalająca stworzyć zgrabne TUI. Wykorzystując jej elementy powstało narzędzie do wykonywania operacji plikowych na zdalnym systemie plików.
 
-Klient konsolowy przeznaczony jest na system \texttt{Ubuntu}. Będzie kompilowany z wykorzystaniem \texttt{g++} oraz budowany z wykorzystaniem \texttt{CMake}.
+Klient konsolowy przeznaczony jest na system \texttt{Ubuntu}. Jest kompilowany z wykorzystaniem \texttt{g++} oraz budowany z wykorzystaniem \texttt{CMake}.
+
+Klient jest uruchamiany poprzez wywołanie pliku wykonywalnego \textbf{./cli} i wymaga zdefiniowanego katalogu \textit{TinDox}, który jest automatycznie tworzony.
+
+Narzędzie zostało przetestowane jedynie z poziomu funkcjonalności dostępnych dla użytkownika (\textit{UAT}). W ramach zrealizowanych scenariuszy testowych skupiono się na procesach podstawowych oraz przypadkach granicznych (brak łączności z serwerem w trakcie realizacji funkcjonalności, obsługa spacji w nazwach plików i katalogów).
 
 \subsection{Narzędzia i biblioteki}
 \bgroup
