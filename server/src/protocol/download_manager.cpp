@@ -14,7 +14,7 @@ namespace tds::protocol {
             m_token = std::move(token);
             m_file.open(m_token->get_file_path(), O_RDONLY);
             m_offset = m_token->get_file_offset();
-            m_file_size = token->get_file_size();
+            m_file_size = m_token->get_file_size();
         }
     }
 
