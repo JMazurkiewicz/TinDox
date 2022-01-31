@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <sstream>
 #include "modalwarningwin.h"
 
 #include "ftxui/component/component.hpp"
@@ -162,8 +161,16 @@ void Tui::showFilesView() {
                 logoutButton->OnEvent(Event::Return);
         }
     }, no_border_opt);
-    auto uploadButton = Button("Upload", screen.ExitLoopClosure(), no_border_opt);
-    auto downloadButton = Button("Download", screen.ExitLoopClosure(), no_border_opt);
+
+    auto uploadButton = Button("Upload", [&] {
+        if (!uploadFile() || !updateFilesEntries(location, file_entries, file_names))
+            logoutButton->OnEvent(Event::Return);
+    }, no_border_opt);
+
+    auto downloadButton = Button("Download", [&] {
+            if (!downloadFile(file_names[selected_file]) || !updateFilesEntries(location, file_entries, file_names))
+                logoutButton->OnEvent(Event::Return);
+    }, no_border_opt);
 
     auto bottom_buttons = Container::Horizontal(
             {createButton, renameButton, copyButton, moveButton, deleteButton, uploadButton, downloadButton});
@@ -528,4 +535,37 @@ bool Tui::showPathSelectWind(const string &instr_text, const string &oper_button
     screen.Loop(modalWind);
 
     return proceedWithOperation;
+}
+
+bool Tui::downloadFile(const string &file_name) {
+    if (!file_name.ends_with('/')) {
+        std::filesystem::create_directory(PATH_TO_FOLDER);
+        if(!tdpService.dl(file_name, PATH_TO_FOLDER + "/" + file_name) && !checkIfShouldReconnect()) {
+            ModalWarningWin errWin = ModalWarningWin(" Cannot download file ", file_name);
+            errWin.showModalWindow();
+        } else {
+            ModalWarningWin successWin = ModalWarningWin(" Downloaded file '" + file_name + "' into ", PATH_TO_FOLDER, false);
+            successWin.showModalWindow();
+        }
+    }
+    return !needToReconnect;
+}
+
+bool Tui::uploadFile() {
+    using namespace ftxui;
+
+    string file_name;
+    ModalInputWin uploadWind = ModalInputWin(" Upload from '" + PATH_TO_FOLDER + "' file: ", "Upload");
+
+    if (uploadWind.showModalWindow(file_name)) {
+        std::filesystem::create_directory(PATH_TO_FOLDER);
+        if (file_name.empty() || !tdpService.ul(file_name, PATH_TO_FOLDER + "/" + file_name)) {
+            if (!checkIfShouldReconnect()) {
+                ModalWarningWin errWind = ModalWarningWin(" Cannot upload file ", file_name);
+                errWind.showModalWindow();
+            }
+        }
+    }
+
+    return !needToReconnect;
 }

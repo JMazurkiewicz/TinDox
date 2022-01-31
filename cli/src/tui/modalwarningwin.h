@@ -9,14 +9,15 @@ class ModalWarningWin {
 
 public:
 
-    ModalWarningWin(std::string mess_first_line, std::string mess_second_line) : first_line(std::move(mess_first_line)),
-                                                                                 second_line(std::move(mess_second_line)) {}
+    ModalWarningWin(std::string mess_first_line, std::string mess_second_line, bool negative = true) : first_line(
+            std::move(mess_first_line)), second_line(std::move(mess_second_line)), isNegative(negative) {}
 
     void showModalWindow();
 
 private:
     std::string first_line;
     std::string second_line;
+    bool isNegative;
 };
 
 

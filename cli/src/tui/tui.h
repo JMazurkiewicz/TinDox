@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 #include <memory>
-#include "return_exception.h"
+#include <filesystem>
 #include "../tdpservice/tdpservice.h"
 
 using std::string, std::vector;
@@ -19,6 +19,7 @@ public:
     void runTDPClient();
 
 private:
+    const string PATH_TO_FOLDER = std::filesystem::current_path().string() + "/TinDox";
     TDPService tdpService;
     std::string server_ip;
     int server_port;
@@ -53,6 +54,10 @@ private:
     bool copyFile(const string &file_name, const string &current_location);
 
     bool moveFile(const string &file_name, const string &current_location);
+
+    bool downloadFile(const string &file_name);
+
+    bool uploadFile();
 };
 
 

@@ -5,7 +5,6 @@ add_library(tui STATIC
         tui.h
         modalwarningwin.cpp
         modalwarningwin.h
-        return_exception.h
         modalinputwin.cpp
         modalinputwin.h)
 

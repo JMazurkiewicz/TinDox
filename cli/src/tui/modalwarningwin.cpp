@@ -16,7 +16,7 @@ void ModalWarningWin::showModalWindow() {
                             center(text(second_line)),
                             separator(),
                             okButton->Render() | center
-                    }) | border | bgcolor(Color::Red) | clear_under;
+                    }) | border | bgcolor(isNegative? Color::Red : Color::GrayDark) | clear_under;
     });
 
     screen.Loop(modalWindow);
