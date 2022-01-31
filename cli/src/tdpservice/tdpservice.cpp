@@ -36,7 +36,8 @@ bool TDPService::logout() {
 }
 
 bool TDPService::auth(const string &login, const string &passwd) {
-    if (sendAndGetResponse("auth", "login", login, "passwd", passwd, "", "")
+    if (sendAndGetResponse("auth", "login", login.empty() ? "." : "'" + login + "'", "passwd",
+                           passwd.empty() ? "." : "'" + passwd + "'", "", "")
         && (error_code = responseAnalyzer.analyseSimpleResponse("auth", received_response, response_body, false)) == OK)
         return true;
     else
@@ -44,7 +45,7 @@ bool TDPService::auth(const string &login, const string &passwd) {
 }
 
 bool TDPService::mkdir(const string &name) {
-    if (sendAndGetResponse("mkdir", "name", name, "", "", "", "")
+    if (sendAndGetResponse("mkdir", "name", "'" + name + "'", "", "", "", "")
         &&
         (error_code = responseAnalyzer.analyseSimpleResponse("mkdir", received_response, response_body, false)) == OK)
         return true;
@@ -53,7 +54,7 @@ bool TDPService::mkdir(const string &name) {
 }
 
 bool TDPService::rm(const string &name) {
-    if (sendAndGetResponse("rm", "name", name, "", "", "", "")
+    if (sendAndGetResponse("rm", "name", "'" + name + "'", "", "", "", "")
         && (error_code = responseAnalyzer.analyseSimpleResponse("rm", received_response, response_body, true)) == OK)
         return true;
     else
@@ -61,7 +62,7 @@ bool TDPService::rm(const string &name) {
 }
 
 bool TDPService::rename(const string &oname, const string &nname) {
-    if (sendAndGetResponse("rename", "oname", oname, "nname", nname, "", "")
+    if (sendAndGetResponse("rename", "oname", "'" + oname + "'", "nname", "'" + nname + "'", "", "")
         &&
         (error_code = responseAnalyzer.analyseSimpleResponse("rename", received_response, response_body, false)) == OK)
         return true;
@@ -70,7 +71,7 @@ bool TDPService::rename(const string &oname, const string &nname) {
 }
 
 bool TDPService::cp(const string &name, const string &path) {
-    if (sendAndGetResponse("cp", "name", name, "path", path, "", "")
+    if (sendAndGetResponse("cp", "name", "'" + name + "'", "path", "'" + path + "'", "", "")
         && (error_code = responseAnalyzer.analyseSimpleResponse("cp", received_response, response_body, false)) == OK)
         return true;
     else
@@ -78,7 +79,7 @@ bool TDPService::cp(const string &name, const string &path) {
 }
 
 bool TDPService::mv(const string &name, const string &path) {
-    if (sendAndGetResponse("mv", "name", name, "path", path, "", "")
+    if (sendAndGetResponse("mv", "name", "'" + name + "'", "path", "'" + path + "'", "", "")
         && (error_code = responseAnalyzer.analyseSimpleResponse("mv", received_response, response_body, false)) == OK)
         return true;
     else
@@ -86,7 +87,7 @@ bool TDPService::mv(const string &name, const string &path) {
 }
 
 bool TDPService::cd(const string &path) {
-    if (sendAndGetResponse("cd", "path", path, "", "", "", "")
+    if (sendAndGetResponse("cd", "path", "'" + path + "'", "", "", "", "")
         && (error_code = responseAnalyzer.analyseSimpleResponse("cd", received_response, response_body, true)) == OK)
         return true;
     else
@@ -94,7 +95,7 @@ bool TDPService::cd(const string &path) {
 }
 
 bool TDPService::ls(const string &path, const string &size, const string &mod) {
-    if (sendAndGetResponse("ls", path.empty() ? "" : "path", path,
+    if (sendAndGetResponse("ls", path.empty() ? "" : "path", "'" + path + "'",
                            size.empty() ? "" : "size", size, mod.empty() ? "" : "mod", mod)
         && (error_code = responseAnalyzer.analyseMultilineResponse("ls", received_response, response_body)) == OK)
         return true;
@@ -103,7 +104,7 @@ bool TDPService::ls(const string &path, const string &size, const string &mod) {
 }
 
 bool TDPService::tree(const string &path) {
-    if (sendAndGetResponse("tree", path.empty() ? "" : "path", path,
+    if (sendAndGetResponse("tree", path.empty() ? "" : "path", "'" + path + "'",
                            "", "", "", "")
         && (error_code = responseAnalyzer.analyseMultilineResponse("tree", received_response, response_body)) == OK)
         return true;
@@ -150,7 +151,7 @@ bool TDPService::ul(const string &name, const string &path, const bool &retry) {
     size_t size = st.st_size;
 
     try {
-        if (sendAndGetResponse("ul", "name", name, "size", std::to_string(size), "retry", retry ? "true" : "false")
+        if (sendAndGetResponse("ul", "name", "'" + name + "'", "size", std::to_string(size), "retry", retry ? "true" : "false")
             &&
             (error_code = responseAnalyzer.analyseSimpleResponse("ul", received_response, response_body, true)) == OK) {
 
@@ -183,7 +184,7 @@ bool TDPService::dl(const string &name, const string &path, const bool &retry) {
     size_t size = st.st_size;
 
     try {
-        if (sendAndGetResponse("dl", "name", name, retry ? "size" : "", retry ? std::to_string(size) : "", "", "")
+        if (sendAndGetResponse("dl", "name", "'" + name + "'", retry ? "size" : "", retry ? std::to_string(size) : "", "", "")
             &&
             (error_code = responseAnalyzer.analyseSimpleResponse("dl", received_response, response_body, true)) == OK) {
 
